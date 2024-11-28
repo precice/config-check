@@ -21,10 +21,10 @@ def testfunc2(a, b):
 class CollectionOfRules:
     # rule, method for rule, arguments for method
     rules = [
-        [Rule(message="test"), testfunc, [[1,2,3]]],
-        [Rule(Severity.INFO, "Nope", "You can't do that!"), testfunc, [[4,5,6]]],
-        [Rule(Severity.WARNING, "NOOOOOPE!!!", "What's your problem?", "fuck off"), testfunc, [[7,8,9]]],
-        [Rule(Severity.INFO, "test right", "just testing with true output", "nothing"), testfunc2, [10,33]]
+        [Rule(message="test"), testfunc, [[1,2,3]]],# just testing... ignore it!!!
+        [Rule(Severity.INFO, "Nope", "You can't do that!"), testfunc, [[4,5,6]]],# just testing... ignore it!!!
+        [Rule(Severity.WARNING, "NOOOOOPE!!!", "What's your problem?", "fuck off"), testfunc, [[7,8,9]]],# just testing... ignore it!!!
+        [Rule(Severity.INFO, "test right", "just testing with true output", "nothing"), testfunc2, [10,33]]# just testing... ignore it!!!
     ]
 
     results:List[str] = []
