@@ -23,7 +23,7 @@ class Rule:
     def check_with(self, check_method, args) -> None:
         result = check_method(*args)
         if type(result) is not bool:
-            self.problem += " [Error]: The passed method does not return a bool value!"
+            print("[Error]: The passed method does not return a bool value! By Rule: " + self.problem)
             self.followed = False
         else:
             self.followed = result
