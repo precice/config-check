@@ -25,11 +25,11 @@ def other_test(a, b, c):
 class CollectionOfRules:
     # rule, method for rule, arguments for method
     rules = [
-        [Rule("test"), exists_edges, [[1,2,3]]],# just testing... ignore it!!!
-        [Rule("You can do that!", Severity.INFO), exists_edges, [[4,5,6]]],# just testing... ignore it!!!
-        [Rule("That's a big problem!", Severity.WARNING, "More testing!"), exists_edges, [[7,8,9]]],# just testing... ignore it!!!
-        [Rule("Just testing with true output", Severity.INFO, "nothing!"), exists_nodes, [[10,33]]],# just testing... ignore it!!!
-        [Rule("Incorrect return value", Severity.WARNING), other_test, [4, 6, 100]]
+        [Rule("Problem 1"), exists_edges, [[1,2,3]]],# just testing... ignore it!!!
+        [Rule("Problem 2", Severity.INFO), exists_edges, [[4,5,6]]],# just testing... ignore it!!!
+        [Rule("Problem 3", Severity.WARNING, "More testing!"), exists_edges, [[7,8,9]]],# just testing... ignore it!!!
+        [Rule("Problem 4", Severity.INFO, "nothing!"), exists_nodes, [[10,33]]],# just testing... ignore it!!!
+        [Rule("Problem 5", Severity.WARNING, "Just fix it!"), other_test, [4, 6, 100]]# just testing... ignore it!!!
     ]
 
     results:List[str] = []

@@ -11,7 +11,7 @@ class Rule:
     severity:Severity
     possible_solutions:str
     followed:bool
-    
+
     numbers_not_followed:int = 0 #static attribute: do not use 'self.numbers_not_followed'
 
     def __init__(self, problem:str, severity:Severity = Severity.INFO, possible_solutions:str = "") -> None:
@@ -23,7 +23,8 @@ class Rule:
     def check_with(self, check_method, args) -> None:
         result = check_method(*args)
         if type(result) is not bool:
-            print("Error : The passed method does not return a bool value! By Rule: " + self.problem)
+            self.problem += " [Error]: The passed method does not return a bool value!"
+            self.followed = False
         else:
             self.followed = result
 
@@ -31,7 +32,7 @@ class Rule:
         if (self.followed):
             return ""
         Rule.numbers_not_followed += 1
-        out:str = f"[{Rule.numbers_not_followed:2}.]" + "[" + self.severity.value + "] : " + self.problem
+        out:str = f"[{Rule.numbers_not_followed:2}.]" + "[" + self.severity.value + "]: " + self.problem
         if (len(self.possible_solutions) > 0):
-            out += "\n\t[Possible Solution] : " + self.possible_solutions
+            out += "\n\t[Possible Solution]: " + self.possible_solutions
         return out
