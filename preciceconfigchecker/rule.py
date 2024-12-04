@@ -7,11 +7,6 @@ class Severity(Enum):
 
 
 class Rule:
-    problem:str
-    severity:Severity
-    possible_solutions:str
-    followed:bool
-
     numbers_not_followed:int = 0 #static attribute: do not use 'self.numbers_not_followed'
 
     def __init__(self, problem:str, severity:Severity = Severity.INFO, possible_solutions:str = "") -> None:
@@ -31,8 +26,11 @@ class Rule:
     def get_result(self) -> str:
         if (self.followed):
             return ""
+
         Rule.numbers_not_followed += 1
         out:str = f"[{Rule.numbers_not_followed:2}.]" + "[" + self.severity.value + "]: " + self.problem
+
         if (len(self.possible_solutions) > 0):
             out += "\n\t[Possible Solution]: " + self.possible_solutions
+
         return out
