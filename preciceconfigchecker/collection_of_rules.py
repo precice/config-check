@@ -3,7 +3,8 @@ from rule import Rule
 from typing import List
 
 
-# methods for checking rules
+# Methods for checking rules.
+# Methods must return a bool value!
 # just testing... ignore it!!!
 def exists_edges(edges:List[int]):
     testList:List[int] = [1,2,3,4,5,6]
@@ -23,25 +24,24 @@ def other_test(a, b, c):
 
 
 class CollectionOfRules:
-    # rule, method for rule, arguments for method
+    # 3-tuples (rule, method for rule, arguments[] for method)
+    # Template: (Rule("problem", Severity.INFO, "possible solutions"), myfunc, [])
     rules = [
-        [Rule("Problem 1"), exists_edges, [[1,2,3]]],# just testing... ignore it!!!
-        [Rule("Problem 2", Severity.INFO), exists_edges, [[4,5,6]]],# just testing... ignore it!!!
-        [Rule("Problem 3", Severity.WARNING, "More testing!"), exists_edges, [[7,8,9]]],# just testing... ignore it!!!
-        [Rule("Problem 4", Severity.INFO, "nothing!"), exists_nodes, [[10,33]]],# just testing... ignore it!!!
-        [Rule("Problem 5", Severity.WARNING, "Just fix it!"), other_test, [4, 6, 100]]# just testing... ignore it!!!
+        (Rule("Problem 1"), exists_edges, [[1,2,3]]),# just testing... ignore it!!!
+        (Rule("Problem 2", Severity.INFO), exists_edges, [[4,5,6]]),# just testing... ignore it!!!
+        (Rule("Problem 3", Severity.WARNING, "More testing!"), exists_edges, [[7,8,9]]),# just testing... ignore it!!!
+        (Rule("Problem 4", Severity.INFO, "nothing!"), exists_nodes, [[10,33]]),# just testing... ignore it!!!
+        (Rule("Problem 5", Severity.WARNING, "Just fix it!"), other_test, [4, 6, 100])# just testing... ignore it!!!
     ]
 
     results:List[str] = []
     
     def check_all_rules(self) -> None:
-        for r in self.rules:
-            rule:Rule = r[0]
-            method = r[1]
-            arguments = r[2]
+        rule:Rule
+        for (rule, method, arguments) in self.rules:
             rule.check_with(method, arguments)
-            result:str = rule.get_result()
-            if (len(result) > 0):
+            if not rule.has_followed():
+                result:str = rule.get_result()
                 self.results.append(result)
 
     def print_result(self) -> None:
