@@ -6,5 +6,6 @@ valid.
 - Warning: `<data: />` is never used
 - Info (maybe only on log level debug): At least two participants to make sense (only valid use case we could think of: one participant using PreCICE's implicit coupling functions/mappings etc. on multiple meshes, so they don't have to implement implicit coupling themselves - so no warning if there are multiple meshes?)
 - Socket-Edges must be in same direction as data flow? Is this an error, because `precice-tools check` does not complain.
+- Info: 4 participants where only 2 ever talk to each other (A with B and C with D) should result in a warning telling the user they might want to do two separate setups.
 - To be defined: Config checker and config visualizer currently do not care about existence of provide-mesh and receive-mesh
 - More valid configs in the integration tests: https://github.com/precice/precice/tree/develop/tests . Test them and check if they are actually valid.
