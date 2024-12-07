@@ -1,6 +1,6 @@
-from rule import Severity
-from rule import Rule
-from typing import List, Callable
+from rule import Rule, Severity
+from violation import Problem
+from typing import Callable, List
 
 
 # Methods for checking rules.
@@ -8,7 +8,7 @@ from typing import List, Callable
 
 
 # 3-tuples (rule, method for rule, arguments[] for method)
-# Template: (Rule("problem", Severity.INFO, "possible solutions"), myfunc, [])
+# Template: (Problem.DATA_NOT_USED, Severity.INFO), myfunc, [])
 rules:tuple[Rule, Callable, tuple] = [
 ]
 
