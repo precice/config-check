@@ -1,0 +1,7 @@
+[project]
+name = "precice-config-checker"
+version = "0.0.1"
+dependencies = [
+    "precice-config-graph @ git@github.com/precice-forschungsprojekt/config-graph",
+    "pyprecice>=3.1.2",
+]
