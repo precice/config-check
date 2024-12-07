@@ -17,7 +17,6 @@ class Violation:
     def get_output(self) -> str:
         explanation:str = ""
         possible_solutions:List[str] = []
-
         match self.problem:
             case Problem.PARTICIPANT_MESH_NOT_CONNECTED: # data[0] is MeshNode, data[1] is ParticipantNode
                 explanation = "Mesh " + str(self.data[0]) + " is not connected to Participant " + str(self.data[1])
@@ -29,7 +28,6 @@ class Violation:
             case _:
                 print("[ERROR]: unknown violation")
                 return
-
         return Violation.create_output(explanation, possible_solutions)
     
     def create_output(explanation:str, possible_solutions:List[str]) -> str:
