@@ -1,3 +1,5 @@
+import sys
+
 from precice_config_graph import graph, xml_processing
 from pyprecice import Participant
 from collection_of_rules import CollectionOfRules
@@ -19,4 +21,4 @@ if __name__ == "__main__":
     # Step 2: Detect more issues through the use of a graph
     root = xml_processing.parse_file(path)
     graph.get_graph(root)
-    test_rule()
+    test_rules()
