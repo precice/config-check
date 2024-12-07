@@ -7,12 +7,9 @@
 #    # Step 2: Detect more issues through the use of a graph
 #    buildGraph("precice-config.xml")
 
-from collection_of_rules import CollectionOfRules
+from collection_of_rules import check_all_rules, print_result
 
-def test_rules() -> None:
-    collection_of_rules:CollectionOfRules = CollectionOfRules()
-    collection_of_rules.check_all_rules()
-    collection_of_rules.print_result()
 
 if __name__ == "__main__":
-    test_rules()
+    check_all_rules()
+    print_result()
