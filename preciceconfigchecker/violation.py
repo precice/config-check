@@ -32,14 +32,7 @@ class Violation:
     
     def create_output(explanation:str, possible_solutions:List[str]) -> str:
         Violation.numbers += 1
-        out:str = f"\n[{Violation.numbers:3}.]: " + explanation
-        if (len(possible_solutions) == 1):
-            out += "\n\t[Possible Solution]:"
-            out += "\n\t" + possible_solutions[0]
-        elif (len(possible_solutions) > 1):
-            out += "\n\t[Possible Solutions]:"
-            number:int = 0
-            for possible_solution in possible_solutions:
-                number += 1
-                out += f"\n\t[{number:2}.] " + possible_solution
+        out:str = f"\n({Violation.numbers:3}.): " + explanation
+        for possible_solution in possible_solutions:
+            out += "\n\t- " + possible_solution
         return out
