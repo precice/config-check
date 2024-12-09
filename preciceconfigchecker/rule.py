@@ -13,19 +13,15 @@ class Rule:
         self.problem = problem
         self.severity = severity
         self.violations:List[Violation] = []
-        self.followed = False
 
     def check_with(self, check_method:Callable, args:tuple) -> None:
         result:List = check_method(*args)
-        if (len(result) > 0):
-            self.followed = False
-            for data in result:
-                self.violations.append(Violation(self.problem, data))
-        else:
-            self.followed = True
+        for data in result:
+            violation = Violation(self.problem, data)
+            self.violations.append(violation)
 
     def has_followed(self) -> bool:
-        return self.followed
+        return (len(self.violations) == 0)
 
     def get_result(self) -> str:
         if self.has_followed():
