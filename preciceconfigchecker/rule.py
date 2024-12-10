@@ -1,11 +1,6 @@
-from enum import Enum
 from typing import List, Callable
 from violation import Violation, Problem
-
-
-class Severity(Enum):
-    INFO = "Info"
-    WARNING = "Warning"
+from severity import Severity
 
 
 class Rule:

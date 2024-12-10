@@ -1,4 +1,5 @@
-from rule import Rule, Severity
+from rule import Rule
+from severity import Severity
 from violation import Problem
 from typing import Callable, List
 
