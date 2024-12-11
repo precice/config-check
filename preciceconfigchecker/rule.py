@@ -1,27 +1,33 @@
-from typing import List, Callable
-from violation import Violation, Problem
+from typing import List
+from abc import ABC, abstractmethod
+from violation import Violation
 from severity import Severity
 
 
-class Rule:
-    def __init__(self, problem:Problem, severity:Severity = Severity.INFO) -> None:
-        self.problem = problem
-        self.severity = severity
-        self.violations:List[Violation] = []
+class Rule(ABC):
+    @property
+    @abstractmethod
+    def problem(self) -> str: pass
+    @property
+    @abstractmethod
+    def severity(self) -> Severity: pass
 
-    def check_with(self, check_method:Callable, args:tuple) -> None:
-        result:List = check_method(*args)
-        for data in result:
-            violation = Violation(self.problem, data)
-            self.violations.append(violation)
+    violations:List[Violation] = []
 
-    def has_followed(self) -> bool:
+    complete_output:str = ""
+
+    @abstractmethod
+    def check(self) -> None: pass
+
+    def satisfied(self) -> bool:
         return (len(self.violations) == 0)
 
-    def get_result(self) -> str:
-        if self.has_followed():
-            return ""
-        out:str = "[" + self.severity.value + "]: " + self.problem.value
+    def collect_output(self) -> None:
+        if self.satisfied():
+            return
+        out:str = "[" + self.severity.value + "]: " + self.problem
         for violation in self.violations:
-            out += violation.get_output()
-        return out
+            out += violation.create_output()
+        if (len(Rule.complete_output) > 0):
+            out = "\n" + out
+        Rule.complete_output += out
