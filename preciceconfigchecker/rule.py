@@ -3,6 +3,8 @@ from abc import ABC, abstractmethod
 from violation import Violation
 from severity import Severity
 
+rules = []
+
 
 class Rule(ABC):
     @property
@@ -12,9 +14,17 @@ class Rule(ABC):
     @abstractmethod
     def severity(self) -> Severity: pass
 
+    complete_output:str = ""
     violations:List[Violation] = []
 
-    complete_output:str = ""
+    @abstractmethod
+    def __init__(self) -> None:
+        self.violations = []
+        self.complete_output = ""
+        self.add_self_to_list()
+
+    def add_self_to_list(self) -> None:
+        rules.append(self)
 
     @abstractmethod
     def check(self) -> None: pass
@@ -25,9 +35,12 @@ class Rule(ABC):
     def collect_output(self) -> None:
         if self.satisfied():
             return
-        out:str = "[" + self.severity.value + "]: " + self.problem
+        out:str = f"[{self.severity.value}]: {self.problem}"
         for violation in self.violations:
             out += violation.create_output()
-        if (len(Rule.complete_output) > 0):
-            out = "\n" + out
-        Rule.complete_output += out
+        if (len(self.complete_output) > 0):
+            out = f"\n{out}"
+        self.complete_output = out
+
+    def get_complete_output(self) -> str:
+        return self.complete_output
