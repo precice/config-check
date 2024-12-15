@@ -1,46 +1,74 @@
-from typing import List
 from abc import ABC, abstractmethod
-from violation import Violation
+from typing import List
 from severity import Severity
-
-rules = []
+from violation import Violation
 
 
 class Rule(ABC):
-    @property
-    @abstractmethod
-    def problem(self) -> str: pass
-    @property
-    @abstractmethod
-    def severity(self) -> Severity: pass
+    """
+    Abstract Class 'Rule'. Checking a 'Rule' for violations and producing formatted output.
+    """
 
-    complete_output:str = ""
-    violations:List[Violation] = []
+    def __init__(self, severity:Severity, problem:str) -> None:
+        """
+        Initializes an Rule object.
 
-    @abstractmethod
-    def __init__(self) -> None:
-        self.violations = []
-        self.complete_output = ""
-        self.add_self_to_list()
-
-    def add_self_to_list(self) -> None:
+        Args:
+            severity (Severity): Type
+            problem (str): Short explanation of what the rule is supposed to check in general.
+        """
+        self.severity = severity
+        self.problem = problem
+        self.violations:List[Violation] = []
         rules.append(self)
 
     @abstractmethod
-    def check(self) -> None: pass
+    def check(self) -> None:
+        """
+        @abstractmethod: Defines how a 'Rule' should be checked
 
+        Tip: Use 'self.violations.append(self.MyViolation(...))' to save the results directly. MyViolation should be an inner class of type Violation.
+        """
+        pass
+    
     def satisfied(self) -> bool:
-        return (len(self.violations) == 0)
+        """
+        Shows when the 'Rule' is satisfied
 
-    def collect_output(self) -> None:
+        Returns:
+            bool: TRUE if there are no violations after the check
+        """
+        return (self.violations.__len__() == 0)
+
+    def print_result(self) -> None:
+        """
+        If the 'Rule' has violations, these will be printed.
+        """
         if self.satisfied():
             return
-        out:str = f"[{self.severity.value}]: {self.problem}"
+        print(f"[{self.severity.value}]: {self.problem}")
         for violation in self.violations:
-            out += violation.create_output()
-        if (len(self.complete_output) > 0):
-            out = f"\n{out}"
-        self.complete_output = out
+            formatted_violation = violation.format()
+            print(formatted_violation)
 
-    def get_complete_output(self) -> str:
-        return self.complete_output
+
+
+# To handle all the rules
+
+rules:List[Rule] = []
+"""List of all initialized rules. Info: Each rule puts itself on this list when initialized."""
+
+def check_all_rules() -> None:
+    """
+    Checks all rules for violations
+    """
+    for rule in rules:
+        rule.check()
+
+def print_all_results() -> None:
+    """
+    Prints all existing violations of all rules
+    """
+    for rule in rules:
+        if not rule.satisfied():
+            rule.print_result()
