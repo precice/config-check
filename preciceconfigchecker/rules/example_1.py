@@ -18,10 +18,13 @@ class Rule_1(Rule):
                     f"Connect {self.node_a} and {self.node_b}"
             ]
 
+    severity = Severity.INFO
+    problem = "No connection between two nodes"
+
     def check(self) -> None:
         #Find violations in the graph and add them to the violations list in Rule.
         self.violations.append(self.MyViolation("Node-A", "Node-B"))
         self.violations.append(self.MyViolation("Node-C", "Node-D"))
         self.violations.append(self.MyViolation("Node-E", "Node-F"))
     
-Rule_1(Severity.INFO, "No connection between two nodes")
+Rule_1()
