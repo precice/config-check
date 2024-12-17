@@ -1,37 +1,78 @@
-from enum import Enum
+from abc import ABC, abstractmethod
+from typing import List
+from severity import Severity
+from violation import Violation
 
 
-class Severity(Enum):
-    INFO = "Info"
-    WARNING = "Warning"
+class Rule(ABC):
+    """
+    Abstract Class 'Rule'. Checking a 'Rule' for violations and producing formatted output.
+    """
+
+    @property
+    @abstractmethod
+    def severity(self) -> Severity: pass
+    """@abstract property: Type"""
+
+    @property
+    @abstractmethod
+    def problem(self) -> str: pass
+    """@abstract property: Short explanation of what the rule is supposed to check in general."""
+
+    def __init__(self) -> None:
+        """
+        Initializes an Rule object.
+        """
+        self.violations:List[Violation] = []
+        rules.append(self)
+
+    @abstractmethod
+    def check(self) -> None:
+        """
+        @abstractmethod: Defines how a 'Rule' should be checked
+
+        Tip: Use 'self.violations.append(self.MyViolation(...))' to save the results directly. MyViolation should be an inner class of type Violation.
+        """
+        pass
+    
+    def satisfied(self) -> bool:
+        """
+        Shows when the 'Rule' is satisfied
+
+        Returns:
+            bool: TRUE if there are no violations after the check
+        """
+        return (self.violations.__len__() == 0)
+
+    def print_result(self) -> None:
+        """
+        If the 'Rule' has violations, these will be printed.
+        """
+        if self.satisfied():
+            return
+        print(f"[{self.severity.value}]: {self.problem}")
+        for violation in self.violations:
+            formatted_violation = violation.format()
+            print(formatted_violation)
 
 
-class Rule:
-    severity:Severity
-    name:str
-    message:str
-    possible_solutions:str
-    followed:bool = True
-    numbers_not_followed:int = 0
 
-    def __init__(self, severity:Severity = Severity.INFO, name:str = "Rule", message:str = "", possible_solutions:str = "") -> None:
-        self.severity = severity
-        self.name = name
-        self.message = message
-        self.possible_solutions = possible_solutions
+# To handle all the rules
 
-    def check_with(self, check_method, args) -> None:
-        result = check_method(*args)
-        if type(result) is not bool:
-            print("Error : The passed method does not return a bool value!")
-        else:
-            self.followed = result
+rules:List[Rule] = []
+"""List of all initialized rules. Info: Each rule puts itself on this list when initialized."""
 
-    def get_result(self) -> str:
-        if (self.followed):
-            return ""
-        Rule.numbers_not_followed += 1
-        out:str = f"[{Rule.numbers_not_followed:2}.]" + "[" + self.severity.value + "][" + self.name + "] : " + self.message
-        if (len(self.possible_solutions) > 0):
-            out += "\n\t[Possible Solution] : " + self.possible_solutions
-        return out
+def check_all_rules() -> None:
+    """
+    Checks all rules for violations
+    """
+    for rule in rules:
+        rule.check()
+
+def print_all_results() -> None:
+    """
+    Prints all existing violations of all rules
+    """
+    for rule in rules:
+        if not rule.satisfied():
+            rule.print_result()
