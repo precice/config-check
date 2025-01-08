@@ -21,7 +21,7 @@ class Rule_1(Rule):
                     f"Connect {self.node_a} and {self.node_b}"
                     ]
 
-    severity = Severity.INFO
+    severity = Severity.WARNING
     problem = "No connection between two nodes"
 
     def check(self) -> None:
