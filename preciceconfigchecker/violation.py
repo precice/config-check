@@ -10,14 +10,20 @@ class Violation(ABC):
     counter:int = 0
     """Static Attribute: Do not use 'self.counter', use 'Violation.counter'"""
 
+    line:int = None
+    """Attribute: Do not use 'Violation.line', use 'self.line'"""
+
     @abstractmethod
-    def __init__(self) -> None:
+    def __init__(self, line:int) -> None:
         """
         @abstractmethod: Initializes an 'Violation' object.
 
-        Tip: When overwriting, it is recommended to pass on appropriate attributes. Later these attributes can be called with 'self.attribute'.
+        Args:
+            line (int): The line in the config.xml file of the violation.
+
+        Hint: When overwriting, it is recommended to pass on appropriate attributes. Later these attributes can be called with 'self.attribute'.
         """
-        pass
+        self.line = line
 
     @abstractmethod
     def format_explanation(self) -> str:
@@ -27,7 +33,7 @@ class Violation(ABC):
         Returns:
             str: formatted explanation
 
-        Tip: Use the attributes defined in '__init__()'.
+        Hint: Use the attributes defined in '__init__()'.
         """
         pass
 
@@ -39,7 +45,7 @@ class Violation(ABC):
         Returns:
             List[str]: of formatted possible solutions
         
-        Tip: Use the attributes defined in '__init__()'.
+        Hint: Use the attributes defined in '__init__()'.
         """
         pass
 
@@ -53,7 +59,8 @@ class Violation(ABC):
         explanation:str = self.format_explanation()
         possible_solutions:List[str] = self.format_possible_solutions()
         Violation.counter += 1
-        out:str = f"({Violation.counter:3}.): {explanation}"
+        existing_line:str = f" (Line {self.line})" if self.line else ""
+        out:str = f"({Violation.counter:3}.){existing_line}: {explanation}"
         for possible_solution in possible_solutions:
                 out += f"\n\t- {possible_solution}"
         return out
