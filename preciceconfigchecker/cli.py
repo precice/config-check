@@ -21,6 +21,7 @@ if __name__ == "__main__":
     graph = graph.get_graph(root)
 
     # individual checks need the graph
+    print("Checking all rules...")
     check_all_rules(graph)
 
     # if the user uses severity=debug, then the severity has to be passed here as an argument
