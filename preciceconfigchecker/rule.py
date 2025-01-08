@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List
+
+from networkx import DiGraph
+
 from severity import Severity
 from violation import Violation
 
@@ -11,30 +14,34 @@ class Rule(ABC):
 
     @property
     @abstractmethod
-    def severity(self) -> Severity: pass
+    def severity(self) -> Severity:
+        pass
+
     """@abstract property: Type"""
 
     @property
     @abstractmethod
-    def problem(self) -> str: pass
+    def problem(self) -> str:
+        pass
+
     """@abstract property: Short explanation of what the rule is supposed to check in general."""
 
     def __init__(self) -> None:
         """
-        Initializes an Rule object.
+        Initializes a Rule object.
         """
-        self.violations:List[Violation] = []
+        self.violations: List[Violation] = []
         rules.append(self)
 
     @abstractmethod
-    def check(self) -> None:
+    def check(self, graph: DiGraph) -> None:
         """
         @abstractmethod: Defines how a 'Rule' should be checked
 
         Tip: Use 'self.violations.append(self.MyViolation(...))' to save the results directly. MyViolation should be an inner class of type Violation.
         """
         pass
-    
+
     def satisfied(self) -> bool:
         """
         Shows when the 'Rule' is satisfied
@@ -42,7 +49,7 @@ class Rule(ABC):
         Returns:
             bool: TRUE if there are no violations after the check
         """
-        return (self.violations.__len__() == 0)
+        return self.violations.__len__() == 0
 
     def print_result(self) -> None:
         """
@@ -56,18 +63,19 @@ class Rule(ABC):
             print(formatted_violation)
 
 
-
 # To handle all the rules
 
-rules:List[Rule] = []
+rules: List[Rule] = []
 """List of all initialized rules. Info: Each rule puts itself on this list when initialized."""
 
-def check_all_rules() -> None:
+
+def check_all_rules(graph: DiGraph) -> None:
     """
     Checks all rules for violations
     """
     for rule in rules:
-        rule.check()
+        rule.check(graph)
+
 
 def print_all_results() -> None:
     """
