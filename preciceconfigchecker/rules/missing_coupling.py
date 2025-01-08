@@ -34,8 +34,13 @@ class MissingCouplingRule(Rule):
         if nx.is_empty(coupling_nodes) and not nx.is_empty(multi_coupling_nodes):
             self.violations.append(self.MissingCouplingViolation())
 
-# filters the graph 
+
 def filter_coupling_nodes(node) -> bool:
+    """
+    A function filtering coupling nodes in the graph.
+    :param node: the node to check
+    :return: true, if the node is a coupling node.
+    """
     if isinstance(node, CouplingNode):
         return True
     else:
@@ -43,6 +48,11 @@ def filter_coupling_nodes(node) -> bool:
 
 
 def filter_multi_coupling_nodes(node) -> bool:
+    """
+    A function filtering multi-coupling nodes in the graph.
+    :param node: the node to check
+    :return: true, if the node is a multi-coupling node.
+    """
     if isinstance(node, MultiCouplingNode):
         return True
     else:
