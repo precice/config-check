@@ -5,6 +5,7 @@ from rule import check_all_rules, print_all_results
 import rules.example_1
 import rules.example_2
 import rules.example_3
+import rules.example_4
 
 if __name__ == "__main__":
     path = sys.argv[1]

@@ -11,13 +11,15 @@ class Rule(ABC):
 
     @property
     @abstractmethod
-    def severity(self) -> Severity: pass
-    """@abstract property: Type"""
+    def severity(self) -> Severity:
+        """@abstract property: Type"""
+        pass
 
     @property
     @abstractmethod
-    def problem(self) -> str: pass
-    """@abstract property: Short explanation of what the rule is supposed to check in general."""
+    def problem(self) -> str:
+        """@abstract property: Short explanation of what the rule is supposed to check in general."""
+        pass
 
     def __init__(self) -> None:
         """
@@ -31,7 +33,7 @@ class Rule(ABC):
         """
         @abstractmethod: Defines how a 'Rule' should be checked
 
-        Tip: Use 'self.violations.append(self.MyViolation(...))' to save the results directly. MyViolation should be an inner class of type Violation.
+        Hint: Use 'self.violations.append(self.MyViolation(...))' to save the results directly. MyViolation should be an inner class of type Violation.
         """
         pass
     
@@ -74,5 +76,4 @@ def print_all_results() -> None:
     Prints all existing violations of all rules
     """
     for rule in rules:
-        if not rule.satisfied():
-            rule.print_result()
+        rule.print_result()
