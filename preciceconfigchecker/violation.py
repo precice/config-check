@@ -19,7 +19,7 @@ class Violation(ABC):
         @abstractmethod: Initializes an 'Violation' object.
 
         Args:
-            line (int): in which this violation is located.
+            line (int): The line in the config.xml file of the violation.
 
         Hint: When overwriting, it is recommended to pass on appropriate attributes. Later these attributes can be called with 'self.attribute'.
         """
