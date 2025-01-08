@@ -13,7 +13,7 @@ class Violation(ABC):
     @abstractmethod
     def __init__(self) -> None:
         """
-        @abstractmethod: Initializes an 'Violation' object.
+        @abstractmethod: Initializes a 'Violation' object.
 
         Tip: When overwriting, it is recommended to pass on appropriate attributes. Later these attributes can be called with 'self.attribute'.
         """
