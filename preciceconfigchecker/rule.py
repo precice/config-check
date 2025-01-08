@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List
+
+from networkx import Graph
+
 from severity import Severity
 from violation import Violation
 
@@ -27,7 +30,7 @@ class Rule(ABC):
         rules.append(self)
 
     @abstractmethod
-    def check(self) -> None:
+    def check(self,*args) -> None:
         """
         @abstractmethod: Defines how a 'Rule' should be checked
 

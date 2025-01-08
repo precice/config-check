@@ -8,6 +8,8 @@ import rules.example_3
 
 if __name__ == "__main__":
     path = sys.argv[1]
+    severity = sys.argv[2] # no arg = only error and warning
+    # arg = debug => also debug infos
 
     print(f"Checking file at {path}")
 
@@ -16,6 +18,7 @@ if __name__ == "__main__":
 
     # Step 2: Detect more issues through the use of a graph
     root = xml_processing.parse_file(path)
-    graph.get_graph(root)
-    check_all_rules()
-    print_all_results()
+    graph = graph.get_graph(root)
+
+    check_all_rules(graph)
+    print_all_results(severity)
