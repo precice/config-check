@@ -3,10 +3,9 @@ from typing import List
 import networkx as nx
 from networkx import DiGraph
 from precice_config_graph.nodes import CouplingNode, MultiCouplingNode
-
-from ..rule import Rule
-from ..severity import Severity
-from ..violation import Violation
+from rule import Rule
+from severity import Severity
+from violation import Violation
 
 
 class MissingCouplingRule(Rule):
@@ -33,7 +32,7 @@ class MissingCouplingRule(Rule):
         multi_coupling_nodes = nx.subgraph_view(graph, filter_node=filter_multi_coupling_nodes)
 
         # If both subgraphs are empty, no coupling nodes exist
-        if nx.is_empty(coupling_nodes) and not nx.is_empty(multi_coupling_nodes):
+        if nx.is_empty(coupling_nodes) and nx.is_empty(multi_coupling_nodes):
             self.violations.append(self.MissingCouplingViolation())
 
 
