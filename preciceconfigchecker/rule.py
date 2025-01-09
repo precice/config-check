@@ -5,6 +5,7 @@ from networkx import DiGraph
 
 from severity import Severity
 from violation import Violation
+import color as c
 
 
 class Rule(ABC):
@@ -49,16 +50,19 @@ class Rule(ABC):
         """
         return self.violations.__len__() == 0
 
-    def print_result(self) -> None:
+    def print_result(self, debug:bool) -> None:
         """
         If the 'Rule' has violations, these will be printed.
         """
         if self.satisfied():
-            return
-        print(f"[{self.severity.value}]: {self.problem}")
-        for violation in self.violations:
-            formatted_violation = violation.format()
-            print(formatted_violation)
+            if debug:
+                print(f"[{Severity.DEBUG.value}]: '{c.dyeing(self.__class__.__name__, c.purple)}' is satisfied.")
+        else:
+            beginn:str = f"[{self.severity.value},{Severity.DEBUG.value}]: ({c.dyeing(self.__class__.__name__, c.purple)})" if debug else f"[{self.severity.value}]:"
+            print(f"{beginn} {self.problem}")
+            for violation in self.violations:
+                formatted_violation = violation.format()
+                print(formatted_violation)
 
 
 # To handle all the rules
@@ -75,9 +79,9 @@ def check_all_rules(graph: DiGraph) -> None:
         rule.check(graph)
 
 
-def print_all_results() -> None:
+def print_all_results(debug:bool) -> None:
     """
     Prints all existing violations of all rules
     """
     for rule in rules:
-        rule.print_result()
+        rule.print_result(debug)

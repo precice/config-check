@@ -1,7 +1,8 @@
 from typing import List
+
 from rule import Rule
-from violation import Violation
 from severity import Severity
+from violation import Violation
 
 class Rule_4(Rule):
     class MyViolation(Violation):

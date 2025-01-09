@@ -1,4 +1,4 @@
-import sys
+import argparse
 
 from severity import Severity
 import color as c
@@ -12,26 +12,22 @@ from rule import check_all_rules, print_all_results
 import rules.missing_coupling
 
 path:str = None
-debug = False
+debug:bool = False
 
 if __name__ == "__main__":
-    arguments = sys.argv
-    if len(arguments) > 3:
-        sys.exit(f"[{Severity.ERROR.value}]: too many arguments.")
-    for argument in arguments:
-        if argument == arguments[0]:
-            pass
-        elif argument.endswith(".xml"):
-            path = argument
-        elif argument == "--debug":
-            debug = True
-            print(f"[{Severity.DEBUG.value}]: debug mode enabled")
-        else:
-            sys.exit(f"[{Severity.ERROR.value}]: {c.dyeing(argument, c.cyan)} is an invalid argument.")
-    if not path:
-        sys.exit(f"[{Severity.ERROR.value}]: No path was passed as an argument.")
+    parser = argparse.ArgumentParser(usage='%(prog)s', description='checks a PreCICE config.xml file for logical errors.')
+    parser.add_argument('src', type=argparse.FileType('r'), help='path of the config.xml source file.')
+    parser.add_argument('-d', '--debug', action='store_true', help='enables debug mode')
+    args = parser.parse_args()
 
-    print(f"Checking file at {c.dyeing(path, c.cyan)}")
+    if args.debug:
+        debug = args.debug
+        print(f"[{Severity.DEBUG.value}]: debug mode enabled")
+    if args.src.name.endswith('.xml'):
+        path = args.src.name
+        print(f"checking file at '{c.dyeing(path, c.cyan)}'")
+    else:
+        print(f"[{Severity.ERROR.value}]: '{c.dyeing(args.src.name, c.cyan)}' is not a xml file")
 
     # Step 1: Use preCICE itself to check for basic errors
     # TODO: Participant.check(...)
@@ -41,9 +37,9 @@ if __name__ == "__main__":
     graph = graph.get_graph(root)
 
     # individual checks need the graph
-    print("Checking all rules...")
+    print("\nChecking all rules...")
     check_all_rules(graph)
 
     # if the user uses severity=debug, then the severity has to be passed here as an argument
-    print_all_results()
+    print_all_results(debug)
     print("All rules checked")
