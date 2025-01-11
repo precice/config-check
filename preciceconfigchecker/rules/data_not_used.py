@@ -4,9 +4,9 @@ import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import DataNode
 
-from ..rule import Rule
-from ..severity import Severity
-from ..violation import Violation
+from rule import Rule
+from severity import Severity
+from violation import Violation
 
 
 class DataNotUsedRule(Rule):

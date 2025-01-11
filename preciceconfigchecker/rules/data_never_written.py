@@ -4,9 +4,9 @@ import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import DataNode, MeshNode
 
-from ..rule import Rule
-from ..severity import Severity
-from ..violation import Violation
+from rule import Rule
+from severity import Severity
+from violation import Violation
 
 
 class DataReadNotWrittenRule(Rule):
@@ -25,7 +25,6 @@ class DataReadNotWrittenRule(Rule):
         problem = ""
 
         def check(self, graph: Graph) -> None:
-
             data_nodes = nx.subgraph_view(graph, filter_node = filter_data_nodes)
 
 
