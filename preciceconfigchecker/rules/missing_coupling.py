@@ -3,6 +3,7 @@ from typing import List
 import networkx as nx
 from networkx import DiGraph
 from precice_config_graph.nodes import CouplingNode, MultiCouplingNode
+
 from rule import Rule
 from severity import Severity
 from violation import Violation
