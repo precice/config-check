@@ -21,8 +21,8 @@ class Rule(ABC):
 
     @property
     @abstractmethod
-    def problem(self) -> str:
-        """@abstract property: Short explanation of what the rule is supposed to check in general."""
+    def name(self) -> str:
+        """@abstract property: Name of the rule in readable style."""
         pass
 
     def __init__(self) -> None:
@@ -58,8 +58,8 @@ class Rule(ABC):
             if debug:
                 print(f"[{Severity.DEBUG.value}]: '{c.dyeing(self.__class__.__name__, c.purple)}' is satisfied.")
         else:
-            beginn:str = f"[{self.severity.value},{Severity.DEBUG.value}]: ({c.dyeing(self.__class__.__name__, c.purple)})" if debug else f"[{self.severity.value}]:"
-            print(f"{beginn} {self.problem}")
+            severity_info:str = f"[{self.severity.value},{Severity.DEBUG.value}]: ({c.dyeing(self.__class__.__name__, c.purple)})" if debug else f"[{self.severity.value}]:"
+            print(f"{severity_info} {self.name}")
             for violation in self.violations:
                 formatted_violation = violation.format()
                 print(formatted_violation)

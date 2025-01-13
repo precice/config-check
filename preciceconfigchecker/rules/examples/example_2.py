@@ -26,7 +26,7 @@ class Rule_2(Rule):
                     ]
 
     severity = Severity.WARNING
-    problem = "No connection between three nodes"
+    name = "2nd Example Rule"
 
     def check(self, graph) -> None:
         #Find violations in the graph and add them to the violations list in Rule.
