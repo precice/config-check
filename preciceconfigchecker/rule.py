@@ -13,6 +13,11 @@ class Rule(ABC):
     Abstract Class 'Rule'. Checking a 'Rule' for violations and producing formatted output.
     """
 
+    number_errors:int = 0
+    """Static Attribute: Do not use 'self.number_errors', use 'Rule.number_errors'"""
+    number_warnings:int = 0
+    """Static Attribute: Do not use 'self.number_warnings', use 'Rule.number_warnings'"""
+
     @property
     @abstractmethod
     def severity(self) -> Severity:
@@ -63,7 +68,10 @@ class Rule(ABC):
             for violation in self.violations:
                 formatted_violation = violation.format()
                 print(formatted_violation)
-
+            if self.severity == Severity.WARNING:
+                Rule.number_warnings += len(self.violations)
+            if self.severity == Severity.ERROR:
+                Rule.number_errors += len(self.violations)
 
 # To handle all the rules
 
@@ -85,5 +93,10 @@ def print_all_results(debug:bool) -> None:
     """
     Prints all existing violations of all rules
     """
+    print("Results:")
     for rule in rules:
         rule.print_result(debug)
+    if Rule.number_errors != 0 or Rule.number_warnings != 0:
+        print(f"Your configuration file raised {Rule.number_errors} {Severity.ERROR.value}s and {Rule.number_warnings} {Severity.WARNING.value}s.\nPlease review your configuration file and make corrections before continuing.")
+    else:
+        print("Everything is fine with your configuration file.")
