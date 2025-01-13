@@ -75,8 +75,10 @@ def check_all_rules(graph: DiGraph) -> None:
     """
     Checks all rules for violations
     """
+    print("\nChecking rules...")
     for rule in rules:
         rule.check(graph)
+    print("All rules checked.")
 
 
 def print_all_results(debug:bool) -> None:

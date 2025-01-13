@@ -58,8 +58,8 @@ class Violation(ABC):
         """
         explanation:str = self.format_explanation()
         possible_solutions:List[str] = self.format_possible_solutions()
-        Violation.counter += 1
         existing_line:str = f" (Line {self.line})" if self.line else ""
+        Violation.counter += 1
         out:str = f"({Violation.counter:3}.){existing_line}: {explanation}"
         for possible_solution in possible_solutions:
                 out += f"\n\t- {possible_solution}"
