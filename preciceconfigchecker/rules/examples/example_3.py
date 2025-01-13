@@ -19,7 +19,7 @@ class Rule_3(Rule):
     severity = Severity.ERROR
     problem = "A node is not connected"
 
-    def check(self) -> None:
+    def check(self, graph) -> None:
         # Find violations in the graph and add them to the violations list in Rule.
         self.violations.append(self.MyViolation("Node-M"))
 
