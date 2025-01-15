@@ -27,8 +27,8 @@ class DataUseReadWrite(Rule):
             return f"Data {self.data_node.name} is declared but never used, read or written."
 
         def format_possible_solutions(self) -> List[str]:
-            return [f"Consider using {self.data_node.name} in a mesh and have a participant read and write it.",
-                    "Else please remove it to improve readability."]
+            return [f"Consider using {self.data_node.name} in a mesh and have participants read and write it.",
+                    "Otherwise please remove it to improve readability."]
 
     class DataUsedNotReadNotWrittenViolation(Violation):
         """
@@ -45,7 +45,7 @@ class DataUseReadWrite(Rule):
         def format_possible_solutions(self) -> List[str]:
             return [f"Consider having a participant read data {self.data_node.name}.",
                     f"Consider having a participant write data {self.data_node.name}.",
-                    "Else please remove it to improve readability."]
+                    "Otherwise please remove it to improve readability."]
 
     class DataUsedNotReadWrittenViolation(Violation):
         """
@@ -66,7 +66,7 @@ class DataUseReadWrite(Rule):
             return [f"Consider having a participant read data {self.data_node.name}.",
                     f"Consider exporting data {self.data_node.name} by a participant.",
                     f"Consider using watchpoints or watch-integrals to keep track of data {self.data_node.name}.",
-                    "Else please remove it to improve readability."]
+                    "Otherwise please remove it to improve readability."]
 
     class DataUsedReadNotWrittenViolation(Violation):
         """
@@ -98,7 +98,7 @@ class DataUseReadWrite(Rule):
 
         def format_possible_solutions(self) -> List[str]:
             return [f"Consider having a participant write {self.data_node.name}.",
-                    "Else please remove it to improve readability."]
+                    "Otherwise please remove it to improve readability."]
 
     def check(self, graph: Graph) -> None:
         g1 = nx.subgraph_view(graph, filter_node=filter_use_read_write_data)
@@ -165,6 +165,7 @@ class DataUseReadWrite(Rule):
                 elif not use_data and not read_data and not write_data:
                     self.violations.append(self.DataNotUsedNotReadNotWrittenViolation(node))
 
+DataUseReadWrite()
 
 def filter_use_read_write_data(node) -> bool:
     """

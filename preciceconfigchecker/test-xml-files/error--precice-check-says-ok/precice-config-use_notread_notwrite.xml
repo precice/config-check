@@ -8,11 +8,11 @@
   </log>
 
   <data:scalar name="Color" />
-  <data:scalar name="Color2" />
+  <data:scalar name="ErrorColor" />
 
   <mesh name="Generator-Mesh" dimensions="2">
     <use-data name="Color" />
-    <use-data name="Color2" />
+    <use-data name="ErrorColor" />
   </mesh>
 
   <mesh name="Propagator-Mesh" dimensions="2">
@@ -33,7 +33,6 @@
       to="Propagator-Mesh"
       constraint="consistent" />
     <read-data name="Color" mesh="Propagator-Mesh" />
-    <read-data name="Color2" mesh="Generator-Mesh" />
   </participant>
 
   <m2n:sockets acceptor="Generator" connector="Propagator" exchange-directory=".." />
