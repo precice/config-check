@@ -7,7 +7,7 @@ class Violation(ABC):
     Abstract Class 'Violation'. Creates a formatted string for its attributes.
     """
 
-    counter:int = 0
+    counter: int = 0
     """Static Attribute: Do not use 'self.counter', use 'Violation.counter'"""
 
     @abstractmethod
@@ -50,10 +50,10 @@ class Violation(ABC):
         Returns:
             str: formatted 'Violation'
         """
-        explanation:str = self.format_explanation()
-        possible_solutions:List[str] = self.format_possible_solutions()
+        explanation: str = self.format_explanation()
+        possible_solutions: List[str] = self.format_possible_solutions()
         Violation.counter += 1
-        out:str = f"({Violation.counter:3}.): {explanation}"
+        out: str = f"({Violation.counter:3}.): {explanation}"
         for possible_solution in possible_solutions:
-                out += f"\n\t- {possible_solution}"
+            out += f"\n\t- {possible_solution}"
         return out
