@@ -95,7 +95,7 @@ def check_all_rules(graph: DiGraph) -> None:
     print("\nChecking rules...")
     for rule in rules:
         rule.check(graph)
-    print("All rules checked.")
+    print("Rules checked.")
 
 
 def print_all_results(debug:bool) -> None:
@@ -103,7 +103,7 @@ def print_all_results(debug:bool) -> None:
     Prints all existing violations of all rules
     """
     if not all_rules_satisfied():
-        print("Results:")
+        print("The following issues were found:")
     for rule in rules:
         rule.print_result(debug)
     if Rule.number_errors != 0 or Rule.number_warnings != 0:
