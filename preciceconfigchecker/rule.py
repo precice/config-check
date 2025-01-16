@@ -51,7 +51,7 @@ class Rule(ABC):
         Shows when the 'Rule' is satisfied
 
         Returns:
-            bool: TRUE if there are no violations after the check
+            bool: TRUE, if there are no violations after the check
         """
         return self.violations.__len__() == 0
 
@@ -78,6 +78,15 @@ class Rule(ABC):
 rules: List[Rule] = []
 """List of all initialized rules. Info: Each rule puts itself on this list when initialized."""
 
+def all_rules_satisfied() -> bool:
+    """
+    Checks whether all rules are satisfied.
+
+    Returns:
+        bool: TRUE, if all rules are satisfied.
+    """
+    return all(rule.satisfied() for rule in rules)
+
 
 def check_all_rules(graph: DiGraph) -> None:
     """
@@ -93,10 +102,11 @@ def print_all_results(debug:bool) -> None:
     """
     Prints all existing violations of all rules
     """
-    print("Results:")
+    if not all_rules_satisfied():
+        print("Results:")
     for rule in rules:
         rule.print_result(debug)
     if Rule.number_errors != 0 or Rule.number_warnings != 0:
-        print(f"Your configuration file raised {Rule.number_errors} {Severity.ERROR.value}s and {Rule.number_warnings} {Severity.WARNING.value}s.\nPlease review your configuration file and make corrections before continuing.")
+        print(f"Your configuration file raised {Rule.number_errors} {Severity.ERROR.value}s and {Rule.number_warnings} {Severity.WARNING.value}s.\nPlease review your configuration file before continuing.")
     else:
-        print("Everything is fine with your configuration file.")
+        print("You are all set to start you simulation!")
