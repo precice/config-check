@@ -1,21 +1,45 @@
-import sys
+import argparse
+
+from severity import Severity
+import color as c
+
 from precice_config_graph import graph, xml_processing
-#from pyprecice import Participant
+
 from rule import check_all_rules, print_all_results
-#import rules.example_1
-#import rules.example_2
-#import rules.example_3
+
+# ALL RULES THAT SHOULD BE CHECKED NEED TO BE IMPORTED
+# SOME IDE's MIGHT REMOVE THEM AS UNUSED IMPORTS
+import rules.missing_coupling
+
+path:str = None
+debug:bool = False
 
 if __name__ == "__main__":
-    path = sys.argv[1]
+    parser = argparse.ArgumentParser(usage='%(prog)s', description='Checks a PreCICE config.xml file for logical errors.')
+    parser.add_argument('src', type=argparse.FileType('r'), help='Path of the config.xml source file.')
+    parser.add_argument('-d', '--debug', action='store_true', help='Enables debug mode')
+    args = parser.parse_args()
 
-    print(f"Checking file at {path}")
+    if args.debug:
+        debug = args.debug
+        print(f"[{Severity.DEBUG.value}]: Debug mode enabled")
+    if args.src.name.endswith('.xml'):
+        path = args.src.name
+        print(f"Checking file at '{c.dyeing(path, c.cyan)}'")
+    else:
+        print(f"[{Severity.ERROR.value}]: '{c.dyeing(args.src.name, c.cyan)}' is not an xml file")
 
-    # Step 1: Use PreCICE itself to check for basic errors
-    #TODO: Participant.check(...)
+    # Step 1: Use preCICE itself to check for basic errors
+    # TODO: Participant.check(...)
 
     # Step 2: Detect more issues through the use of a graph
     root = xml_processing.parse_file(path)
-    graph.get_graph(root)
-    check_all_rules()
-    print_all_results()
+    graph = graph.get_graph(root)
+
+    # individual checks need the graph
+    print("\nChecking all rules...")
+    check_all_rules(graph)
+
+    # if the user uses severity=debug, then the severity has to be passed here as an argument
+    print_all_results(debug)
+    print("All rules checked.")
