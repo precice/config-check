@@ -13,7 +13,7 @@ class MissingCouplingRule(Rule):
     # As participants need a coupling to communicate, a coupling must exist.
     # If no coupling exists, then this gets treated as an error.
     severity = Severity.ERROR
-    problem = "The configuration does not have any (multi-)couplings."
+    name = "Missing coupling scheme"
 
     class MissingCouplingViolation(Violation):
         # No nodes have to be passed: A coupling is missing and does not depend on anything else

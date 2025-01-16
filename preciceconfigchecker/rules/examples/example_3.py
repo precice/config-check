@@ -17,9 +17,9 @@ class Rule_3(Rule):
             return [f"Delete {self.node_a}"]
 
     severity = Severity.ERROR
-    problem = "A node is not connected"
+    name = "3rd Example Rule"
 
-    def check(self) -> None:
+    def check(self, graph) -> None:
         # Find violations in the graph and add them to the violations list in Rule.
         self.violations.append(self.MyViolation("Node-M"))
 
