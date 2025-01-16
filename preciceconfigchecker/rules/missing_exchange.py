@@ -3,7 +3,6 @@ from typing import List
 import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import DataNode, ExchangeNode, MeshNode, ParticipantNode, ReadDataNode, WriteDataNode
-from precice_config_graph import graph as g
 from rule import Rule
 from severity import Severity
 from violation import Violation
@@ -88,12 +87,12 @@ MissingExchangeRule()
 # Helper functions
 def filter_data_exchange_nodes(node) -> bool:
     """
-    A function filtering coupling nodes in the graph.
+    A function filtering data and exchange nodes in the graph.
 
     Args:
         node: the node to check
 
     Returns:
-        True, if the node is a coupling node.
+        True, if the node is a data or exchange node.
     """
     return isinstance(node, DataNode) or isinstance(node, ExchangeNode)
