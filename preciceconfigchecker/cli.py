@@ -9,7 +9,8 @@ from rule import check_all_rules, print_all_results
 
 # ALL RULES THAT SHOULD BE CHECKED NEED TO BE IMPORTED
 # SOME IDE's MIGHT REMOVE THEM AS UNUSED IMPORTS
-import rules.missing_coupling
+from rules import missing_coupling
+from rules import data_use_read_write
 
 path:str = None
 debug:bool = False
