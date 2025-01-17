@@ -11,7 +11,7 @@ from violation import Violation
 
 
 class DataUseReadWrite(Rule):
-    problem = "There is a problem with using, reading and writing data."
+    name = "Data rules."
     # This is an oversight, but not an error
     severity = Severity.WARNING
 
