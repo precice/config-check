@@ -44,6 +44,7 @@ config-checker
 ├── .github, .idea, etc…
 │
 ├── docs                       # Documentation on rules and the inner workings of this checker
+│   └── ...
 │
 ├── preciceconfigchecker       # Main library files
 │   ├── rules                  # All rules that are checked by this utility
