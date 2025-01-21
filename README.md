@@ -6,7 +6,7 @@ A library that checks a preCICE configuration file for logical errors.
 configuration for logical errors.
 
 > [!NOTE]
-> This checker assumes that `precice-tools check` has already been executed without an error on the configuration file.<br> 
+> This checker assumes that `precice-tools check` has already been executed without an error on the configuration file.<br>
 > Otherwise, the behavior of this checker is undefined.
 
 ## Requirements
@@ -82,7 +82,7 @@ If new versions of dependencies have been released, try `pip install --ignore in
 
 ## Checking a preCICE config
 
-To check a preCICE configuration file for logical errors, run  
+To check a preCICE configuration file for logical errors, run
 
 ```bash
 python preciceconfigchecker/cli.py "/path/to/precice-config.xml"
