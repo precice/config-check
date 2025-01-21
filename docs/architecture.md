@@ -4,7 +4,7 @@
 
 _This part of the documentation details the design of the software. See `Rules.md` for a list of implemented Rules._
 
-This program is designed to collect all messages, and then print them out at once. This allows for multiple features over directly printing messages upon finding something, including:
+This program is designed to collect all messages, and then print them out at once, after checking all Rules. This allows for multiple features over directly printing messages upon finding something, including:
 - easier testing
 - potential use as a library
 - merging multiple related messages into one
