@@ -2,7 +2,7 @@
 
 ## Rules and Violations
 
-_This part of the documentation talks about the design of the software. See `Rules.md` for a list of implemented Rules._
+_This part of the documentation details the design of the software. See `Rules.md` for a list of implemented Rules._
 
 This program is designed to collect all messages, and then print them out in one go. This allows for multiple features over directly printing messages upon finding something, including:
 - easier testing
