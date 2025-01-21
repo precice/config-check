@@ -2,7 +2,7 @@
 
 A library that checks a preCICE configuration file for logical errors.
 
-**How does this differ from [precice-tools](https://precice.org/tooling-builtin.html)?** This checker only checks the
+**How does this differ from [precice-tools check](https://precice.org/tooling-builtin.html)?** This checker only checks the
 configuration for logical errors.
 
 > [!NOTE]
@@ -14,7 +14,7 @@ configuration for logical errors.
 - Python 3.12
 - Pip
 - Git for cloning the repository
-- precice-config-graph
+- [precice-config-graph Library](https://github.com/precice-forschungsprojekt/config-graph). This will be installed during the Installation step below.
 
 ## Installation
 
@@ -32,6 +32,10 @@ source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
 ```bash
 pip install .
 ```
+You need to force re-install the `precice_config_graph`-dependency on new versions, since it is downloaded directly from GitHub. To do so, run:
+```bash
+pip install --ignore-installed .
+```
 
 ## Project Structure
 
@@ -39,8 +43,10 @@ pip install .
 config-checker
 ├── .github, .idea, etc…
 │
+├── docs                       # Documentation on rules and the inner workings of this checker
+│
 ├── preciceconfigchecker       # Main library files
-│   ├── rules                  # All rules that get checked by the checker
+│   ├── rules                  # All rules that are checked by this utility
 │   │   ├── ...
 │   │   └── examples           # Exemplary implementations of rules to test output format 
 │   │       └── ...
@@ -48,11 +54,11 @@ config-checker
 │   ├── test-xml-files         # Configuration files to test rules 
 │   │   └── ...
 │   │
-│   ├── cli.py                 # Call this script to test a provided config file for logical errors
-│   ├── color.py               # Definition of colors for output 
-│   ├── rule.py                # Template for implementing rules
-│   ├── severity.py            # Enum for severity of output
-│   └── violation.py           # Template for implementing violations
+│   ├── cli.py                 # Main entrypoint for this checker
+│   ├── color.py               # Definition of colors for CLI output
+│   ├── rule.py                # Class of a rule and logic to check all rules
+│   ├── severity.py            # Enum for specifying severity of output
+│   └── violation.py           # Class of a violation
 │
 │
 ├── .gitignore, LICENSE, README.md
@@ -61,28 +67,9 @@ config-checker
 └── shell.nix                  # Dependencies for anyone using NixOS / the nix-package manager. Should be replaced by a flake in the future.
 ```
 
-## Using in your project
-
-This library is not yet published to any package registry. Nonetheless, it can still be imported into your pyproject.toml like so:
-
-```toml
-# …
-dependencies = [
-    "preciceconfigchecker @ git+https://github.com/precice-forschungsprojekt/config-checker.git",
-    # …
-]
-# …
-```
-
-Then, run `pip install .` in your project. TODO ?
-
-[TODO]
-
-If new versions of dependencies have been released, try `pip install --ignore installed .` to update your project.
-
 ## Checking a preCICE config
 
-To check a preCICE configuration file for logical errors, run
+To check a preCICE configuration file for logical errors, run the following within the root of this repository:
 
 ```bash
 python preciceconfigchecker/cli.py "/path/to/precice-config.xml"
@@ -93,7 +80,3 @@ If you want more information about the checks that were performed and their resu
 ```bash
 python preciceconfigchecker/cli.py "/path/to/precice-config.xml" --debug
 ```
-
-## Documentation
-
-In the future, we will document how this checker works!
