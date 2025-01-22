@@ -8,11 +8,13 @@ Here you will find an overview over all logical errors, which we refer to as 'ru
 preCICE config checker.
 Our rules have been sorted into three categories of <em>severity</em>:
 
-- `error`: These rules should be adhered to ("eingehalten"), in order to guarantee a flawless ("fehlerfreie")
-  execution (bzw. überhaupt eine) of the coupled simulation.
-- `warning`: Rules in this category represent an oversight in the config and are not necessary to implement.
+- `error`: These rules should be adhered to, in order to guarantee (a flawless) execution of the coupled simulation.
+- `warning`: Rules in this category do not necessarily cause errors during the simulation, yet should be inspected to
+  ensure the intended outcome.
 - `debug`: These rules are simply hints and do not get checked by default. Usually they do not represent mistakes but
   are meant to help find the most hidden bugs 🪲
+
+Rules with `TODO` before their names have not yet been implemented but will be soon.
 
 ## Rules with severity `error`
 
@@ -34,11 +36,20 @@ exchanged through an exchange, then its declaration is redundant.
 Data gets declared but not fully utilized (not used in a mesh, not read or not written by a participant). Additionally,
 there exists no exchange for this data element.
 
-#### Missing exchange: full usage of data 
+#### Missing exchange: full usage of data
 
 Data gets declared and used in a mesh, read and written by a participant, but not exchanged in a coupling-scheme.
 
 ## Rules with severity `warning`
+
+### `TODO` Coupling-scheme without mapping
+
+To ensure that exchanged data between one participant and its mesh to another participant and its mesh, the mapping has
+to be defined.
+If the mapping does not get defined, it is not certain that the meshes “fit together” and data gets exchanged
+correctly.
+
+It is possible, however, that meshes fit together naturally.
 
 ### Data rules
 
@@ -77,5 +88,18 @@ through other means).
 
 The data element gets declared but not used in a mesh, read or written by any participant.
 
+### `TODO` Unused mesh
+
+A participant can provide a mesh to another participant, who receives it but does not use it.
+This means that the mesh is not used in any coupling scheme.
+
+This does not necessarily cause the simulation to malfunction or misbehave.
+
 ## Rules with severity `debug`
 
+### `TODO` Disjoint simulations
+
+A simulation between participants A and B and a second one between participants C and D can run simultaneously, but will
+deteriorate the readability of the preCICE-config and will make it more prone to errors.
+
+In most cases, however, running multiple “disjoint simulations” simultaneously is intended.   
