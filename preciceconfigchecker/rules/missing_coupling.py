@@ -1,8 +1,8 @@
 from typing import List
 
 import networkx as nx
-from networkx import DiGraph
-from precice_config_graph.nodes import CouplingNode, MultiCouplingNode
+from networkx import Graph
+from precice_config_graph.nodes import CouplingSchemeNode, MultiCouplingSchemeNode
 
 from rule import Rule
 from severity import Severity
@@ -27,14 +27,14 @@ class MissingCouplingRule(Rule):
         def format_possible_solutions(self) -> List[str]:
             return ["Please add a coupling-scheme to your configuration to exchange data between participants."]
 
-    def check(self, graph: DiGraph) -> None:
+    def check(self, graph: Graph) -> None:
         # Filter all coupling-nodes: Only coupling nodes remain
         coupling_nodes = nx.subgraph_view(graph, filter_node=filter_coupling_nodes)
         # Filter all multi-coupling-nodes: Only multi-coupling nodes remain
         multi_coupling_nodes = nx.subgraph_view(graph, filter_node=filter_multi_coupling_nodes)
 
-        # If both subgraphs are empty, no coupling nodes exist
-        if nx.is_empty(coupling_nodes) and nx.is_empty(multi_coupling_nodes):
+        # If both subgraphs contain no nodes, no coupling nodes exist
+        if not len(coupling_nodes.nodes) and not multi_coupling_nodes.nodes:
             self.violations.append(self.MissingCouplingViolation())
 
 # Initialize a rule object to add it to the rules-array.
@@ -51,7 +51,7 @@ def filter_coupling_nodes(node) -> bool:
     Returns:
         True, if the node is a coupling node.
     """
-    return isinstance(node, CouplingNode)
+    return isinstance(node, CouplingSchemeNode)
 
 
 def filter_multi_coupling_nodes(node) -> bool:
@@ -64,6 +64,6 @@ def filter_multi_coupling_nodes(node) -> bool:
     Returns:
       True, if the node is a multi-coupling node.
     """
-    return isinstance(node, MultiCouplingNode)
+    return isinstance(node, MultiCouplingSchemeNode)
 
 

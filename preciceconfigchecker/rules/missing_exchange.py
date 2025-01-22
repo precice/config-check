@@ -12,7 +12,7 @@ class MissingExchangeRule(Rule):
     # To communicate data, it needs to be exchanged in a coupling scheme. Declaring and using data,
     # but without an exchange is an error.
     severity = Severity.ERROR
-    name = "Data gets used but not exchanged in a coupling-scheme."
+    name = "Missing data exchange."
 
     class MissingExchangeViolation(Violation):
         """
