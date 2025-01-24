@@ -14,8 +14,8 @@ from rules import missing_coupling
 from rules import missing_exchange
 from rules import data_use_read_write
 
-path:str = None
-debug:bool = False
+path: str = None
+debug: bool = False
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(usage='%(prog)s', description='Checks a PreCICE config.xml file for logical errors.')

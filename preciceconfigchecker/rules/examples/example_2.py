@@ -29,7 +29,7 @@ class Rule_2(Rule):
     name = "2nd Example Rule"
 
     def check(self, graph) -> None:
-        #Find violations in the graph and add them to the violations list in Rule.
+        # Find violations in the graph and add them to the violations list in Rule.
         self.violations.append(self.MyViolation("Node-G", "Node-H", "Node-I"))
         self.violations.append(self.MyViolation("Node-J", "Node-K", "Node-L"))
 

@@ -38,12 +38,12 @@ class MissingExchangeRule(Rule):
                      writer: ParticipantNode) -> None:
             self.data_node = data_node
             self.mesh = mesh
-            self.reader = reader
             self.writer = writer
+            self.reader = reader
 
         def format_explanation(self) -> str:
-            return (f"Data {self.data_node.name} is used in mesh {self.mesh.name}, gets written by {self.reader.name} "
-                    f"and written by {self.writer.name}, but does not get exchanged in a coupling-scheme.")
+            return (f"Data {self.data_node.name} is used in mesh {self.mesh.name}, gets written by participant {self.writer.name} "
+                    f"and read by participant {self.reader.name}, but does not get exchanged in a coupling-scheme.")
 
         def format_possible_solutions(self) -> List[str]:
             return [f"Please exchange {self.data_node.name} in a coupling-scheme.",
@@ -52,6 +52,7 @@ class MissingExchangeRule(Rule):
                     f"<exchange data=\"{self.data_node.name}\" mesh=\"{self.mesh.name}\" from=\"{self.writer.name}\" to=\"{self.reader.name}\" />"]
 
     def check(self, graph: Graph) -> None:
+        # Only data and exchange nodes remain
         g1 = nx.subgraph_view(graph, filter_node=filter_data_exchange_nodes)
 
         for node in g1.nodes():
