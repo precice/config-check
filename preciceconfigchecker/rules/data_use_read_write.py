@@ -114,7 +114,7 @@ class DataUseReadWrite(Rule):
                         use_data = True
                         mesh = neighbor
                         mesh_neighbors = g1.neighbors(neighbor)
-                        # Check if mesh gets observed by export, watchpoint or -integral
+                        # Check if mesh gets observed by export, watchpoint or watch-integral
                         # These types of reader nodes are less important than a read-data node, thus only check them if
                         # no read-data node has been found
                         for mesh_neighbor in mesh_neighbors:
