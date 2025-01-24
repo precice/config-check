@@ -15,11 +15,11 @@ When encountering a logical error that does not already get reviewed by our chec
 please create a new issue on our [GitHub page](https://github.com/precice-forschungsprojekt/config-checker) and:
 
 - Check that the problem is not already under development (marked with `TODO`here)
-- Explain the problem: 
-  - What exactly is the problem?
-  - Why is it a problem?
-  - Are there cases when this setup is valid?
-  - Please also provide a `precice-config.xml`file with the error you described and one with a fix of how it should be
+- Explain the problem:
+    - What exactly is the problem?
+    - Why is it a problem?
+    - Are there cases when this setup is valid?
+    - Please also provide a `precice-config.xml`file with the error you described and one with a fix of how it should be
 
 Here you will find an overview over all logical errors, which we refer to as 'rules', which currently get handled by our
 preCICE config checker.
@@ -28,8 +28,8 @@ Our rules have been sorted into three categories of <em>severity</em>:
 - `error`: These rules should be adhered to, in order to guarantee (a flawless) execution of the coupled simulation.
 - `warning`: Rules in this category do not necessarily cause errors during the simulation, yet should be inspected to
   ensure the intended outcome.
-- `debug`: These rules are simply hints and do not get checked by default. Usually they do not represent mistakes but
-  are meant to help find the most hidden bugs 🪲
+- `debug`: These rules are simply hints and do not get checked or printed by default. 
+Usually they do not represent mistakes but are meant to help find the most hidden bugs 🪲
 
 Rules with `TODO` before their names have not yet been implemented but will be soon.
 
