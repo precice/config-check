@@ -108,7 +108,7 @@ class DataUseReadWrite(Rule):
                 mesh: MeshNode = None
                 writer: ParticipantNode = None
                 reader: ParticipantNode | ExportNode | WatchpointNode | WatchIntegralNode = None
-                
+
                 # Check all neighbors of the data node for use-, reader- and writer-nodes
                 for neighbor in g1.neighbors(node):
                     # Check if data gets used by a mesh
@@ -117,7 +117,9 @@ class DataUseReadWrite(Rule):
                         mesh = neighbor
                         mesh_neighbors = g1.neighbors(neighbor)
                         # Check if mesh gets observed by export, watchpoint or watch-integral
-                        # These types of reader nodes are less important than a read-data node, thus only check them if
+                        # These types of reader nodes do not read the data itself, but only "read" the mesh and all of
+                        # its used data
+                        # They are thus less important than a read-data node, so only check them if
                         # no read-data node has been found
                         for mesh_neighbor in mesh_neighbors:
                             if isinstance(neighbor, ExportNode) and not read_data:
