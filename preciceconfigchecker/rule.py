@@ -95,13 +95,14 @@ def all_rules_satisfied() -> bool:
     return all(rule.satisfied() for rule in rules)
 
 
-def check_all_rules(graph: DiGraph) -> None:
+def check_all_rules(graph: DiGraph, debug: bool) -> None:
     """
     Checks all rules for violations
     """
     print("\nChecking rules...")
     for rule in rules:
-        rule.check(graph)
+        if debug or rule.severity != Severity.DEBUG:
+            rule.check(graph)
     print("Rules checked.")
 
 

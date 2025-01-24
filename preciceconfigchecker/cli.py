@@ -39,7 +39,7 @@ if __name__ == "__main__":
     graph = graph.get_graph(root)
 
     # individual checks need the graph
-    check_all_rules(graph)
+    check_all_rules(graph, debug)
 
     # if the user uses severity=debug, then the severity has to be passed here as an argument
     print_all_results(debug)
