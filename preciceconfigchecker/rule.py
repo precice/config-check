@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from networkx import DiGraph
+from networkx import Graph
 
 from severity import Severity
 from violation import Violation
@@ -38,7 +38,7 @@ class Rule(ABC):
         rules.append(self)
 
     @abstractmethod
-    def check(self, graph: DiGraph) -> None:
+    def check(self, graph: Graph) -> None:
         """
         @abstractmethod: Defines how a 'Rule' should be checked
 
@@ -75,7 +75,6 @@ class Rule(ABC):
 
 
 # To handle all the rules
-
 rules: List[Rule] = []
 """List of all initialized rules. Info: Each rule puts itself on this list when initialized."""
 
@@ -90,7 +89,7 @@ def all_rules_satisfied() -> bool:
     return all(rule.satisfied() for rule in rules)
 
 
-def check_all_rules(graph: DiGraph) -> None:
+def check_all_rules(graph: Graph) -> None:
     """
     Checks all rules for violations
     """

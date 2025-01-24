@@ -7,13 +7,13 @@ class Violation(ABC):
     Abstract Class 'Violation'. Creates a formatted string for its attributes.
     """
 
-    line:int = None
+    line: int = None
     """Attribute: Do not use 'Violation.line', use 'self.line'"""
 
     @abstractmethod
-    def __init__(self, line:int) -> None:
+    def __init__(self, line: int) -> None:
         """
-        @abstractmethod: Initializes an 'Violation' object.
+        @abstractmethod: Initializes a 'Violation' object.
 
         Args:
             line (int): The line in the config.xml file of the violation.
@@ -53,10 +53,10 @@ class Violation(ABC):
         Returns:
             str: formatted 'Violation'
         """
-        explanation:str = self.format_explanation()
-        possible_solutions:List[str] = self.format_possible_solutions()
-        existing_line:str = f"(Line {self.line}) " if self.line else ""
-        out:str = f"> {existing_line}{explanation}"
+        explanation: str = self.format_explanation()
+        possible_solutions: List[str] = self.format_possible_solutions()
+        existing_line: str = f"(Line {self.line}) " if self.line else ""
+        out: str = f"> {existing_line}{explanation}"
         for possible_solution in possible_solutions:
-                out += f"\n\t- {possible_solution}"
+            out += f"\n\t- {possible_solution}"
         return out
