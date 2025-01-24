@@ -58,6 +58,7 @@ class Rule(ABC):
     def print_result(self, debug: bool) -> None:
         """
         If the 'Rule' has violations, these will be printed.
+        If debug mode is enabled, more information is displayed.
         """
         if not debug and (self.severity == Severity.DEBUG or self.satisfied()):
             return
