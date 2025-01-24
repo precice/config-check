@@ -108,6 +108,8 @@ class DataUseReadWrite(Rule):
                 mesh: MeshNode = None
                 writer: ParticipantNode = None
                 reader: ParticipantNode | ExportNode | WatchpointNode | WatchIntegralNode = None
+                
+                # Check all neighbors of the data node for use-, reader- and writer-nodes
                 for neighbor in g1.neighbors(node):
                     # Check if data gets used by a mesh
                     if isinstance(neighbor, MeshNode):
