@@ -98,7 +98,7 @@ def check_all_rules(graph: DiGraph) -> None:
     print("Rules checked.")
 
 
-def print_all_results(debug:bool) -> None:
+def print_all_results(debug: bool) -> None:
     """
     Prints all existing violations of all rules
     """
@@ -106,7 +106,13 @@ def print_all_results(debug:bool) -> None:
         print("The following issues were found:")
     for rule in rules:
         rule.print_result(debug)
+    error_str:str = f"{Severity.ERROR.value}"
+    warning_str:str = f"{Severity.WARNING.value}"
+    if Rule.number_errors != 1:
+        error_str += "s"
+    if Rule.number_warnings != 1:
+        warning_str += "s"
     if Rule.number_errors != 0 or Rule.number_warnings != 0:
-        print(f"Your configuration file raised {Rule.number_errors} {Severity.ERROR.value}s and {Rule.number_warnings} {Severity.WARNING.value}s.\nPlease review your configuration file before continuing.")
+        print(f"Your configuration file raised {Rule.number_errors} {error_str} and {Rule.number_warnings} {warning_str}.\nPlease review your configuration file before continuing.")
     else:
         print("You are all set to start you simulation!")
