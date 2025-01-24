@@ -63,7 +63,14 @@ class Rule(ABC):
             if debug:
                 print(f"[{Severity.DEBUG.value}]: '{c.dyeing(self.__class__.__name__, c.purple)}' is satisfied.")
         else:
-            severity_info:str = f"[{self.severity.value},{Severity.DEBUG.value}]: ({c.dyeing(self.__class__.__name__, c.purple)})" if debug else f"[{self.severity.value}]:"
+            severity_info:str
+            if debug:
+                if self.severity == Severity.DEBUG:
+                    severity_info = f"[{self.severity.value}]: ({c.dyeing(self.__class__.__name__, c.purple)})"
+                else:
+                    severity_info = f"[{self.severity.value},{Severity.DEBUG.value}]: ({c.dyeing(self.__class__.__name__, c.purple)})"
+            else:
+                severity_info = f"[{self.severity.value}]:"
             print(f"{severity_info} {self.name}")
             for violation in self.violations:
                 formatted_violation = violation.format()
