@@ -1,4 +1,5 @@
 import argparse
+import sys
 
 from severity import Severity
 import color as c
@@ -9,10 +10,12 @@ from rule import check_all_rules, print_all_results
 
 # ALL RULES THAT SHOULD BE CHECKED NEED TO BE IMPORTED
 # SOME IDE's MIGHT REMOVE THEM AS UNUSED IMPORTS
-import rules.missing_coupling
+from rules import missing_coupling
+from rules import missing_exchange
+from rules import data_use_read_write
 
-path:str = None
-debug:bool = False
+path: str = None
+debug: bool = False
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(usage='%(prog)s', description='Checks a PreCICE config.xml file for logical errors.')
@@ -27,7 +30,7 @@ if __name__ == "__main__":
         path = args.src.name
         print(f"Checking file at '{c.dyeing(path, c.cyan)}'")
     else:
-        print(f"[{Severity.ERROR.value}]: '{c.dyeing(args.src.name, c.cyan)}' is not an xml file")
+        sys.exit(f"[{Severity.ERROR.value}]: '{c.dyeing(args.src.name, c.cyan)}' is not an xml file")
 
     # Step 1: Use preCICE itself to check for basic errors
     # TODO: Participant.check(...)
