@@ -5,8 +5,8 @@ let
         src = pkgs.fetchFromGitHub {
             owner = "precice-forschungsprojekt";
             repo = "config-graph";
-            rev = "packaging-setup"; #"master";# TODO: Set a fixed version "refs/tags/v${version}";
-            hash = "sha256-5UDeDUxxAmEgCfYXQT+FyFK/FwVHvYu3FlY3y4Wfnuc=";
+            rev = "master"; # TODO: Set a fixed version "refs/tags/v${version}";
+            hash = "sha256-CnSEIOKAEbOTTiQsU+KGrkwKSdw+d2ziQA277UA8mHs=";
         };
         pyproject = true;
 
