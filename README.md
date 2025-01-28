@@ -81,3 +81,16 @@ If you want more information about the checks that were performed and their resu
 ```bash
 python preciceconfigchecker/cli.py "/path/to/precice-config.xml" --debug
 ```
+
+## Suggesting new Rules
+
+We are always open to suggestions for new rules.
+When encountering a logical error that does not already get reviewed by our checker,
+please create a new issue on our [GitHub repository](https://github.com/precice-forschungsprojekt/config-checker) and:
+
+- Check that the problem is not already under development (marked with `TODO`here)
+- Explain the problem:
+    - What exactly is the problem?
+    - Why is it a problem?
+    - Are there cases when this setup is valid?
+    - Please also provide a `precice-config.xml`file with the error you described and one with a fix of how it should be

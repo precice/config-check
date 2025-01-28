@@ -9,18 +9,6 @@ Cases that get handled beforehand do <em>not</em> get checked by this logical ch
 Instead, we try to find <em>logical</em> mistakes in the configuration file, which adhere to the defined syntax of
 preCICE, but will lead to errors when actually running the simulation.
 
-### We are always open to suggestions for new rules.
-
-When encountering a logical error that does not already get reviewed by our checker,
-please create a new issue on our [GitHub page](https://github.com/precice-forschungsprojekt/config-checker) and:
-
-- Check that the problem is not already under development (marked with `TODO`here)
-- Explain the problem:
-    - What exactly is the problem?
-    - Why is it a problem?
-    - Are there cases when this setup is valid?
-    - Please also provide a `precice-config.xml`file with the error you described and one with a fix of how it should be
-
 Here you will find an overview over all logical errors, which we refer to as 'rules', which currently get handled by our
 preCICE config checker.
 Our rules have been sorted into three categories of <em>severity</em>:
