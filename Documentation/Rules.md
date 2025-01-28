@@ -5,19 +5,19 @@ This checker in development for the coupling library preCICE.
 Currently, through the preCICE native command `precice-tools check`, syntax and basic setup mistakes will get checked.
 
 Our checker assumes that this command has been executed beforehand and returned without an error.
-Cases that get handled beforehand do <em>not</em> get checked by this logical checker.
-Instead, we try to find <em>logical</em> mistakes in the configuration file, which adhere to the defined syntax of
+Cases that get handled beforehand do _not_ get checked by this logical checker.
+Instead, we try to find _logical_ mistakes in the configuration file, which adhere to the defined syntax of
 preCICE, but will lead to errors when actually running the simulation.
 
 Here you will find an overview over all logical errors, which we refer to as 'rules', which currently get handled by our
 preCICE config checker.
-Our rules have been sorted into three categories of <em>severity</em>:
+Our rules have been sorted into three categories of _severity_:
 
 - `error`: These rules should be adhered to, in order to guarantee (a flawless) execution of the coupled simulation.
 - `warning`: Rules in this category do not necessarily cause errors during the simulation, yet should be inspected to
   ensure the intended outcome.
-- `debug`: These rules are simply hints and do not get checked or printed by default. 
-Usually they do not represent mistakes but are meant to help find the most hidden bugs 🪲
+- `debug`: These rules are simply hints and do not get checked or printed by default.
+  Usually they do not represent mistakes but are meant to help find the most hidden bugs 🪲
 
 Rules with `TODO` before their names have not yet been implemented but will be soon.
 
