@@ -58,20 +58,31 @@ class Rule(ABC):
     def print_result(self, debug: bool) -> None:
         """
         If the 'Rule' has violations, these will be printed.
+        If debug mode is enabled, more information is displayed.
         """
+        if not debug and (self.severity == Severity.DEBUG or self.satisfied()):
+            return
         if self.satisfied():
-            if debug:
-                print(f"[{Severity.DEBUG.value}]: '{c.dyeing(self.__class__.__name__, c.purple)}' is satisfied.")
+            print(f"[{Severity.DEBUG.value}]: '{c.dyeing(self.__class__.__name__, c.purple)}' is satisfied.")
+            return
+
+        severity_info: str
+        if debug and self.severity != Severity.DEBUG:
+            severity_info = f"[{self.severity.value},{Severity.DEBUG.value}]: ({c.dyeing(self.__class__.__name__, c.purple)})"
+        elif debug and self.severity == Severity.DEBUG:
+            severity_info = f"[{Severity.DEBUG.value}]: ({c.dyeing(self.__class__.__name__, c.purple)})"
         else:
-            severity_info: str = f"[{self.severity.value},{Severity.DEBUG.value}]: ({c.dyeing(self.__class__.__name__, c.purple)})" if debug else f"[{self.severity.value}]:"
-            print(f"{severity_info} {self.name}")
-            for violation in self.violations:
-                formatted_violation = violation.format()
-                print(formatted_violation)
-            if self.severity == Severity.WARNING:
-                Rule.number_warnings += len(self.violations)
-            if self.severity == Severity.ERROR:
-                Rule.number_errors += len(self.violations)
+            severity_info = f"[{self.severity.value}]:"
+        print(f"{severity_info} {self.name}")
+
+        for violation in self.violations:
+            formatted_violation = violation.format()
+            print(formatted_violation)
+
+        if self.severity == Severity.WARNING:
+            Rule.number_warnings += len(self.violations)
+        if self.severity == Severity.ERROR:
+            Rule.number_errors += len(self.violations)
 
 
 # To handle all the rules
@@ -89,13 +100,15 @@ def all_rules_satisfied() -> bool:
     return all(rule.satisfied() for rule in rules)
 
 
-def check_all_rules(graph: Graph) -> None:
+def check_all_rules(graph: Graph, debug: bool) -> None:
+
     """
     Checks all rules for violations
     """
     print("\nChecking rules...")
     for rule in rules:
-        rule.check(graph)
+        if debug or rule.severity != Severity.DEBUG:
+            rule.check(graph)
     print("Rules checked.")
 
 
@@ -107,8 +120,14 @@ def print_all_results(debug: bool) -> None:
         print("The following issues were found:")
     for rule in rules:
         rule.print_result(debug)
+    error_str:str = f"{Severity.ERROR.value}"
+    warning_str:str = f"{Severity.WARNING.value}"
+    if Rule.number_errors != 1:
+        error_str += "s"
+    if Rule.number_warnings != 1:
+        warning_str += "s"
     if Rule.number_errors != 0 or Rule.number_warnings != 0:
-        print(f"Your configuration file raised {Rule.number_errors} {Severity.ERROR.value}s and {Rule.number_warnings} "
-              f"{Severity.WARNING.value}s.\nPlease review your configuration file before continuing.")
+        print(f"Your configuration file raised {Rule.number_errors} {error_str} and {Rule.number_warnings} {warning_str}.")
+        print("Please review your configuration file before continuing.")
     else:
         print("You are all set to start you simulation!")
