@@ -2,7 +2,7 @@ from typing import List
 
 import networkx as nx
 from networkx import Graph
-from precice_config_graph.nodes import DataNode, MeshNode, ReadDataNode, WriteDataNode, WatchpointNode, ExportNode, \
+from precice_config_graph.nodes import DataNode, MeshNode, ReadDataNode, WriteDataNode, WatchPointNode, ExportNode, \
     WatchIntegralNode, ParticipantNode
 from rule import Rule
 from severity import Severity
@@ -73,24 +73,28 @@ class DataUseReadWrite(Rule):
         """
 
         def __init__(self, data_node: DataNode, mesh: MeshNode,
-                     reader: ParticipantNode | ExportNode | WatchpointNode | WatchIntegralNode):
+                     reader: ParticipantNode | ExportNode | WatchPointNode | WatchIntegralNode):
             self.data_node = data_node
             self.mesh = mesh
             self.reader = reader
             if isinstance(reader, ParticipantNode):
                 self.type = "participant"
+                self.name = reader.name
             elif isinstance(reader, ExportNode):
                 self.type = "export"
-            elif isinstance(reader, WatchpointNode):
+                self.name = reader.format
+            elif isinstance(reader, WatchPointNode):
                 self.type = "watchpoint"
+                self.name = reader.name
             elif isinstance(reader, WatchIntegralNode):
                 self.type = "watch-integral"
+                self.name = reader.name
             else:
                 self.type = ""
 
         def format_explanation(self) -> str:
             return (
-                f"Data {self.data_node.name} is being used in mesh {self.mesh.name} and {self.type} {self.reader.name} "
+                f"Data {self.data_node.name} is being used in mesh {self.mesh.name} and {self.type} {self.name} "
                 f"is reading it, but nobody is writing it.")
 
         def format_possible_solutions(self) -> List[str]:
@@ -107,7 +111,7 @@ class DataUseReadWrite(Rule):
                 write_data: bool = False
                 mesh: MeshNode = None
                 writer: ParticipantNode = None
-                reader: ParticipantNode | ExportNode | WatchpointNode | WatchIntegralNode = None
+                reader: ParticipantNode | ExportNode | WatchPointNode | WatchIntegralNode = None
 
                 # Check all neighbors of the data node for use-, reader- and writer-nodes
                 for neighbor in g1.neighbors(node):
@@ -116,16 +120,16 @@ class DataUseReadWrite(Rule):
                         use_data = True
                         mesh = neighbor
                         mesh_neighbors = g1.neighbors(neighbor)
-                        # Check if mesh gets observed by export, watchpoint or watch-integral
+                        # Check if mesh gets observed by export, watchpoint or watch-integral.
                         # These types of reader nodes do not read the data itself, but only "read" the mesh and all of
-                        # its used data
-                        # They are thus less important than a read-data node, so only check them if
-                        # no read-data node has been found
+                        # its used data.
+                        # They are thus less important than a read-data node (which represents a participant),
+                        # so only check them if no read-data node has been found.
                         for mesh_neighbor in mesh_neighbors:
                             if isinstance(neighbor, ExportNode) and not read_data:
                                 read_data = True
                                 reader = mesh_neighbor
-                            elif isinstance(neighbor, WatchpointNode) and not read_data:
+                            elif isinstance(neighbor, WatchPointNode) and not read_data:
                                 read_data = True
                                 reader = mesh_neighbor
                             elif isinstance(neighbor, WatchIntegralNode) and not read_data:
@@ -186,6 +190,6 @@ def filter_use_read_write_data(node) -> bool:
             isinstance(node, MeshNode) or
             isinstance(node, ReadDataNode) or
             isinstance(node, ExportNode) or
-            isinstance(node, WatchpointNode) or
+            isinstance(node, WatchPointNode) or
             isinstance(node, WatchIntegralNode) or
             isinstance(node, WriteDataNode))
