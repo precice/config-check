@@ -88,7 +88,7 @@ We are always open to suggestions for new rules.
 When encountering a logical error that does not already get reviewed by our checker,
 please create a new issue on our [GitHub repository](https://github.com/precice-forschungsprojekt/config-checker) and:
 
-- Check that the problem is not already under development (marked with `TODO`here)
+- Check that the problem is not already under development (marked with `TODO` in [docs/Rules.md](https://github.com/precice-forschungsprojekt/config-checker/blob/main/docs/Rules.md))
 - Explain the problem:
     - What exactly is the problem?
     - Why is it a problem?
