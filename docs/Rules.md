@@ -23,7 +23,7 @@ Rules with `TODO` before their names have not yet been implemented but will be s
 
 ## Rules with severity `error`
 
-### Missing coupling-scheme
+### (1) Missing coupling-scheme
 
 If a preCICE config.xml is missing a coupling-scheme (or a multi-coupling-scheme), then no data gets exchanged between
 participants.
@@ -31,23 +31,53 @@ participants.
 Since preCICE is a tool for running coupled simulations between multiple participants, not defining a coupling-scheme is
 an error.
 
-### Missing exchange
+### (2) `TODO` Participant not part of a coupling-scheme
 
-In order for data to get exchanged, it has to be communicated through an 'exchange'. If data gets declared but not
-exchanged through an exchange, then its declaration is redundant.
+A participant needs to be part of at least one coupling scheme.
 
-#### Missing exchange: no full usage of data
+Otherwise, the participant does not exchange data and is not part of a coupled simulation, which is an error.
 
-Data gets declared but not fully utilized (not used in a mesh, not read or not written by a participant). Additionally,
-there exists no exchange for this data element.
+### (3) `TODO` Participant needs to be part of an m2n exchange
 
-#### Missing exchange: full usage of data
+In order for the two solvers to exchange data between them, 
+their participants have to be connected through an m2n node in the config.xml.
 
-Data gets declared and used in a mesh, read and written by a participant, but not exchanged in a coupling-scheme.
+Otherwise, they are not partaking in the coupled simulation.
+
+#### `TODO` Participant not part of an m2n exchange
+
+A participant needs to be part of at least one m2n data exchange to exchange data.
+
+#### `TODO` Duplicate m2n exchange
+
+A participant can be part of more than one m2n exchange, but an exchange between two participants is only allowed to be
+defined once.
+
+### (4) `TODO` Read- and write-data are only valid on a participants own meshes or if explicitly requested
+
+If a participant wants to read-/write-data from or to a mesh, then he needs to know the correct positions to do so.
+
+He knows these coordinates if the mesh is his own (`provide-mesh`) or he explicitly states that he knows them from a 
+received mesh (with `direct-access="true"`).
+
+If neither is satisfied, the participant has no permission to read from or write to the mesh.
+
+### (5) `TODO` Participant reads from/writes to mesh, but nobody writes to/reads from it
+
+If a participant reads data from a mesh, then someone should write it beforehand.<br>
+Similarly, if a participant writes data to a mesh, then someone should read from it later on.
 
 ## Rules with severity `warning`
 
-### `TODO` Coupling-scheme without mapping
+### (1) Missing exchange
+
+In order for data to get exchanged, it has to be communicated through an 'exchange'.
+If it does not get exchanged, then it should be directly used by the participant itself, e.g., through an action.
+
+If data gets declared but not exchanged through an exchange (or used by the participant itself), 
+then in most cases, its declaration is redundant.
+
+### (2) `TODO` Coupling-scheme without mapping
 
 To ensure that exchanged data between one participant and its mesh to another participant and its mesh, the mapping has
 to be defined.
@@ -56,7 +86,7 @@ correctly.
 
 It is possible, however, that meshes fit together naturally.
 
-### Data rules
+### (3) Data rules
 
 A data element in a preCICE needs to be mentioned at many locations to finally allow it to be communicated from one
 participant to another.
@@ -93,7 +123,7 @@ through other means).
 
 The data element gets declared but not used in a mesh, read or written by any participant.
 
-### `TODO` Unused mesh
+### (4) `TODO` Unused mesh
 
 A participant can provide a mesh to another participant, who receives it but does not use it.
 This means that the mesh is not used in any coupling scheme.
@@ -102,7 +132,7 @@ This does not necessarily cause the simulation to malfunction or misbehave.
 
 ## Rules with severity `debug`
 
-### `TODO` Disjoint simulations
+### (1) `TODO` Disjoint simulations
 
 A simulation between participants A and B and a second one between participants C and D can run simultaneously, but will
 deteriorate the readability of the preCICE-config and will make it more prone to errors.
