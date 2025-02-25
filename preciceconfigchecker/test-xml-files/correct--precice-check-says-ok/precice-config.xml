@@ -34,7 +34,6 @@
       to="Propagator-Mesh"
       constraint="consistent" />
     <read-data name="Color" mesh="Propagator-Mesh" />
-    <read-data name="Color2" mesh="Generator-Mesh" />
   </participant>
 
   <m2n:sockets acceptor="Generator" connector="Propagator" exchange-directory=".." />
