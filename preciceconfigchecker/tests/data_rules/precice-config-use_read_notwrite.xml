@@ -8,11 +8,11 @@
   </log>
 
   <data:scalar name="Color" />
-  <data:scalar name="Color2" />
+  <data:scalar name="ErrorColor" />
 
   <mesh name="Generator-Mesh" dimensions="2">
     <use-data name="Color" />
-    <use-data name="Color2" />
+    <use-data name="ErrorColor" />
   </mesh>
 
   <mesh name="Propagator-Mesh" dimensions="2">
@@ -21,8 +21,8 @@
 
   <participant name="Generator">
     <provide-mesh name="Generator-Mesh" />
-    <write-data name="Color" mesh="Generator-Mesh" />  
-    <write-data name="Color2" mesh="Generator-Mesh" />  
+    <write-data name="Color" mesh="Generator-Mesh" />
+    <read-data name="ErrorColor" mesh="Generator-Mesh" />
   </participant>
 
   <participant name="Propagator">
@@ -34,10 +34,14 @@
       to="Propagator-Mesh"
       constraint="consistent" />
     <read-data name="Color" mesh="Propagator-Mesh" />
-    <read-data name="Color2" mesh="Generator-Mesh" />
   </participant>
 
   <m2n:sockets acceptor="Generator" connector="Propagator" exchange-directory=".." />
 
- 
+  <coupling-scheme:serial-explicit>
+    <participants first="Generator" second="Propagator" />
+    <time-window-size value="0.01" />
+    <max-time value="0.3" />
+    <exchange data="Color" mesh="Generator-Mesh" from="Generator" to="Propagator" />
+  </coupling-scheme:serial-explicit>
 </precice-configuration>
