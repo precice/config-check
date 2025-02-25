@@ -1,5 +1,5 @@
 from typing import List
-
+from dataclasses import dataclass
 import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import DataNode, ExchangeNode, MeshNode, ParticipantNode, ReadDataNode, WriteDataNode
@@ -8,12 +8,14 @@ from preciceconfigchecker.severity import Severity
 from preciceconfigchecker.violation import Violation
 
 
+@dataclass
 class MissingExchangeRule(Rule):
     # To communicate data, it needs to be exchanged in a coupling scheme. Declaring and using data,
     # but without an exchange is an error.
     severity = Severity.ERROR
     name = "Missing data exchange."
 
+    @dataclass
     class MissingExchangeViolation(Violation):
         """
         This class handles data, which does not get used, not getting exchanged either.
@@ -29,6 +31,7 @@ class MissingExchangeRule(Rule):
             return [f"Please exchange {self.data_node.name} in a coupling-scheme.",
                     "Otherwise, please remove it to improve readability."]
 
+    @dataclass
     class MissingUseDataExchangeViolation(Violation):
         """
         This class handles data being used, read and written but not being exchanged in a coupling-scheme.
@@ -42,8 +45,9 @@ class MissingExchangeRule(Rule):
             self.reader = reader
 
         def format_explanation(self) -> str:
-            return (f"Data {self.data_node.name} is used in mesh {self.mesh.name}, gets written by participant {self.writer.name} "
-                    f"and read by participant {self.reader.name}, but does not get exchanged in a coupling-scheme.")
+            return (
+                f"Data {self.data_node.name} is used in mesh {self.mesh.name}, gets written by participant {self.writer.name} "
+                f"and read by participant {self.reader.name}, but does not get exchanged in a coupling-scheme.")
 
         def format_possible_solutions(self) -> List[str]:
             return [f"Please exchange {self.data_node.name} in a coupling-scheme.",
