@@ -21,7 +21,8 @@
 
   <participant name="Generator">
     <provide-mesh name="Generator-Mesh" />
-    <write-data name="Color" mesh="Generator-Mesh" />  
+    <write-data name="Color" mesh="Generator-Mesh" />
+    <read-data name="ErrorColor" mesh="Generator-Mesh" />
   </participant>
 
   <participant name="Propagator">
@@ -33,7 +34,6 @@
       to="Propagator-Mesh"
       constraint="consistent" />
     <read-data name="Color" mesh="Propagator-Mesh" />
-    <read-data name="ErrorColor" mesh="Generator-Mesh" />
   </participant>
 
   <m2n:sockets acceptor="Generator" connector="Propagator" exchange-directory=".." />
