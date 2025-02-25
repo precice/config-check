@@ -52,12 +52,13 @@ config-checker
 │   │   └── examples           # Exemplary implementations of rules to test output format 
 │   │       └── ...
 │   │
-│   ├── test-xml-files         # Configuration files to test rules 
+│   ├── tests                  # Configuration files to test rules 
 │   │   └── ...
 │   │
 │   ├── cli.py                 # Main entrypoint for this checker
 │   ├── color.py               # Definition of colors for CLI output
 │   ├── rule.py                # Class of a rule and logic to check all rules
+│   ├── rules_processing.py    # Processes rules and handles output
 │   ├── severity.py            # Enum for specifying severity of output
 │   └── violation.py           # Class of a violation
 │
