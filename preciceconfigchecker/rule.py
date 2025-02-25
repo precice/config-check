@@ -84,6 +84,7 @@ class Rule(ABC):
         if self.severity == Severity.ERROR:
             Rule.number_errors += len(self.violations)
 
+
 # To handle all the rules
 rules: list[Rule] = []
 """List of all initialized rules. Info: Each rule puts itself on this list when initialized."""

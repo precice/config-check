@@ -1,7 +1,7 @@
 from networkx import Graph
 
-from preciceconfigchecker.rule import Rule, rules
-from preciceconfigchecker.severity import Severity
+from rule import Rule, rules
+from severity import Severity
 
 # ALL RULES THAT SHOULD BE CHECKED NEED TO BE IMPORTED
 # SOME IDE's MIGHT REMOVE THEM AS UNUSED IMPORTS
@@ -21,14 +21,13 @@ def all_rules_satisfied() -> bool:
 
 
 def check_all_rules(graph: Graph, debug: bool) -> None:
-
     """
     Checks all rules for violations
     """
     print("\nChecking rules...")
     for rule in rules:
         if debug or rule.severity != Severity.DEBUG:
-            violations_for_this_rule = rule.check(graph)
+            rule.check(graph)
     print("Rules checked.")
 
 
@@ -40,14 +39,15 @@ def print_all_results(debug: bool) -> None:
         print("The following issues were found:")
     for rule in rules:
         rule.print_result(debug)
-    error_str:str = f"{Severity.ERROR.value}"
-    warning_str:str = f"{Severity.WARNING.value}"
+    error_str: str = f"{Severity.ERROR.value}"
+    warning_str: str = f"{Severity.WARNING.value}"
     if Rule.number_errors != 1:
         error_str += "s"
     if Rule.number_warnings != 1:
         warning_str += "s"
     if Rule.number_errors != 0 or Rule.number_warnings != 0:
-        print(f"Your configuration file raised {Rule.number_errors} {error_str} and {Rule.number_warnings} {warning_str}.")
+        print(f"Your configuration file raised {Rule.number_errors} {error_str} "
+              f"and {Rule.number_warnings} {warning_str}.")
         print("Please review your configuration file before continuing.")
     else:
         print("You are all set to start you simulation!")
