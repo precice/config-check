@@ -8,11 +8,9 @@
   </log>
 
   <data:scalar name="Color" />
-  <data:scalar name="Color2" />
 
   <mesh name="Generator-Mesh" dimensions="2">
     <use-data name="Color" />
-    <use-data name="Color2" />
   </mesh>
 
   <mesh name="Propagator-Mesh" dimensions="2">
