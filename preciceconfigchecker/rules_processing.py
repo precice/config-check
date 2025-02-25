@@ -1,13 +1,13 @@
 from networkx import Graph
 
-from rule import Rule, rules
-from severity import Severity
+from preciceconfigchecker.rule import Rule, rules
+from preciceconfigchecker.severity import Severity
 
 # ALL RULES THAT SHOULD BE CHECKED NEED TO BE IMPORTED
 # SOME IDE's MIGHT REMOVE THEM AS UNUSED IMPORTS
-from rules import missing_coupling
-from rules import missing_exchange
-from rules import data_use_read_write
+from preciceconfigchecker.rules import missing_coupling
+from preciceconfigchecker.rules import missing_exchange
+from preciceconfigchecker.rules import data_use_read_write
 
 
 def all_rules_satisfied() -> bool:

@@ -3,9 +3,9 @@ from typing import List
 
 from networkx import Graph
 
-from severity import Severity
-from violation import Violation
-import color as c
+from preciceconfigchecker.severity import Severity
+from preciceconfigchecker.violation import Violation
+import preciceconfigchecker.color as c
 
 
 class Rule(ABC):
