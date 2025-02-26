@@ -10,13 +10,11 @@ from preciceconfigchecker.violation import Violation
 
 
 
-@dataclass
 class MissingExchangeRule(Rule):
     # A coupling-scheme without an exchange is not allowed.
     severity = Severity.ERROR
     name = "Coupling-scheme needs at least one exchange."
 
-    @dataclass
     class MissingExchangeViolation(Violation):
         """
         This class handles coupling-schemes missing data-exchanges.

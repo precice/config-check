@@ -1,5 +1,4 @@
 from typing import List
-from dataclasses import dataclass
 import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import CouplingSchemeNode, MultiCouplingSchemeNode
@@ -9,14 +8,12 @@ from preciceconfigchecker.severity import Severity
 from preciceconfigchecker.violation import Violation
 
 
-@dataclass
 class MissingCouplingSchemeRule(Rule):
     # As participants need a coupling-scheme to communicate, a coupling-scheme must exist.
     # If no coupling exists, then this gets treated as an error.
     severity = Severity.ERROR
     name = "Missing coupling-scheme"
 
-    @dataclass
     class MissingCouplingSchemeViolation(Violation):
         # No nodes have to be passed: A coupling-scheme is missing and does not depend on anything else
         # from the config file

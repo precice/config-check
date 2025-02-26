@@ -1,5 +1,4 @@
 from typing import List
-from dataclasses import dataclass
 
 import networkx as nx
 from networkx import Graph
@@ -10,15 +9,11 @@ from preciceconfigchecker.severity import Severity
 from preciceconfigchecker.violation import Violation
 
 
-
-
-@dataclass
 class DataUseReadWrite(Rule):
     name = "Data rules."
     # These are oversights, but do not necessarily cause the simulation to malfunction.
     severity = Severity.WARNING
 
-    @dataclass
     class DataNotUsedNotReadNotWrittenViolation(Violation):
         """
             This violation handles nobody using, reading or writing a data node.
@@ -34,7 +29,6 @@ class DataUseReadWrite(Rule):
             return [f"Consider using {self.data_node.name} in a mesh and have participants read and write it.",
                     "Otherwise please remove it to improve readability."]
 
-    @dataclass
     class DataUsedNotReadNotWrittenViolation(Violation):
         """
             This violation handles someone using a data node, but nobody is reading and writing said data node.
@@ -52,7 +46,6 @@ class DataUseReadWrite(Rule):
                     f"Consider having a participant write data {self.data_node.name}.",
                     "Otherwise please remove it to improve readability."]
 
-    @dataclass
     class DataUsedNotReadWrittenViolation(Violation):
         """
             This class handles someone using and writing a data node, but nobody reading said data node.
@@ -74,7 +67,6 @@ class DataUseReadWrite(Rule):
                     f"Consider using watchpoints or watch-integrals to keep track of data {self.data_node.name}.",
                     "Otherwise please remove it to improve readability."]
 
-    @dataclass
     class DataUsedReadNotWrittenViolation(Violation):
         """
             This class handles a mesh using and someone reading a data node, but nobody writing said data node.
