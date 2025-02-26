@@ -71,11 +71,7 @@ Similarly, if a participant writes data to a mesh, then someone should read from
 
 ### (1) Missing exchange
 
-In order for data to get exchanged, it has to be communicated through an 'exchange'.
-If it does not get exchanged, then it should be directly used by the participant itself, e.g., through an action.
-
-If data gets declared but not exchanged through an exchange (or used by the participant itself), 
-then in most cases, its declaration is redundant.
+A coupling-scheme needs to have at least one exchange element. Otherwise, it is redundant. 
 
 ### (2) `TODO` Coupling-scheme without mapping
 
@@ -88,22 +84,25 @@ It is possible, however, that meshes fit together naturally.
 
 ### (3) Data rules
 
-A data element in a preCICE needs to be mentioned at many locations to finally allow it to be communicated from one
-participant to another.
-To exchange it from one participant to another, after declaration, data has to be:
+A data element in a preCICE needs to be mentioned at many locations to finally allow it to be utilized by one or more 
+participants.
+After declaration, data has to be:
 
 - used in a mesh
 - written by a participant
 - read by a participant (or read through other means, e.g., of immediate export)
-- exchanged in a coupling-scheme
+- exchanged in a coupling-scheme, if it gets written and read by different participants-
 
-The last point already gets checked in `Missing coupling-scheme` and `Missing exchange`.<br>
 All other cases get checked here (minus the ones that get handled by `precice-tools check`).
 
 Using, reading or writing data without the respective other tags is not as severe an error, as this data element is
 likely not used in the simulation yet, due to multiple tags missing.
 
 For the exact implementation, see `rules/data_use_read_write.py`.
+
+#### Data gets used in a mesh, read and written by different participants, but not exchanged
+
+The data element does not get exchanged between the participants which are accessing the data. 
 
 #### Data gets used but not written or read
 
