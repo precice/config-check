@@ -11,7 +11,7 @@ from violation import Violation
 class MissingExchangeRule(Rule):
     # A coupling-scheme without an exchange is not allowed.
     severity = Severity.ERROR
-    name = "Missing data exchange in a coupling-scheme."
+    name = "Coupling-scheme needs at least one exchange."
 
     class MissingExchangeViolation(Violation):
         """
