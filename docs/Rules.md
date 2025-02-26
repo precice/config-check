@@ -67,13 +67,14 @@ If neither is satisfied, the participant has no permission to read from or write
 If a participant reads data from a mesh, then someone should write it beforehand.<br>
 Similarly, if a participant writes data to a mesh, then someone should read from it later on.
 
+### (6) Missing exchange
+
+A coupling-scheme needs to have at least one exchange element. Otherwise, it is redundant.
+
+
 ## Rules with severity `warning`
 
-### (1) Missing exchange
-
-A coupling-scheme needs to have at least one exchange element. Otherwise, it is redundant. 
-
-### (2) `TODO` Coupling-scheme without mapping
+### (1) `TODO` Coupling-scheme without mapping
 
 To ensure that exchanged data between one participant and its mesh to another participant and its mesh, the mapping has
 to be defined.
@@ -82,7 +83,7 @@ correctly.
 
 It is possible, however, that meshes fit together naturally.
 
-### (3) Data rules
+### (2) Data rules
 
 A data element in a preCICE needs to be mentioned at many locations to finally allow it to be utilized by one or more 
 participants.
@@ -122,7 +123,7 @@ through other means).
 
 The data element gets declared but not used in a mesh, read or written by any participant.
 
-### (4) `TODO` Unused mesh
+### (3) `TODO` Unused mesh
 
 A participant can provide a mesh to another participant, who receives it but does not use it.
 This means that the mesh is not used in any coupling scheme.
