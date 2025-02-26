@@ -52,14 +52,14 @@ class DataUseReadWrite(Rule):
             This class handles someone using and writing a data node, but nobody reading said data node.
         """
 
-        def __init__(self, data_node: DataNode, mesh: MeshNode, participant: ParticipantNode):
+        def __init__(self, data_node: DataNode, mesh: MeshNode, writer: ParticipantNode):
             self.data_node = data_node
             self.mesh = mesh
-            self.participant = participant
+            self.writer = writer
 
         def format_explanation(self) -> str:
             return (
-                f"Data {self.data_node.name} is used in mesh {self.mesh.name} and participant {self.participant.name} "
+                f"Data {self.data_node.name} is used in mesh {self.mesh.name} and participant {self.writer.name} "
                 f"is writing it, but nobody is reading it.")
 
         def format_possible_solutions(self) -> List[str]:
@@ -88,7 +88,7 @@ class DataUseReadWrite(Rule):
 
     class DataNotExchangedViolation(Violation):
         """
-            This class handles data being read and written by different participants,
+            This class handles data being used in a mesh, read and written by different participants,
             but not being exchanged between them.
         """
 
