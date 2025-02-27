@@ -5,6 +5,7 @@ from severity import Severity
 import color as c
 
 from precice_config_graph import graph, xml_processing
+
 from rules_processing import check_all_rules, print_all_results
 
 path: str = None

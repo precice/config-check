@@ -1,14 +1,14 @@
 from networkx import Graph
 
 from preciceconfigchecker.violation import Violation
+from rule import Rule, rules
+from severity import Severity
 import color as c
-from preciceconfigchecker.rule import Rule, rules
-from preciceconfigchecker.severity import Severity
 
 # ALL RULES THAT SHOULD BE CHECKED NEED TO BE IMPORTED
 # SOME IDE's MIGHT REMOVE THEM AS UNUSED IMPORTS
 # noinspection PyUnresolvedReferences
-from preciceconfigchecker.rules import missing_coupling, missing_exchange, data_use_read_write
+from rules import missing_coupling, missing_exchange, data_use_read_write
 
 
 def all_rules_satisfied(violations_by_rule: dict[Rule, list[Violation]]) -> bool:

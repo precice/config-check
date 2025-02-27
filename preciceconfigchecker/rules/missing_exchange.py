@@ -1,11 +1,9 @@
 import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import ExchangeNode, CouplingSchemeNode, MultiCouplingSchemeNode
-from preciceconfigchecker.rule import Rule
-from preciceconfigchecker.severity import Severity
-from preciceconfigchecker.violation import Violation
-
-
+from rule import Rule
+from severity import Severity
+from violation import Violation
 
 
 class MissingExchangeRule(Rule):
