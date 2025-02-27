@@ -9,10 +9,10 @@ This program is designed to collect all messages, and then, after having checked
 - potential use as a library
 - merging multiple related messages into one
 
-The actual logic for checking for Violations is implemented in Rules. A Rule is a class with a `check` method, that takes in the graph built from the config file and stores zero or more Violations. Each Violation refers to one (potential) error. Since one Rule can be violated multiple times, Rules and Violations have a `1:N` relation.
+The actual logic for checking for Violations is implemented in Rules. A Rule is a class with a `check` method, that takes in the graph built from the config file and returns zero or more Violations. Each Violation refers to one (potential) error. Since one Rule can be violated multiple times, Rules and Violations have a `1:N` relation.
 
 ### Mixed Violations
 
 Sometimes, rules can be summarized. Take as an example the `<data />` node. It can be read, but never written to. It can also be written to, but never read. Additionally, it can never be written or read. In the latter case, it would be confusing to print two errors ("this data is never written to" and "this data is never read").
 
-Therefore, some Rules have mixed Violation types. For our example, this means the `DataUseReadWrite`-Rule produces Violations that are of different types (`DataNotUsedNotReadNotWrittenViolation`, `DataUsedNotReadNotWrittenViolation`, etc.).
+Therefore, some Rules can return mixed Violation types. For our example, this means the `DataUseReadWrite`-Rule produces Violations that are of different types (`DataNotUsedNotReadNotWrittenViolation`, `DataUsedNotReadNotWrittenViolation`, etc.).
