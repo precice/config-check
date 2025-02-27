@@ -102,7 +102,6 @@ class DataUseReadWrite(Rule):
             return [f"Please exchange {self.data_node.name} in a coupling-scheme between participants "
                     f"{self.writer.name} and {self.reader.name}"]
 
-
     def check(self, graph: Graph) -> list[Violation]:
         violations: list[Violation] = []
 
@@ -216,6 +215,7 @@ class DataUseReadWrite(Rule):
                     continue
                 elif not use_data and not read_data and not write_data:
                     violations.append(self.DataNotUsedNotReadNotWrittenViolation(data_node))
+        return violations
 
 
 # Initialize a rule object to add it to the rules-array.
