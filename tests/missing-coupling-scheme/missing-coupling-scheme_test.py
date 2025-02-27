@@ -31,7 +31,6 @@ def test_missing_coupling_scheme():
 
     for rule in rules:
         violations_actual += violations_by_rule[rule]
-    print(violations_actual)
 
     # Extract nodes from graph to build custom violations
     for node in graph.nodes():
