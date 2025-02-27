@@ -1,6 +1,3 @@
-from tarfile import data_filter
-from typing import List
-
 import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import DataNode, MeshNode, ReadDataNode, WriteDataNode, WatchPointNode, ExportNode, \
@@ -26,7 +23,7 @@ class DataUseReadWrite(Rule):
         def format_explanation(self) -> str:
             return f"Data {self.data_node.name} is declared but never used, read or written."
 
-        def format_possible_solutions(self) -> List[str]:
+        def format_possible_solutions(self) -> list[str]:
             return [f"Consider using {self.data_node.name} in a mesh and have participants read and write it.",
                     "Otherwise please remove it to improve readability."]
 
@@ -42,7 +39,7 @@ class DataUseReadWrite(Rule):
         def format_explanation(self) -> str:
             return f"Data {self.data_node.name} gets used in mesh {self.mesh.name}, but nobody is reading or writing it."
 
-        def format_possible_solutions(self) -> List[str]:
+        def format_possible_solutions(self) -> list[str]:
             return [f"Consider having a participant read data {self.data_node.name}.",
                     f"Consider having a participant write data {self.data_node.name}.",
                     "Otherwise please remove it to improve readability."]
@@ -62,7 +59,7 @@ class DataUseReadWrite(Rule):
                 f"Data {self.data_node.name} is used in mesh {self.mesh.name} and participant {self.writer.name} "
                 f"is writing it, but nobody is reading it.")
 
-        def format_possible_solutions(self) -> List[str]:
+        def format_possible_solutions(self) -> list[str]:
             return [f"Consider having a participant read data {self.data_node.name}.",
                     f"Consider exporting data {self.data_node.name} by a participant.",
                     f"Consider using watchpoints or watch-integrals to keep track of data {self.data_node.name}.",
@@ -82,7 +79,7 @@ class DataUseReadWrite(Rule):
             return (f"Data {self.data_node.name} is being used in mesh {self.mesh.name} and participant "
                     f"{self.reader.name} is reading it, but nobody is writing it.")
 
-        def format_possible_solutions(self) -> List[str]:
+        def format_possible_solutions(self) -> list[str]:
             return [f"Consider having a participant write {self.data_node.name}.",
                     "Otherwise please remove it to improve readability."]
 
@@ -101,11 +98,14 @@ class DataUseReadWrite(Rule):
             return (f"Data {self.data_node.name} gets written by {self.writer.name} and read by {self.reader.name}, "
                     f"but not exchanged between them.")
 
-        def format_possible_solutions(self) -> List[str]:
+        def format_possible_solutions(self) -> list[str]:
             return [f"Please exchange {self.data_node.name} in a coupling-scheme between participants "
                     f"{self.writer.name} and {self.reader.name}"]
 
-    def check(self, graph: Graph) -> None:
+
+    def check(self, graph: Graph) -> list[Violation]:
+        violations: list[Violation] = []
+
         g1 = nx.subgraph_view(graph, filter_node=filter_use_read_write_data)
         for data_node in g1.nodes:
             # We only need to test data nodes here
@@ -174,31 +174,36 @@ class DataUseReadWrite(Rule):
                                 continue
                             # Otherwise, there needs to be an exchange of data between them.
                             else:
+                                exchanged: bool = False
                                 g2 = nx.subgraph_view(graph, filter_node=filter_data_exchange)
                                 # Only exchanges neighbor data nodes with this filter
                                 # Check all exchange nodes if they pass data between writer and reader
+                                # If data_node does not have neighbors, it does not get exchanged between them
                                 if nx.degree(g2, data_node) == 0:
-                                    self.violations.append(self.DataNotExchangedViolation(writer, reader, data_node))
+                                    violations.append(self.DataNotExchangedViolation(writer, reader, data_node))
+                                    continue
                                 for exchange in g2.neighbors(data_node):
                                     # If the exchange has both writer and reader,
                                     # then they exchange data and everything is fine
                                     if exchange.from_participant == writer and exchange.to_participant == reader:
+                                        exchanged = True
                                         break
-                                    # This only gets reached if all exchanges do not contain writer and reader.
-                                    # Thus, no exchange exists between them, even though there should.
-                                    self.violations.append(self.DataNotExchangedViolation(writer, reader, data_node))
+                                # This only gets reached if all exchanges do not contain writer and reader.
+                                # Thus, no exchange exists between them, even though there should.
+                                if not exchanged:
+                                    violations.append(self.DataNotExchangedViolation(writer, reader, data_node))
 
                 elif use_data and read_data and not write_data:
                     for mesh in meshes:
                         for reader in readers:
-                            self.violations.append(self.DataUsedReadNotWrittenViolation(data_node, mesh, reader))
+                            violations.append(self.DataUsedReadNotWrittenViolation(data_node, mesh, reader))
                 elif use_data and not read_data and write_data:
                     for mesh in meshes:
                         for writer in writers:
-                            self.violations.append(self.DataUsedNotReadWrittenViolation(data_node, mesh, writer))
+                            violations.append(self.DataUsedNotReadWrittenViolation(data_node, mesh, writer))
                 elif use_data and not read_data and not write_data:
                     for mesh in meshes:
-                        self.violations.append(self.DataUsedNotReadNotWrittenViolation(data_node, mesh))
+                        violations.append(self.DataUsedNotReadNotWrittenViolation(data_node, mesh))
 
                 elif not use_data and read_data and write_data:
                     # This case gets handled by precice-tools check
@@ -210,7 +215,7 @@ class DataUseReadWrite(Rule):
                     # This case gets handled by precice-tools check
                     continue
                 elif not use_data and not read_data and not write_data:
-                    self.violations.append(self.DataNotUsedNotReadNotWrittenViolation(data_node))
+                    violations.append(self.DataNotUsedNotReadNotWrittenViolation(data_node))
 
 
 # Initialize a rule object to add it to the rules-array.

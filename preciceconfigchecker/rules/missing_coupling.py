@@ -1,5 +1,3 @@
-from typing import List
-
 import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import CouplingSchemeNode, MultiCouplingSchemeNode
@@ -24,10 +22,10 @@ class MissingCouplingSchemeRule(Rule):
         def format_explanation(self) -> str:
             return "It seems like your configuration is missing a coupling-scheme."
 
-        def format_possible_solutions(self) -> List[str]:
+        def format_possible_solutions(self) -> list[str]:
             return ["Please add a coupling-scheme to your configuration to exchange data between participants."]
 
-    def check(self, graph: Graph) -> None:
+    def check(self, graph: Graph) -> list[MissingCouplingSchemeViolation]:
         # Filter all coupling-nodes: Only coupling-scheme nodes remain
         coupling_nodes = nx.subgraph_view(graph, filter_node=filter_coupling_scheme_nodes)
         # Filter all multi-coupling-nodes: Only multi-coupling-scheme nodes remain
@@ -35,7 +33,9 @@ class MissingCouplingSchemeRule(Rule):
 
         # If both subgraphs contain no nodes, no coupling nodes exist
         if not coupling_nodes.nodes and not multi_coupling_nodes.nodes:
-            self.violations.append(self.MissingCouplingSchemeViolation())
+            return [self.MissingCouplingSchemeViolation()]
+
+        return []
 
 
 # Initialize a rule object to add it to the rules-array.

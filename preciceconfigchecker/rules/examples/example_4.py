@@ -1,5 +1,3 @@
-from typing import List
-
 from rule import Rule
 from severity import Severity
 from violation import Violation
@@ -12,15 +10,15 @@ class Rule_4(Rule):
         def format_explanation(self) -> str:
             return f"Something went wrong with {self.node_a}"
         
-        def format_possible_solutions(self) -> List[str]:
+        def format_possible_solutions(self) -> list[str]:
             return [f"Delete {self.node_a}"
             ]
 
     severity = Severity.ERROR
     name = "4th Example Rule"
 
-    def check(self, graph) -> None:
-        #Find violations in the graph and add them to the violations list in Rule.
-        pass
+    def check(self, graph) -> list[Violation]:
+        #Find violations in the graph and return them.
+        return []
     
 Rule_4()

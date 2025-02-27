@@ -1,5 +1,3 @@
-from typing import List
-
 import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import ExchangeNode, CouplingSchemeNode, MultiCouplingSchemeNode
@@ -29,21 +27,23 @@ class MissingExchangeRule(Rule):
                 return (f"The multi-coupling-scheme of control-participant "
                         f"{self.coupling_scheme.control_participant.name} is missing an exchange.")
 
-        def format_possible_solutions(self) -> List[str]:
+        def format_possible_solutions(self) -> list[str]:
             return ["Please add an exchange to the coupling-scheme.",
                     "Otherwise, please remove it to improve readability."]
 
-    def check(self, graph: Graph) -> None:
+    def check(self, graph: Graph) -> list[Violation]:
+        violations = []
+
         # Only exchange and coupling-scheme nodes remain
         g1 = nx.subgraph_view(graph, filter_node=filter_exchange_coupling_scheme_nodes)
-
         for node in g1.nodes():
             if isinstance(node, CouplingSchemeNode):
                 # Check whether the coupling-scheme node has any exchange node neighbors
                 exchanges = g1.neighbors(node)
                 if not list(exchanges):
                     # If not, then it does not have an exchange
-                    self.violations.append(self.MissingExchangeViolation(node))
+                    violations.append(self.MissingExchangeViolation(node))
+        return violations
 
 
 # Initialize a rule object to add it to the rules-array.
