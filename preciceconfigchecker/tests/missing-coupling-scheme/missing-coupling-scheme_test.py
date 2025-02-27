@@ -36,7 +36,14 @@ for rule in rules:
 violations_expected_s = sorted(violations_expected, key=lambda obj: type(obj).__name__)
 violations_actual_s = sorted(violations_actual, key=lambda obj: type(obj).__name__)
 
+assert len(violations_expected_s) == len(violations_actual_s), (
+    f"[Missing-coupling-scheme test] Different number of expected- and actual violations.\n"
+    f"   Number of expected violations: {len(violations_expected)},\n"
+    f"   Number of actual violations: {len(violations_actual)}.")
+
 for violation_e, violation_a in zip(violations_expected_s, violations_actual_s):
-    # print(violation_e, violation_a)
-    assert equals(violation_e, violation_a), "There is an error in missing-coupling-scheme test."
+    assert equals(violation_e, violation_a), (
+        "[Missing-coupling-scheme test] Expected- and actual violations do not match.\n"
+        f"   Expected violation: {violation_e.format_explanation()}\n"
+        f"   Actual violation: {violation_a.format_explanation()}")
 print("Passed missing-coupling-scheme test.")
