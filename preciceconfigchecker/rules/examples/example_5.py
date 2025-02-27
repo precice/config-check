@@ -1,5 +1,3 @@
-from typing import List
-
 from rule import Rule
 from severity import Severity
 from violation import Violation
@@ -12,7 +10,7 @@ class Rule_5(Rule):
         def format_explanation(self) -> str:
             return "Testing Debug"
         
-        def format_possible_solutions(self) -> List[str]:
+        def format_possible_solutions(self) -> list[str]:
             return ["The",
                     "Test"
             ]
@@ -20,8 +18,8 @@ class Rule_5(Rule):
     severity = Severity.DEBUG
     name = "5th Example Rule"
 
-    def check(self, graph) -> None:
-        #Find violations in the graph and add them to the violations list in Rule.
-        self.violations.append(self.MyViolation(42))
+    def check(self, graph) -> list[Violation]:
+        #Find violations in the graph and return them.
+        return [ self.MyViolation(42) ]
     
 Rule_5()
