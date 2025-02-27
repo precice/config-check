@@ -67,6 +67,7 @@ let
     pythonEnv = pkgs.python312.withPackages(ps: [
         config-graph
         pyprecice
+        pytest
     ]);
 in pkgs.mkShell {
     packages = [
