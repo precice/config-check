@@ -1,5 +1,3 @@
-from typing import List
-
 import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import DataNode, ExchangeNode, MeshNode, ParticipantNode, ReadDataNode, WriteDataNode
@@ -25,7 +23,7 @@ class MissingExchangeRule(Rule):
         def format_explanation(self) -> str:
             return f"Data {self.data_node.name} does not get exchanged in a coupling-scheme."
 
-        def format_possible_solutions(self) -> List[str]:
+        def format_possible_solutions(self) -> list[str]:
             return [f"Please exchange {self.data_node.name} in a coupling-scheme.",
                     "Otherwise, please remove it to improve readability."]
 
@@ -45,15 +43,17 @@ class MissingExchangeRule(Rule):
             return (f"Data {self.data_node.name} is used in mesh {self.mesh.name}, gets written by participant {self.writer.name} "
                     f"and read by participant {self.reader.name}, but does not get exchanged in a coupling-scheme.")
 
-        def format_possible_solutions(self) -> List[str]:
+        def format_possible_solutions(self) -> list[str]:
             return [f"Please exchange {self.data_node.name} in a coupling-scheme.",
                     f"Simply add the following line to a coupling-scheme involving participants {self.reader.name} and "
                     f"{self.writer.name}:\n "
                     f"<exchange data=\"{self.data_node.name}\" mesh=\"{self.mesh.name}\" from=\"{self.writer.name}\" to=\"{self.reader.name}\" />"]
 
-    def check(self, graph: Graph) -> None:
+    def check(self, graph: Graph) -> list[Violation]:
         # Only data and exchange nodes remain
         g1 = nx.subgraph_view(graph, filter_node=filter_data_exchange_nodes)
+
+        violations = []
 
         for node in g1.nodes():
             # Check all data nodes
@@ -75,10 +75,12 @@ class MissingExchangeRule(Rule):
                             writer = adjacent.participant
                     # Data gets used, read and written
                     if mesh and reader and writer:
-                        self.violations.append(self.MissingUseDataExchangeViolation(node, mesh, reader, writer))
+                        violations.append(self.MissingUseDataExchangeViolation(node, mesh, reader, writer))
                     # Data does not get used, read and written
                     else:
-                        self.violations.append(self.MissingExchangeViolation(node))
+                        violations.append(self.MissingExchangeViolation(node))
+
+        return violations
 
 
 # Initialize a rule object to add it to the rules-array.

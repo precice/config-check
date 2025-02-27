@@ -1,5 +1,3 @@
-from typing import List
-
 import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import DataNode, MeshNode, ReadDataNode, WriteDataNode, WatchPointNode, ExportNode, \
@@ -25,7 +23,7 @@ class DataUseReadWrite(Rule):
         def format_explanation(self) -> str:
             return f"Data {self.data_node.name} is declared but never used, read or written."
 
-        def format_possible_solutions(self) -> List[str]:
+        def format_possible_solutions(self) -> list[str]:
             return [f"Consider using {self.data_node.name} in a mesh and have participants read and write it.",
                     "Otherwise please remove it to improve readability."]
 
@@ -41,7 +39,7 @@ class DataUseReadWrite(Rule):
         def format_explanation(self) -> str:
             return f"Data {self.data_node.name} gets used in mesh {self.mesh.name}, but nobody is reading or writing it."
 
-        def format_possible_solutions(self) -> List[str]:
+        def format_possible_solutions(self) -> list[str]:
             return [f"Consider having a participant read data {self.data_node.name}.",
                     f"Consider having a participant write data {self.data_node.name}.",
                     "Otherwise please remove it to improve readability."]
@@ -61,7 +59,7 @@ class DataUseReadWrite(Rule):
                 f"Data {self.data_node.name} is used in mesh {self.mesh.name} and participant {self.participant.name} "
                 f"is writing it, but nobody is reading it.")
 
-        def format_possible_solutions(self) -> List[str]:
+        def format_possible_solutions(self) -> list[str]:
             return [f"Consider having a participant read data {self.data_node.name}.",
                     f"Consider exporting data {self.data_node.name} by a participant.",
                     f"Consider using watchpoints or watch-integrals to keep track of data {self.data_node.name}.",
@@ -97,11 +95,13 @@ class DataUseReadWrite(Rule):
                 f"Data {self.data_node.name} is being used in mesh {self.mesh.name} and {self.type} {self.name} "
                 f"is reading it, but nobody is writing it.")
 
-        def format_possible_solutions(self) -> List[str]:
+        def format_possible_solutions(self) -> list[str]:
             return [f"Consider having a participant write {self.data_node.name}.",
                     "Otherwise please remove it to improve readability."]
 
-    def check(self, graph: Graph) -> None:
+    def check(self, graph: Graph) -> list[Violation]:
+        violations: list[Violation] = []
+
         g1 = nx.subgraph_view(graph, filter_node=filter_use_read_write_data)
         for node in g1.nodes:
             # We only need to test data nodes here
@@ -148,11 +148,11 @@ class DataUseReadWrite(Rule):
                     # Everything is fine here
                     continue
                 elif use_data and read_data and not write_data:
-                    self.violations.append(self.DataUsedReadNotWrittenViolation(node, mesh, reader))
+                    violations.append(self.DataUsedReadNotWrittenViolation(node, mesh, reader))
                 elif use_data and not read_data and write_data:
-                    self.violations.append(self.DataUsedNotReadWrittenViolation(node, mesh, writer))
+                    violations.append(self.DataUsedNotReadWrittenViolation(node, mesh, writer))
                 elif use_data and not read_data and not write_data:
-                    self.violations.append(self.DataUsedNotReadNotWrittenViolation(node, mesh))
+                    violations.append(self.DataUsedNotReadNotWrittenViolation(node, mesh))
                 elif not use_data and read_data and write_data:
                     # This case gets handled by precice-tools check
                     continue
@@ -163,7 +163,9 @@ class DataUseReadWrite(Rule):
                     # This case gets handled by precice-tools check
                     continue
                 elif not use_data and not read_data and not write_data:
-                    self.violations.append(self.DataNotUsedNotReadNotWrittenViolation(node))
+                    violations.append(self.DataNotUsedNotReadNotWrittenViolation(node))
+
+        return violations
 
 
 # Initialize a rule object to add it to the rules-array.
