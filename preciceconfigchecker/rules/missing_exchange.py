@@ -51,9 +51,11 @@ class MissingExchangeRule(Rule):
                     f"{self.writer.name}:\n "
                     f"<exchange data=\"{self.data_node.name}\" mesh=\"{self.mesh.name}\" from=\"{self.writer.name}\" to=\"{self.reader.name}\" />"]
 
-    def check(self, graph: Graph) -> None:
+    def check(self, graph: Graph) -> list[Violation]:
         # Only data and exchange nodes remain
         g1 = nx.subgraph_view(graph, filter_node=filter_data_exchange_nodes)
+
+        violations = []
 
         for node in g1.nodes():
             # Check all data nodes
@@ -75,10 +77,12 @@ class MissingExchangeRule(Rule):
                             writer = adjacent.participant
                     # Data gets used, read and written
                     if mesh and reader and writer:
-                        self.violations.append(self.MissingUseDataExchangeViolation(node, mesh, reader, writer))
+                        violations.append(self.MissingUseDataExchangeViolation(node, mesh, reader, writer))
                     # Data does not get used, read and written
                     else:
-                        self.violations.append(self.MissingExchangeViolation(node))
+                        violations.append(self.MissingExchangeViolation(node))
+
+        return violations
 
 
 # Initialize a rule object to add it to the rules-array.

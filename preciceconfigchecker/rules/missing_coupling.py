@@ -27,7 +27,7 @@ class MissingCouplingSchemeRule(Rule):
         def format_possible_solutions(self) -> List[str]:
             return ["Please add a coupling-scheme to your configuration to exchange data between participants."]
 
-    def check(self, graph: Graph) -> None:
+    def check(self, graph: Graph) -> list[MissingCouplingSchemeViolation]:
         # Filter all coupling-nodes: Only coupling-scheme nodes remain
         coupling_nodes = nx.subgraph_view(graph, filter_node=filter_coupling_scheme_nodes)
         # Filter all multi-coupling-nodes: Only multi-coupling-scheme nodes remain
@@ -35,7 +35,9 @@ class MissingCouplingSchemeRule(Rule):
 
         # If both subgraphs contain no nodes, no coupling nodes exist
         if not coupling_nodes.nodes and not multi_coupling_nodes.nodes:
-            self.violations.append(self.MissingCouplingSchemeViolation())
+            return [self.MissingCouplingSchemeViolation()]
+
+        return []
 
 
 # Initialize a rule object to add it to the rules-array.

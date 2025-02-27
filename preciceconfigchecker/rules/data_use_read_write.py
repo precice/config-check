@@ -101,7 +101,9 @@ class DataUseReadWrite(Rule):
             return [f"Consider having a participant write {self.data_node.name}.",
                     "Otherwise please remove it to improve readability."]
 
-    def check(self, graph: Graph) -> None:
+    def check(self, graph: Graph) -> list[Violation]:
+        violations: list[Violation] = []
+
         g1 = nx.subgraph_view(graph, filter_node=filter_use_read_write_data)
         for node in g1.nodes:
             # We only need to test data nodes here
@@ -148,11 +150,11 @@ class DataUseReadWrite(Rule):
                     # Everything is fine here
                     continue
                 elif use_data and read_data and not write_data:
-                    self.violations.append(self.DataUsedReadNotWrittenViolation(node, mesh, reader))
+                    violations.append(self.DataUsedReadNotWrittenViolation(node, mesh, reader))
                 elif use_data and not read_data and write_data:
-                    self.violations.append(self.DataUsedNotReadWrittenViolation(node, mesh, writer))
+                    violations.append(self.DataUsedNotReadWrittenViolation(node, mesh, writer))
                 elif use_data and not read_data and not write_data:
-                    self.violations.append(self.DataUsedNotReadNotWrittenViolation(node, mesh))
+                    violations.append(self.DataUsedNotReadNotWrittenViolation(node, mesh))
                 elif not use_data and read_data and write_data:
                     # This case gets handled by precice-tools check
                     continue
@@ -163,7 +165,9 @@ class DataUseReadWrite(Rule):
                     # This case gets handled by precice-tools check
                     continue
                 elif not use_data and not read_data and not write_data:
-                    self.violations.append(self.DataNotUsedNotReadNotWrittenViolation(node))
+                    violations.append(self.DataNotUsedNotReadNotWrittenViolation(node))
+
+        return violations
 
 
 # Initialize a rule object to add it to the rules-array.
