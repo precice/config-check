@@ -16,16 +16,16 @@ def test_simple_good():
     xml = xml_processing.parse_file("tests/simple-good/precice-config.xml")
     graph = g.get_graph(xml)
 
+    violations_actual = []
+
     with contextlib.redirect_stdout(io.StringIO()):
-        check_all_rules(graph, True)
+        violations_by_rule = check_all_rules(graph, True)
+
+    for rule in rules:
+        violations_actual += violations_by_rule[rule]
 
     # No violations are expected
     violations_expected = []
-
-    violations_actual = []
-    for rule in rules:
-        for violation in rule.violations:
-            violations_actual.append(violation)
 
     # Sort them so that violations of the same type are in the same order
     violations_expected_s = sorted(violations_expected, key=lambda obj: type(obj).__name__)
