@@ -17,14 +17,21 @@ def equals(a, b):
         return False
     return vars(a) == vars(b)
 
+
 def test_missing_coupling_scheme():
     xml = xml_processing.parse_file("tests/missing-coupling-scheme/precice-config.xml")
     graph = g.get_graph(xml)
 
+    violations_actual = []
+
     # To suppress terminal messages
     with contextlib.redirect_stdout(io.StringIO()):
         # Debug=True might find additional violations, if they are of the severity "debug".
-        check_all_rules(graph, True)
+        violations_by_rule = check_all_rules(graph, True)
+
+    for rule in rules:
+        violations_actual += violations_by_rule[rule]
+    print(violations_actual)
 
     # Extract nodes from graph to build custom violations
     for node in graph.nodes():
@@ -44,11 +51,6 @@ def test_missing_coupling_scheme():
 
     v_data_not_exchanged = d.DataNotExchangedViolation(n_generator, n_propagator, n_color)
     violations_expected += [v_data_not_exchanged]
-
-    violations_actual = []
-    for rule in rules:
-        for violation in rule.violations:
-            violations_actual.append(violation)
 
     # Sort them so that violations of the same type are in the same order
     violations_expected_s = sorted(violations_expected, key=lambda obj: type(obj).__name__)
