@@ -64,4 +64,5 @@ for violation_e, violation_a in zip(violations_expected_s, violations_actual_s):
         "[Missing-coupling-scheme test] Expected- and actual violations do not match.\n"
         f"   Expected violation: {violation_e.format_explanation()}\n"
         f"   Actual violation: {violation_a.format_explanation()}")
+# Only gets reached if no AssertionError gets raised
 print(f"[Missing-coupling-scheme test] {color.dyeing("Passed", color.green)}.")
