@@ -1,5 +1,3 @@
-from typing import List
-
 import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import DataNode, ExchangeNode, MeshNode, ParticipantNode, ReadDataNode, WriteDataNode
@@ -25,7 +23,7 @@ class MissingExchangeRule(Rule):
         def format_explanation(self) -> str:
             return f"Data {self.data_node.name} does not get exchanged in a coupling-scheme."
 
-        def format_possible_solutions(self) -> List[str]:
+        def format_possible_solutions(self) -> list[str]:
             return [f"Please exchange {self.data_node.name} in a coupling-scheme.",
                     "Otherwise, please remove it to improve readability."]
 
@@ -45,7 +43,7 @@ class MissingExchangeRule(Rule):
             return (f"Data {self.data_node.name} is used in mesh {self.mesh.name}, gets written by participant {self.writer.name} "
                     f"and read by participant {self.reader.name}, but does not get exchanged in a coupling-scheme.")
 
-        def format_possible_solutions(self) -> List[str]:
+        def format_possible_solutions(self) -> list[str]:
             return [f"Please exchange {self.data_node.name} in a coupling-scheme.",
                     f"Simply add the following line to a coupling-scheme involving participants {self.reader.name} and "
                     f"{self.writer.name}:\n "

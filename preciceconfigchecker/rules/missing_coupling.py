@@ -1,5 +1,3 @@
-from typing import List
-
 import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import CouplingSchemeNode, MultiCouplingSchemeNode
@@ -24,7 +22,7 @@ class MissingCouplingSchemeRule(Rule):
         def format_explanation(self) -> str:
             return "It seems like your configuration is missing a coupling-scheme."
 
-        def format_possible_solutions(self) -> List[str]:
+        def format_possible_solutions(self) -> list[str]:
             return ["Please add a coupling-scheme to your configuration to exchange data between participants."]
 
     def check(self, graph: Graph) -> list[MissingCouplingSchemeViolation]:
