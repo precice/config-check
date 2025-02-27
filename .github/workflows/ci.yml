@@ -21,7 +21,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          apt install libopenmpi-dev
+          sudo apt install -y libopenmpi-dev
           python -m pip install --upgrade pip
           pip install .
       - name: Test with pytest
