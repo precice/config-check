@@ -14,15 +14,15 @@ jobs:
         python-version: ["3.12"]
 
     steps:
+      - name: Install preCICE
+        run: |
+          wget https://github.com/precice/precice/releases/download/v3.1.2/libprecice3_3.1.2_noble.deb
+          sudo apt install -y ./libprecice3_3.1.2_noble.deb
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install preCICE
-        run: |
-          wget https://github.com/precice/precice/releases/download/v3.1.2/libprecice3_3.1.2_noble.deb
-          sudo apt install ./libprecice3_3.1.2_noble.deb
       - name: Install dependencies
         run: |
           sudo apt install -y libopenmpi-dev
