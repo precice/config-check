@@ -37,4 +37,4 @@ def assert_equal_violations(test_name: str, violations_expected: list[Violation]
             f"   Expected violation: {violation_e.format_explanation()}\n"
             f"   Actual violation: {violation_a.format_explanation()}")
     # Only gets reached if no AssertionError gets raised
-    print(f"[Compositional-coupling test] {color.dyeing("Passed", color.green)}.")
+    print(f"[{test_name}] {color.dyeing("Passed", color.green)}.")
