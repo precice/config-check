@@ -1,6 +1,6 @@
 from enum import Enum
 
-import color as c
+import preciceconfigchecker.color as c
 
 
 # Colors: 0: gray, 1: red, 2: green, 3: yellow, 4: blue, 5: magenta, 6: cyan, 7: white
