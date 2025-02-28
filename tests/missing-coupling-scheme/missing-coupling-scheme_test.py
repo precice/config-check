@@ -6,16 +6,10 @@ from precice_config_graph.nodes import DataNode, ParticipantNode
 
 from preciceconfigchecker.rules_processing import check_all_rules
 from preciceconfigchecker.rule import rules
-from preciceconfigchecker import color
 
 from preciceconfigchecker.rules.missing_coupling import MissingCouplingSchemeRule as c
 from preciceconfigchecker.rules.data_use_read_write import DataUseReadWrite as d
-
-
-def equals(a, b):
-    if type(a) != type(b):
-        return False
-    return vars(a) == vars(b)
+from tests.test_utils import assert_equal_violations
 
 
 def test_missing_coupling_scheme():
@@ -51,19 +45,4 @@ def test_missing_coupling_scheme():
     v_data_not_exchanged = d.DataNotExchangedViolation(n_generator, n_propagator, n_color)
     violations_expected += [v_data_not_exchanged]
 
-    # Sort them so that violations of the same type are in the same order
-    violations_expected_s = sorted(violations_expected, key=lambda obj: type(obj).__name__)
-    violations_actual_s = sorted(violations_actual, key=lambda obj: type(obj).__name__)
-
-    assert len(violations_expected_s) == len(violations_actual_s), (
-        f"[Missing-coupling-scheme test] Different number of expected- and actual violations.\n"
-        f"   Number of expected violations: {len(violations_expected)},\n"
-        f"   Number of actual violations: {len(violations_actual)}.")
-
-    for violation_e, violation_a in zip(violations_expected_s, violations_actual_s):
-        assert equals(violation_e, violation_a), (
-            "[Missing-coupling-scheme test] Expected- and actual violations do not match.\n"
-            f"   Expected violation: {violation_e.format_explanation()}\n"
-            f"   Actual violation: {violation_a.format_explanation()}")
-    # Only gets reached if no AssertionError gets raised
-    print(f"[Missing-coupling-scheme test] {color.dyeing("Passed", color.green)}.")
+    assert_equal_violations("Missing-coupling-scheme test", violations_expected, violations_actual)
