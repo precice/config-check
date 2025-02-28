@@ -18,15 +18,15 @@ class CompositionalCouplingRule(Rule):
         """
 
         def __init__(self, participants: list[ParticipantNode]) -> None:
-            self.participants = participants
+            participants_s = sorted(participants, key=lambda participant: participant.name)
             self.names = ""
-            for i in range(len(self.participants) - 1):
-                self.names += self.participants[i].name
+            for i in range(len(participants_s) - 1):
+                self.names += participants_s[i].name
                 self.names += ", "
             # Last participant has to be connected with "and", the others with a comma.
             self.names += "and "
             # Name of last participant
-            self.names += self.participants[-1].name
+            self.names += participants_s[-1].name
 
         def format_explanation(self) -> str:
             return f"Participants {self.names} are involved in a circularly dependent (serial) coupling."

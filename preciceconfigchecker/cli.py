@@ -1,12 +1,12 @@
 import argparse
 import sys
 
-from severity import Severity
-import color as c
+from preciceconfigchecker.severity import Severity
+import preciceconfigchecker.color as c
 
 from precice_config_graph import graph, xml_processing
 
-from rules_processing import check_all_rules, print_all_results
+from preciceconfigchecker.rules_processing import check_all_rules, print_all_results
 
 path: str = None
 debug: bool = False
