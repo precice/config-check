@@ -6,9 +6,12 @@ from preciceconfigchecker.rule import Rule
 from preciceconfigchecker.severity import Severity
 from preciceconfigchecker.violation import Violation
 
+from precice_config_graph import graph as g
+from precice_config_graph.edges import Edge
 
-class DataUseReadWrite(Rule):
-    name = "Data rules."
+
+class DataUseReadWriteRule(Rule):
+    name = "Utilization of data."
     # These are oversights, but do not necessarily cause the simulation to malfunction.
     severity = Severity.WARNING
 
@@ -163,6 +166,15 @@ class DataUseReadWrite(Rule):
 
                 # Add violations according to use/read/write
                 if use_data and read_data and write_data:
+                    # Check if there exists a path from writer to reader or if they are the same
+                    data_flow_edges = []
+                    # Build a graph from participants involved in exchanges of data node
+                    exchanges = [node for node in graph.nodes
+                                 if isinstance(node, ExchangeNode) and node.data == data_node]
+                    for exchange in exchanges:
+                        data_flow_edges += [(exchange.from_participant, exchange.to_participant)]
+                    data_flow_graph = nx.DiGraph()
+                    data_flow_graph.add_edges_from(data_flow_edges)
                     # Check if data gets read and written by the same participant.
                     # If so, then no exchange is needed.
                     # Otherwise, an exchange is needed.
@@ -173,24 +185,15 @@ class DataUseReadWrite(Rule):
                                 continue
                             # Otherwise, there needs to be an exchange of data between them.
                             else:
-                                exchanged: bool = False
-                                g2 = nx.subgraph_view(graph, filter_node=filter_data_exchange)
-                                # Only exchanges neighbor data nodes with this filter
-                                # Check all exchange nodes if they pass data between writer and reader
-                                # If data_node does not have neighbors, it does not get exchanged between them
-                                if nx.degree(g2, data_node) == 0:
+                                if writer not in data_flow_graph or reader not in data_flow_graph:
+                                    # One of writer/reader is not connected through an exchange involving data_node
                                     violations.append(self.DataNotExchangedViolation(writer, reader, data_node))
-                                    continue
-                                for exchange in g2.neighbors(data_node):
-                                    # If the exchange has both writer and reader,
-                                    # then they exchange data and everything is fine
-                                    if exchange.from_participant == writer and exchange.to_participant == reader:
-                                        exchanged = True
-                                        break
-                                # This only gets reached if all exchanges do not contain writer and reader.
-                                # Thus, no exchange exists between them, even though there should.
-                                if not exchanged:
-                                    violations.append(self.DataNotExchangedViolation(writer, reader, data_node))
+                                else:
+                                    # Both writer/reader are connected with an exchange involving data_node
+                                    # Check if there exists a path between them
+                                    path = nx.has_path(data_flow_graph, writer, reader)
+                                    if not path:
+                                        violations.append(self.DataNotExchangedViolation(writer, reader, data_node))
 
                 elif use_data and read_data and not write_data:
                     for mesh in meshes:
@@ -219,7 +222,7 @@ class DataUseReadWrite(Rule):
 
 
 # Initialize a rule object to add it to the rules-array.
-DataUseReadWrite()
+DataUseReadWriteRule()
 
 
 def filter_use_read_write_data(node) -> bool:
