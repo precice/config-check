@@ -6,7 +6,7 @@ let
             owner = "precice-forschungsprojekt";
             repo = "config-graph";
             rev = "master"; # TODO: Set a fixed version "refs/tags/v${version}";
-            hash = "sha256-o5zVqZtZh6/c6nl4aSoxccSkzi3ZgiT5/ihXA4m3YmQ=";
+            hash = "sha256-QKqOncz4r7YOdaO1Hem5egSISBjraku8ISOLKMvZIkc=";
         };
         pyproject = true;
 
@@ -18,6 +18,7 @@ let
             elementpath
             matplotlib
             networkx
+            pytest
         ];
     };
     pyprecice = pkgs.python312.pkgs.buildPythonPackage rec {
@@ -80,7 +81,7 @@ in pkgs.mkShell {
         # Tells pip to put packages into $PIP_PREFIX instead of the usual locations.
         # See https://pip.pypa.io/en/stable/user_guide/#environment-variables.
         export PIP_PREFIX=$(pwd)/_build/pip_packages
-        export PYTHONPATH="$PIP_PREFIX/${pkgs.python3.sitePackages}:$PYTHONPATH"
+        export PYTHONPATH="$PIP_PREFIX/${pkgs.python3.sitePackages}:$PWD:$PYTHONPATH"
         export PATH="$PIP_PREFIX/bin:$PATH"
         unset SOURCE_DATE_EPOCH
     '';

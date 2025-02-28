@@ -1,12 +1,12 @@
 import argparse
 import sys
 
-from severity import Severity
-import color as c
+from preciceconfigchecker.severity import Severity
+import preciceconfigchecker.color as c
 
 from precice_config_graph import graph, xml_processing
 
-from rules_processing import check_all_rules, print_all_results
+from preciceconfigchecker.rules_processing import check_all_rules, print_all_results
 
 path: str = None
 debug: bool = False
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     graph = graph.get_graph(root)
 
     # Individual checks need the graph
-    check_all_rules(graph, debug)
+    violations_by_rule = check_all_rules(graph, debug)
 
     # if the user uses severity=debug, then the severity has to be passed here as an argument
-    print_all_results(debug)
+    print_all_results(violations_by_rule, debug)
