@@ -71,6 +71,13 @@ Similarly, if a participant writes data to a mesh, then someone should read from
 
 A coupling-scheme needs to have at least one exchange element. Otherwise, it is redundant.
 
+### Compositional coupling deadlock
+
+Participants can be "connected" through coupling-schemes. 
+When using `serial` couplings, the `second` participant waits for the `first`.
+
+This means that when more than two participants get coupled in pairs of two, a circular dependency can 
+evolve, in which `X` waits for `Y`, `Y` waits for `Z` and `Z` for `X`, leading to a deadlock.
 
 ## Rules with severity `warning`
 

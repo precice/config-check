@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<precice-configuration>
+    <log>
+        <sink
+                filter="%Severity% > debug"
+                format="---[precice] %ColorizedSeverity% %Message%"
+                enabled="true"/>
+    </log>
+
+    <data:scalar name="Color"/>
+
+    <mesh name="Generator-Mesh" dimensions="2">
+        <use-data name="Color"/>
+    </mesh>
+
+    <mesh name="Propagator-Mesh" dimensions="2">
+        <use-data name="Color"/>
+    </mesh>
+
+    <mesh name="Alligator-Mesh" dimensions="2">
+        <use-data name="Color"/>
+    </mesh>
+
+    <mesh name="Instigator-Mesh" dimensions="2">
+        <use-data name="Color"/>
+    </mesh>
+
+    <participant name="Instigator">
+        <!-- No write-data -->
+        <provide-mesh name="Instigator-Mesh"/>
+        <mapping:nearest-neighbor
+                direction="read"
+                from="Alligator-Mesh"
+                to="Instigator-Mesh"
+                constraint="consistent"/>
+        <read-data name="Color" mesh="Instigator-Mesh"/>
+    </participant>
+
+    <participant name="Alligator">
+        <provide-mesh name="Alligator-Mesh"/>
+        <write-data name="Color" mesh="Alligator-Mesh"/>
+        <mapping:nearest-neighbor
+                direction="read"
+                from="Propagator-Mesh"
+                to="Alligator-Mesh"
+                constraint="consistent"/>
+        <read-data name="Color" mesh="Alligator-Mesh"/>
+    </participant>
+
+    <participant name="Generator">
+        <provide-mesh name="Generator-Mesh"/>
+        <write-data name="Color" mesh="Generator-Mesh"/>
+        <mapping:nearest-neighbor
+                direction="read"
+                from="Alligator-Mesh"
+                to="Generator-Mesh"
+                constraint="consistent"/>
+        <read-data name="Color" mesh="Generator-Mesh"/>
+    </participant>
+
+    <participant name="Propagator">
+        <receive-mesh name="Generator-Mesh" from="Generator"/>
+        <write-data name="Color" mesh="Propagator-Mesh"/>
+        <provide-mesh name="Propagator-Mesh"/>
+        <mapping:nearest-neighbor
+                direction="read"
+                from="Generator-Mesh"
+                to="Propagator-Mesh"
+                constraint="consistent"/>
+        <read-data name="Color" mesh="Propagator-Mesh"/>
+    </participant>
+
+    <m2n:sockets acceptor="Generator" connector="Propagator" exchange-directory=".."/>
+    <m2n:sockets acceptor="Generator" connector="Alligator" exchange-directory=".."/>
+    <m2n:sockets acceptor="Alligator" connector="Propagator" exchange-directory=".."/>
+    <m2n:sockets acceptor="Alligator" connector="Instigator" exchange-directory=".."/>
+
+    <coupling-scheme:serial-explicit>
+        <participants first="Generator" second="Propagator"/>
+        <time-window-size value="0.01"/>
+        <max-time value="0.3"/>
+        <exchange data="Color" mesh="Generator-Mesh" from="Generator" to="Propagator"/>
+    </coupling-scheme:serial-explicit>
+
+    <coupling-scheme:serial-explicit>
+        <participants first="Propagator" second="Alligator"/>
+        <time-window-size value="0.01"/>
+        <max-time value="0.3"/>
+        <exchange data="Color" mesh="Propagator-Mesh" from="Propagator" to="Alligator"/>
+    </coupling-scheme:serial-explicit>
+
+    <coupling-scheme:serial-explicit>
+        <participants first="Alligator" second="Generator"/>
+        <time-window-size value="0.01"/>
+        <max-time value="0.3"/>
+        <exchange data="Color" mesh="Alligator-Mesh" from="Alligator" to="Generator"/>
+    </coupling-scheme:serial-explicit>
+
+    <coupling-scheme:serial-explicit>
+        <participants first="Alligator" second="Instigator"/>
+        <time-window-size value="0.01"/>
+        <max-time value="0.3"/>
+        <exchange data="Color" mesh="Alligator-Mesh" from="Alligator" to="Instigator"/>
+    </coupling-scheme:serial-explicit>
+
+</precice-configuration>
