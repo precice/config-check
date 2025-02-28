@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 
 from networkx import Graph
 
-from severity import Severity
-from violation import Violation
+from preciceconfigchecker.severity import Severity
+from preciceconfigchecker.violation import Violation
 
 
 class Rule(ABC):
