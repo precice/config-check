@@ -27,7 +27,7 @@ jobs:
         run: |
           sudo apt install -y libopenmpi-dev
           python -m pip install --upgrade pip setuptools cython
-          pip install .
+          pip install -e .
       - name: Test with pytest
         run: |
           pytest -v -s
