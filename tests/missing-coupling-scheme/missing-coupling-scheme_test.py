@@ -8,7 +8,7 @@ from preciceconfigchecker.rules_processing import check_all_rules
 from preciceconfigchecker.rule import rules
 
 from preciceconfigchecker.rules.missing_coupling import MissingCouplingSchemeRule as c
-from preciceconfigchecker.rules.data_use_read_write import DataUseReadWrite as d
+from preciceconfigchecker.rules.data_use_read_write import DataUseReadWriteRule as d
 from tests.test_utils import assert_equal_violations
 
 
