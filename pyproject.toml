@@ -9,3 +9,7 @@ dependencies = [
 
 [tool.setuptools]
 packages = ["preciceconfigchecker"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test.py", "*_test.py"]
