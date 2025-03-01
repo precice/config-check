@@ -19,7 +19,7 @@ def test_data_not_use_not_read_not_write():
                 n_mesh = node
 
     violations_expected = []
-    # ErrorColor does not get used/read/written
-    violations_expected += [d.DataUsedNotReadNotWrittenViolation(n_error_color,n_mesh)]
+    # ErrorColor gets used in Generator-Mesh, does not get read/written
+    violations_expected += [d.DataUsedNotReadNotWrittenViolation(n_error_color, n_mesh)]
 
     assert_equal_violations("Data used, not read, not written-test", violations_actual, violations_expected)
