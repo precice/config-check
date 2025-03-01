@@ -6,9 +6,6 @@ from preciceconfigchecker.rule import Rule
 from preciceconfigchecker.severity import Severity
 from preciceconfigchecker.violation import Violation
 
-from precice_config_graph import graph as g
-from precice_config_graph.edges import Edge
-
 
 class DataUseReadWriteRule(Rule):
     name = "Utilization of data."
