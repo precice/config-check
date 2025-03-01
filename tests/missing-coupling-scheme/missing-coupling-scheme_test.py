@@ -27,7 +27,7 @@ def test_missing_coupling_scheme():
     v_missing_coupling_scheme = c.MissingCouplingSchemeViolation()
     violations_expected += [v_missing_coupling_scheme]
 
-    v_data_not_exchanged = d.DataNotExchangedViolation(n_generator, n_propagator, n_color)
+    v_data_not_exchanged = d.DataNotExchangedViolation(n_color, n_generator, n_propagator)
     violations_expected += [v_data_not_exchanged]
 
     assert_equal_violations("Missing-coupling-scheme test", violations_expected, violations_actual)
