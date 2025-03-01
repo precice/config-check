@@ -2,6 +2,7 @@ import contextlib
 import io
 
 from networkx import Graph
+from precice_config_graph import xml_processing, graph as g
 
 from preciceconfigchecker.rule import Rule, rules
 from preciceconfigchecker.rules_processing import check_all_rules
@@ -58,3 +59,9 @@ def get_actual_violations(graph: Graph) -> dict[Rule, list[Violation]]:
         violations_actual += violations_by_rule[rule]
 
     return violations_by_rule
+
+
+def create_graph(path: str) -> Graph:
+    xml = xml_processing.parse_file(path)
+    graph = g.get_graph(xml)
+    return graph
