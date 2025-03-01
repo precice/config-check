@@ -1,30 +1,16 @@
-import contextlib
-import io
-
 from precice_config_graph import graph as g, xml_processing
 from precice_config_graph.nodes import DataNode, ParticipantNode
 
-from preciceconfigchecker.rules_processing import check_all_rules
-from preciceconfigchecker.rule import rules
-
 from preciceconfigchecker.rules.missing_coupling import MissingCouplingSchemeRule as c
 from preciceconfigchecker.rules.data_use_read_write import DataUseReadWriteRule as d
-from tests.test_utils import assert_equal_violations
+from tests.test_utils import assert_equal_violations, get_actual_violations
 
 
 def test_missing_coupling_scheme():
     xml = xml_processing.parse_file("tests/missing-coupling-scheme/precice-config.xml")
     graph = g.get_graph(xml)
 
-    violations_actual = []
-
-    # To suppress terminal messages
-    with contextlib.redirect_stdout(io.StringIO()):
-        # Debug=True might find additional violations, if they are of the severity "debug".
-        violations_by_rule = check_all_rules(graph, True)
-
-    for rule in rules:
-        violations_actual += violations_by_rule[rule]
+    violations_actual = get_actual_violations(graph)
 
     # Extract nodes from graph to build custom violations
     for node in graph.nodes():
