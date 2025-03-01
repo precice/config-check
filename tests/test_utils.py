@@ -49,7 +49,7 @@ def assert_equal_violations(test_name: str, violations_expected: list[Violation]
     print(f"\n[{test_name}] {color.dyeing("Passed", color.green)}.")
 
 
-def get_actual_violations(graph: Graph) -> dict[Rule, list[Violation]]:
+def get_actual_violations(graph: Graph) -> list[Violation]:
     """
         This function returns a list containing all violations found by our checker of a given graph,
          representing a precice-config file.
