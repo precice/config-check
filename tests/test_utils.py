@@ -45,7 +45,7 @@ def assert_equal_violations(test_name: str, violations_expected: list[Violation]
             f"   Expected violation: {violation_e.format_explanation()}\n"
             f"   Actual violation: {violation_a.format_explanation()}")
     # Only gets reached if no AssertionError gets raised
-    print(f"[{test_name}] {color.dyeing("Passed", color.green)}.")
+    print(f"\n[{test_name}] {color.dyeing("Passed", color.green)}.")
 
 
 def get_actual_violations(graph: Graph) -> dict[Rule, list[Violation]]:
@@ -58,7 +58,7 @@ def get_actual_violations(graph: Graph) -> dict[Rule, list[Violation]]:
     for rule in rules:
         violations_actual += violations_by_rule[rule]
 
-    return violations_by_rule
+    return violations_actual
 
 
 def create_graph(path: str) -> Graph:
