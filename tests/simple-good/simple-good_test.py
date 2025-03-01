@@ -1,10 +1,9 @@
 from precice_config_graph import graph as g, xml_processing
-from tests.test_utils import assert_equal_violations, get_actual_violations
+from tests.test_utils import assert_equal_violations, get_actual_violations, create_graph
 
 
 def test_simple_good():
-    xml = xml_processing.parse_file("tests/simple-good/precice-config.xml")
-    graph = g.get_graph(xml)
+    graph = create_graph("tests/simple-good/precice-config.xml")
 
     violations_actual = get_actual_violations(graph)
 
