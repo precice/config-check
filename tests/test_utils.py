@@ -9,9 +9,10 @@ from preciceconfigchecker.rules_processing import check_all_rules
 from preciceconfigchecker.violation import Violation
 from preciceconfigchecker import color
 
+
 # Helper functions for test files
 
-def equals(a, b):
+def equals(a, b) -> bool:
     """
         This function tests if two objects have equal values.
         :param a: The first object.
@@ -23,7 +24,8 @@ def equals(a, b):
     return vars(a) == vars(b)
 
 
-def assert_equal_violations(test_name: str, violations_expected: list[Violation], violations_actual: list[Violation]):
+def assert_equal_violations(test_name: str, violations_expected: list[Violation],
+                            violations_actual: list[Violation]) -> None:
     """
         This function asserts that lists containing expected and actual violations are equal.
         :param test_name: The name of the test which causes the violations.
