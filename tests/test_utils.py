@@ -1,3 +1,10 @@
+import contextlib
+import io
+
+from networkx import Graph
+
+from preciceconfigchecker.rule import Rule, rules
+from preciceconfigchecker.rules_processing import check_all_rules
 from preciceconfigchecker.violation import Violation
 from preciceconfigchecker import color
 
@@ -38,3 +45,16 @@ def assert_equal_violations(test_name: str, violations_expected: list[Violation]
             f"   Actual violation: {violation_a.format_explanation()}")
     # Only gets reached if no AssertionError gets raised
     print(f"[{test_name}] {color.dyeing("Passed", color.green)}.")
+
+
+def get_actual_violations(graph: Graph) -> dict[Rule, list[Violation]]:
+    violations_actual = []
+    # To suppress terminal messages
+    with contextlib.redirect_stdout(io.StringIO()):
+        # Debug=True might find additional violations, if they are of the severity "debug".
+        violations_by_rule = check_all_rules(graph, True)
+
+    for rule in rules:
+        violations_actual += violations_by_rule[rule]
+
+    return violations_by_rule
