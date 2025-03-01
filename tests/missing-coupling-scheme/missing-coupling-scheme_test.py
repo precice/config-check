@@ -3,12 +3,11 @@ from precice_config_graph.nodes import DataNode, ParticipantNode
 
 from preciceconfigchecker.rules.missing_coupling import MissingCouplingSchemeRule as c
 from preciceconfigchecker.rules.data_use_read_write import DataUseReadWriteRule as d
-from tests.test_utils import assert_equal_violations, get_actual_violations
+from tests.test_utils import assert_equal_violations, get_actual_violations, create_graph
 
 
 def test_missing_coupling_scheme():
-    xml = xml_processing.parse_file("tests/missing-coupling-scheme/precice-config.xml")
-    graph = g.get_graph(xml)
+    graph = create_graph("tests/missing-coupling-scheme/precice-config.xml")
 
     violations_actual = get_actual_violations(graph)
 
