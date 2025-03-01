@@ -9,6 +9,7 @@ from preciceconfigchecker.rules_processing import check_all_rules
 from preciceconfigchecker.violation import Violation
 from preciceconfigchecker import color
 
+# Helper functions for test files
 
 def equals(a, b):
     """
@@ -49,6 +50,12 @@ def assert_equal_violations(test_name: str, violations_expected: list[Violation]
 
 
 def get_actual_violations(graph: Graph) -> dict[Rule, list[Violation]]:
+    """
+        This function returns a list containing all violations found by our checker of a given graph,
+         representing a precice-config file.
+        :param graph: The graph to check.
+        :return: The violations found.
+    """
     violations_actual = []
     # To suppress terminal messages
     with contextlib.redirect_stdout(io.StringIO()):
@@ -62,6 +69,11 @@ def get_actual_violations(graph: Graph) -> dict[Rule, list[Violation]]:
 
 
 def create_graph(path: str) -> Graph:
+    """
+        This function creates a graph from a precice-config.xml file.
+        :param path: The path to the precice-config.xml file.
+        :return: The graph created.
+    """
     xml = xml_processing.parse_file(path)
     graph = g.get_graph(xml)
     return graph
