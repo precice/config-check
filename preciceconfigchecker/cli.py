@@ -8,10 +8,9 @@ from precice_config_graph import graph, xml_processing
 
 from preciceconfigchecker.rules_processing import check_all_rules, print_all_results
 
-path: str = None
-debug: bool = False
-
-if __name__ == "__main__":
+def main():
+    path: str = None
+    debug: bool = False
     parser = argparse.ArgumentParser(usage='%(prog)s',
                                      description='Checks a preCICE config.xml file for logical errors.')
     parser.add_argument('src', type=argparse.FileType('r'), help='Path of the config.xml source file.')
@@ -32,10 +31,13 @@ if __name__ == "__main__":
 
     # Step 2: Detect more issues through the use of a graph
     root = xml_processing.parse_file(path)
-    graph = graph.get_graph(root)
+    graph_ = graph.get_graph(root)
 
     # Individual checks need the graph
-    violations_by_rule = check_all_rules(graph, debug)
+    violations_by_rule = check_all_rules(graph_, debug)
 
     # if the user uses severity=debug, then the severity has to be passed here as an argument
     print_all_results(violations_by_rule, debug)
+
+if __name__ == "__main__":
+    sys.exit(main())
