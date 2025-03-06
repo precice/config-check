@@ -56,7 +56,7 @@ def print_all_results(violations_by_rule: dict[Rule, list[Violation]], debug: bo
 
     if total_num_errors != 0 or total_num_warnings != 0:
         error_str: str = Severity.ERROR.value + ("s" if total_num_errors != 1 else "")
-        warning_str: str = Severity.WARNING.value + ("s" if total_num_errors != 1 else "")
+        warning_str: str = Severity.WARNING.value + ("s" if total_num_warnings != 1 else "")
         print(f"Your configuration file raised {total_num_errors} {error_str} "
               f"and {total_num_warnings} {warning_str}.")
         print("Please review your configuration file before continuing.")
