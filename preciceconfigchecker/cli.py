@@ -31,10 +31,10 @@ def main():
 
     # Step 2: Detect more issues through the use of a graph
     root = xml_processing.parse_file(path)
-    graph_ = graph.get_graph(root)
+    G = graph.get_graph(root)
 
     # Individual checks need the graph
-    violations_by_rule = check_all_rules(graph_, debug)
+    violations_by_rule = check_all_rules(G, debug)
 
     # if the user uses severity=debug, then the severity has to be passed here as an argument
     print_all_results(violations_by_rule, debug)
