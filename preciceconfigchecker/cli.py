@@ -4,7 +4,7 @@ import sys
 from preciceconfigchecker.severity import Severity
 import preciceconfigchecker.color as c
 
-from precice_config_graph import graph, xml_processing
+from precice_config_graph import graph as g, xml_processing
 
 from preciceconfigchecker.rules_processing import check_all_rules, print_all_results
 
@@ -31,10 +31,10 @@ def main():
 
     # Step 2: Detect more issues through the use of a graph
     root = xml_processing.parse_file(path)
-    G = graph.get_graph(root)
+    graph = g.get_graph(root)
 
     # Individual checks need the graph
-    violations_by_rule = check_all_rules(G, debug)
+    violations_by_rule = check_all_rules(graph, debug)
 
     # if the user uses severity=debug, then the severity has to be passed here as an argument
     print_all_results(violations_by_rule, debug)
