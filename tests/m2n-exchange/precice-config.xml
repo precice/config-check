@@ -20,9 +20,12 @@
   <participant name="Alligator">
   </participant>
 
+  <participant name="Instigator">
+  </participant>
+
   <participant name="Generator">
     <provide-mesh name="Generator-Mesh" />
-    <write-data name="Color" mesh="Generator-Mesh" />  
+    <write-data name="Color" mesh="Generator-Mesh" />
   </participant>
 
   <participant name="Propagator">
@@ -39,6 +42,8 @@
   <m2n:sockets acceptor="Generator" connector="Propagator" exchange-directory=".." />
   <m2n:sockets acceptor="Generator" connector="Propagator" exchange-directory=".." />
   <m2n:sockets acceptor="Propagator" connector="Generator" exchange-directory=".." />
+
+  <m2n:sockets acceptor="Generator" connector="Instigator" exchange-directory=".."/>
 
   <coupling-scheme:serial-explicit>
     <participants first="Generator" second="Propagator" />
