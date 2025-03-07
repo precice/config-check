@@ -1,26 +1,12 @@
-import contextlib
-import io
-
-from precice_config_graph import graph as g, xml_processing
 from precice_config_graph.nodes import ParticipantNode
-
-from preciceconfigchecker.rule import rules
 from preciceconfigchecker.rules.m2n_exchange import M2NExchangeRule as e
-from preciceconfigchecker.rules_processing import check_all_rules, print_all_results
-from tests.test_utils import assert_equal_violations
+from tests.test_utils import assert_equal_violations, create_graph, get_actual_violations
 
 
 def test_m2n_exchange():
-    xml = xml_processing.parse_file("precice-config.xml")
-    graph = g.get_graph(xml)
+    graph = create_graph("tests/m2n-exchange/precice-config.xml")
 
-    violations_actual = []
-
-    with contextlib.redirect_stdout(io.StringIO()):
-        violations_by_rule = check_all_rules(graph, True)
-
-    for rule in rules:
-        violations_actual += violations_by_rule[rule]
+    violations_actual = get_actual_violations(graph)
 
     violations_expected = []
 
@@ -35,7 +21,5 @@ def test_m2n_exchange():
 
     violations_expected += [e.MissingM2NEchangeViolation(n_alligator),
                             e.DuplicateM2NExchangeViolation(n_generator, n_propagator)]
-
-
 
     assert_equal_violations("M2N-Exchange test", violations_expected, violations_actual)
