@@ -218,10 +218,6 @@ class DataUseReadWriteRule(Rule):
         return violations
 
 
-# Initialize a rule object to add it to the rules-array.
-DataUseReadWriteRule()
-
-
 def filter_use_read_write_data(node) -> bool:
     """
     This method filters nodes, that could potentially use data, read data or write data.
