@@ -8,8 +8,6 @@ def test_m2n_exchange():
 
     violations_actual = get_actual_violations(graph)
 
-    violations_expected = []
-
     for node in graph.nodes:
         if isinstance(node, ParticipantNode):
             if node.name == "Alligator":
@@ -18,6 +16,8 @@ def test_m2n_exchange():
                 n_generator = node
             elif node.name == "Propagator":
                 n_propagator = node
+
+    violations_expected = []
 
     violations_expected += [e.MissingM2NEchangeViolation(n_alligator),
                             e.DuplicateM2NExchangeViolation(n_generator, n_propagator)]
