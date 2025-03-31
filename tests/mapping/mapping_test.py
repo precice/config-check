@@ -1,4 +1,4 @@
-from precice_config_graph.nodes import ParticipantNode, MeshNode
+from precice_config_graph.nodes import ParticipantNode, MeshNode, Direction
 
 from preciceconfigchecker.rules.mapping import MappingRule as m
 
@@ -29,8 +29,9 @@ def test_mapping():
 
     violations_expected = []
 
-    violations_expected += [m.JustInTimeMappingViolation(p_alligator, m_generator, "from")]
+    violations_expected += [m.JustInTimeMappingViolation(p_alligator, m_generator, Direction.READ)]
 
-    violations_expected += [m.MappingDirectionViolation(p_propagator,p_generator, m_propagator,  m_generator,"from")]
+    violations_expected += [
+        m.MappingDirectionViolation(p_propagator, p_generator, m_propagator, m_generator, Direction.WRITE)]
 
     assert_equal_violations("Mapping-test", violations_expected, violations_actual)
