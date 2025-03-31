@@ -10,12 +10,13 @@ from preciceconfigchecker.rules import missing_coupling, missing_exchange, data_
 from preciceconfigchecker.severity import Severity
 from preciceconfigchecker.violation import Violation
 
-rules:list[Rule] = [missing_coupling.MissingCouplingSchemeRule(),
-                    missing_exchange.MissingExchangeRule(),
-                    data_use_read_write.DataUseReadWriteRule(),
-                    compositional_coupling.CompositionalCouplingRule(),
-                    m2n_exchange.M2NExchangeRule()
-                    ]
+rules:list[Rule] = [
+    missing_coupling.MissingCouplingSchemeRule(),
+    missing_exchange.MissingExchangeRule(),
+    data_use_read_write.DataUseReadWriteRule(),
+    compositional_coupling.CompositionalCouplingRule(),
+    m2n_exchange.M2NExchangeRule()
+]
 
 
 def all_rules_satisfied(violations_by_rule: dict[Rule, list[Violation]]) -> bool:
