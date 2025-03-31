@@ -38,10 +38,6 @@ class MissingCouplingSchemeRule(Rule):
         return []
 
 
-# Initialize a rule object to add it to the rules-array.
-MissingCouplingSchemeRule()
-
-
 # Helper functions
 def filter_coupling_scheme_nodes(node) -> bool:
     """
