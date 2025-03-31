@@ -29,7 +29,7 @@
         <!-- No write-data -->
         <provide-mesh name="Instigator-Mesh"/>
         <mapping:nearest-neighbor
-                direction="read"
+                direction="write"
                 from="Alligator-Mesh"
                 to="Instigator-Mesh"
                 constraint="consistent"/>
@@ -40,7 +40,7 @@
         <provide-mesh name="Alligator-Mesh"/>
         <write-data name="Color" mesh="Alligator-Mesh"/>
         <mapping:nearest-neighbor
-                direction="read"
+                direction="write"
                 from="Propagator-Mesh"
                 to="Alligator-Mesh"
                 constraint="consistent"/>
@@ -51,7 +51,7 @@
         <provide-mesh name="Generator-Mesh"/>
         <write-data name="Color" mesh="Generator-Mesh"/>
         <mapping:nearest-neighbor
-                direction="read"
+                direction="write"
                 from="Alligator-Mesh"
                 to="Generator-Mesh"
                 constraint="consistent"/>
@@ -63,7 +63,7 @@
         <write-data name="Color" mesh="Propagator-Mesh"/>
         <provide-mesh name="Propagator-Mesh"/>
         <mapping:nearest-neighbor
-                direction="read"
+                direction="write"
                 from="Generator-Mesh"
                 to="Propagator-Mesh"
                 constraint="consistent"/>
