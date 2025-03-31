@@ -52,8 +52,7 @@ class MappingRule(Rule):
                     f"the wrong direction.")
 
         def format_possible_solutions(self) -> list[str]:
-            sol: list[str] = [f"Please change the direction of the mapping between participant "
-                              f"{self.participant_parent.name} and {self.participant_stranger.name}."]
+            sol: list[str] = []
             # 'to' corresponds to a 'write' mapping
             if self.direction == "to":
                 sol += [f"Either change direction=\"write\" to direction=\"read\", or swap meshes "
@@ -62,6 +61,8 @@ class MappingRule(Rule):
             elif self.direction == "from":
                 sol += [f"Either change direction=\"read\" to direction=\"write\", or swap meshes "
                         f"{self.mesh_parent.name} and {self.mesh_stranger.name}."]
+            sol += [f"Move the mapping from participant {self.participant_parent.name} to participant "
+                    f"{self.participant_stranger.name} and change its direction."]
             sol += ["Otherwise, please remove it to improve readability."]
             return sol
 
@@ -104,23 +105,23 @@ class MappingRule(Rule):
                 else:
                     mesh_parent: MeshNode = mapping.to_mesh
                     mesh_stranger = mapping.from_mesh
-                participant_stranger: ParticipantNode = get_participant_from_mesh(graph, mesh_stranger)
+                participant_stranger: ParticipantNode = get_participant_of_mesh(graph, mesh_stranger)
                 # TODO: Error if stranger = parent? Mappings should probably not be on the same participant
                 if direction == Direction.WRITE:
-                    # If the direction is 'write', then the 'to' mesh needs to be provided by Parent
-                    if mapping.to_mesh == mesh_parent:
-                        # Everything is fine here
-                        pass
-                    elif mapping.from_mesh == mesh_parent:
-                        # Parent is trying to write _to_ Strangers mesh
-                        violations.append(self.MappingDirectionViolation(participant_parent, participant_stranger,
-                                                                         mesh_parent, mesh_stranger, "to"))
-                elif direction == Direction.READ:
-                    # If the direction is 'read', then the 'from' mesh needs to be by Parent
+                    # If the direction is 'write', then the 'from' mesh needs to be provided by Parent
                     if mapping.from_mesh == mesh_parent:
                         # Everything is fine here
                         pass
                     elif mapping.to_mesh == mesh_parent:
+                        # Parent is trying to write _to_ Strangers mesh
+                        violations.append(self.MappingDirectionViolation(participant_parent, participant_stranger,
+                                                                         mesh_parent, mesh_stranger, "to"))
+                elif direction == Direction.READ:
+                    # If the direction is 'read', then the 'to' mesh needs to be by Parent
+                    if mapping.to_mesh == mesh_parent:
+                        # Everything is fine here
+                        pass
+                    elif mapping.from_mesh == mesh_parent:
                         # Parent is trying to read _from_ Stranger
                         violations.append(self.MappingDirectionViolation(participant_parent, participant_stranger,
                                                                          mesh_parent, mesh_stranger, "from"))
@@ -131,14 +132,20 @@ class MappingRule(Rule):
 MappingRule()
 
 
-def get_participant_from_mesh(graph: Graph, mesh: MeshNode) -> ParticipantNode:
+def get_participant_of_mesh(graph: Graph, mesh: MeshNode) -> ParticipantNode:
+    """
+        This method returns the participant who owns the given mesh.
+        :param graph: The graph of the preCICE config.
+        :param mesh: The mesh of which the participant is needed.
+        :return: The participant who owns the mesh.
+    """
     participant: ParticipantNode = None
     for node in graph.nodes:
         if isinstance(node, ParticipantNode):
             if mesh in node.provide_meshes and participant is None:
                 participant = node
             elif mesh in node.provide_meshes and participant is not None:
-                # TODO: Error here? a mesh should not be provided by more than one participant
+                # TODO: Error here? A mesh should not be provided by more than one participant
                 pass
     # TODO: Error if participant does not exist?
     return participant
