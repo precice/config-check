@@ -40,7 +40,7 @@
         <provide-mesh name="Alligator-Mesh"/>
         <write-data name="Color" mesh="Alligator-Mesh"/>
         <mapping:nearest-neighbor
-                direction="write"
+                direction="read"
                 from="Propagator-Mesh"
                 to="Alligator-Mesh"
                 constraint="consistent"/>

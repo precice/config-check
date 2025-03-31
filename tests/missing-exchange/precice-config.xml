@@ -26,7 +26,7 @@
     <receive-mesh name="Generator-Mesh" from="Generator" />
     <provide-mesh name="Propagator-Mesh" />
     <mapping:nearest-neighbor
-      direction="write"
+      direction="read"
       from="Generator-Mesh"
       to="Propagator-Mesh"
       constraint="consistent" />
