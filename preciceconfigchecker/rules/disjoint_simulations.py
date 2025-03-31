@@ -52,6 +52,3 @@ class DisjointSimulationsRule(Rule):
             return [self.DisjointSimulationsViolation(participant_sets)]
         else:
             return []
-
-
-DisjointSimulationsRule()

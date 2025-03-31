@@ -15,7 +15,8 @@ rules:list[Rule] = [
     missing_exchange.MissingExchangeRule(),
     data_use_read_write.DataUseReadWriteRule(),
     compositional_coupling.CompositionalCouplingRule(),
-    m2n_exchange.M2NExchangeRule()
+    m2n_exchange.M2NExchangeRule(),
+    disjoint_simulations.DisjointSimulationsRule(),
 ]
 
 
