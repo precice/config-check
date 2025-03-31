@@ -1,5 +1,3 @@
-from typing import List
-
 from networkx.classes import Graph
 from precice_config_graph.nodes import ParticipantNode, MeshNode, MappingNode, Direction
 
@@ -18,47 +16,55 @@ class MappingRule(Rule):
             does not have access to the corresponding mesh, i.e., he does not have "api-access" to the mesh.
         """
 
-        def __init__(self, participant: ParticipantNode, mesh: MeshNode, direction: str):
+        def __init__(self, participant: ParticipantNode, mesh: MeshNode, direction: Direction):
             self.participant = participant
             self.mesh = mesh
             self.direction = direction
+            self.connecting_word: str = ""
+            if self.direction == Direction.READ:
+                self.connecting_word = "from"
+            elif self.direction == Direction.WRITE:
+                self.connecting_word = "to"
 
         def format_explanation(self) -> str:
-            return (
-                f"The participant {self.participant.name} is specifying a just-in-time mapping {self.direction} mesh "
-                f"{self.mesh.name}, but does not have access to it.")
+            return (f"The participant {self.participant.name} is specifying a just-in-time {self.direction.value}-"
+                    f"mapping {self.connecting_word} mesh {self.mesh.name}, but does not have access to it.")
 
         def format_possible_solutions(self) -> list[str]:
             return [f"Let participant {self.participant.name} receive mesh {self.mesh.name} with the attribute "
                     f"api-access=\"true\".",
                     f"Map the values from mesh {self.mesh.name} to a mesh by participant {self.participant.name}, before"
-                    f" reading or writing it",
+                    f" {self.direction.value}ing it.",
                     "Otherwise, please remove it to improve readability."]
 
     class MappingDirectionViolation(Violation):
         name = "Mapping direction."
 
         def __init__(self, participant_parent: ParticipantNode, participant_stranger: ParticipantNode,
-                     mesh_parent: MeshNode, mesh_stranger: MeshNode, direction: str):
+                     mesh_parent: MeshNode, mesh_stranger: MeshNode, direction: Direction):
             self.participant_parent = participant_parent
             self.participant_stranger = participant_stranger
             self.mesh_parent = mesh_parent
             self.mesh_stranger = mesh_stranger
             self.direction = direction
+            if self.direction == Direction.READ:
+                self.connecting_word = "from"
+            elif self.direction == Direction.WRITE:
+                self.connecting_word = "to"
 
         def format_explanation(self) -> str:
-            return (f"The mapping of participant {self.participant_parent.name} and mesh {self.mesh_parent.name} "
-                    f"{self.direction} {self.participant_stranger.name} and mesh {self.mesh_stranger.name} is in "
-                    f"the wrong direction.")
+            return (f"The {self.direction.value}-mapping of participant {self.participant_parent.name} and mesh "
+                    f"{self.mesh_parent.name} {self.connecting_word} participant {self.participant_stranger.name} and "
+                    f"mesh {self.mesh_stranger.name} is in the wrong direction.")
 
         def format_possible_solutions(self) -> list[str]:
             sol: list[str] = []
             # 'to' corresponds to a 'write' mapping
-            if self.direction == "to":
+            if self.direction == Direction.WRITE:
                 sol += [f"Either change direction=\"write\" to direction=\"read\", or swap meshes "
                         f"{self.mesh_parent.name} and {self.mesh_stranger.name}."]
             # 'from' corresponds to a 'read' mapping
-            elif self.direction == "from":
+            elif self.direction == Direction.READ:
                 sol += [f"Either change direction=\"read\" to direction=\"write\", or swap meshes "
                         f"{self.mesh_parent.name} and {self.mesh_stranger.name}."]
             sol += [f"Move the mapping from participant {self.participant_parent.name} to participant "
@@ -74,15 +80,16 @@ class MappingRule(Rule):
 
             # Only consider just-in-time mappings here
             if mapping.just_in_time:
+                direction: Direction = mapping.direction
                 # JIT mappings are missing either 'to' or 'from' attributes
-                direction: str = ""
+                connector: str = ""
                 mesh: MeshNode = None
                 # Find out which
                 if mapping.from_mesh:
-                    direction = "from"
+                    connector = "from"
                     mesh = mapping.from_mesh
                 elif mapping.to_mesh:
-                    direction = "to"
+                    connector = "to"
                     mesh = mapping.to_mesh
 
                 # Check if participant receives mesh with api-access true
@@ -92,7 +99,7 @@ class MappingRule(Rule):
                         # If api-access != true, then participant does not have permission to read/write from/to it
                         if not receive_mesh.api_access:
                             violations.append(
-                                self.JustInTimeMappingViolation(mapping.parent_participant, mesh, direction))
+                                self.JustInTimeMappingViolation(mapping.parent_participant, mesh,direction))
 
             # 'just-in-time' mappings have already been handled
             elif not mapping.just_in_time:
@@ -115,7 +122,7 @@ class MappingRule(Rule):
                     elif mapping.to_mesh == mesh_parent:
                         # Parent is trying to write _to_ Strangers mesh
                         violations.append(self.MappingDirectionViolation(participant_parent, participant_stranger,
-                                                                         mesh_parent, mesh_stranger, "to"))
+                                                                         mesh_parent, mesh_stranger, direction))
                 elif direction == Direction.READ:
                     # If the direction is 'read', then the 'to' mesh needs to be by Parent
                     if mapping.to_mesh == mesh_parent:
@@ -124,7 +131,7 @@ class MappingRule(Rule):
                     elif mapping.from_mesh == mesh_parent:
                         # Parent is trying to read _from_ Stranger
                         violations.append(self.MappingDirectionViolation(participant_parent, participant_stranger,
-                                                                         mesh_parent, mesh_stranger, "from"))
+                                                                         mesh_parent, mesh_stranger, direction))
 
         return violations
 
