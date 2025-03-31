@@ -107,6 +107,3 @@ class M2NExchangeRule(Rule):
                 elif violation.participant1 == participant2 and violation.participant2 == participant1:
                     return True
         return False
-
-
-M2NExchangeRule()

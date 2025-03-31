@@ -13,7 +13,8 @@ from preciceconfigchecker.violation import Violation
 rules:list[Rule] = [missing_coupling.MissingCouplingSchemeRule(),
                     missing_exchange.MissingExchangeRule(),
                     data_use_read_write.DataUseReadWriteRule(),
-                    compositional_coupling.CompositionalCouplingRule()
+                    compositional_coupling.CompositionalCouplingRule(),
+                    m2n_exchange.M2NExchangeRule()
                     ]
 
 
