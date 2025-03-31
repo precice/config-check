@@ -6,7 +6,7 @@ from preciceconfigchecker.rule import Rule, rules
 # SOME IDE's MIGHT REMOVE THEM AS UNUSED IMPORTS
 # noinspection PyUnresolvedReferences
 from preciceconfigchecker.rules import missing_coupling, missing_exchange, data_use_read_write, compositional_coupling, \
-    m2n_exchange
+    m2n_exchange, disjoint_simulations
 from preciceconfigchecker.severity import Severity
 from preciceconfigchecker.violation import Violation
 
