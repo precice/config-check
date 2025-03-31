@@ -32,6 +32,3 @@ class Rule_1(Rule):
         # ...
         violations.append(self.MyViolation("Node-E", "Node-F", 3))
         return violations
-
-
-Rule_1()

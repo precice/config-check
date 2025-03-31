@@ -46,10 +46,6 @@ class MissingExchangeRule(Rule):
         return violations
 
 
-# Initialize a rule object to add it to the rules-array.
-MissingExchangeRule()
-
-
 # Helper functions
 def filter_exchange_coupling_scheme_nodes(node) -> bool:
     """
