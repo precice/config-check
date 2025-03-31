@@ -48,8 +48,10 @@ class MappingRule(Rule):
             self.mesh_stranger = mesh_stranger
             self.direction = direction
             if self.direction == Direction.READ:
+                # X reads "from" Y
                 self.connecting_word = "from"
             elif self.direction == Direction.WRITE:
+                # X writes "to" Y
                 self.connecting_word = "to"
 
         def format_explanation(self) -> str:
@@ -59,11 +61,9 @@ class MappingRule(Rule):
 
         def format_possible_solutions(self) -> list[str]:
             sol: list[str] = []
-            # 'to' corresponds to a 'write' mapping
             if self.direction == Direction.WRITE:
                 sol += [f"Either change direction=\"write\" to direction=\"read\", or swap meshes "
                         f"{self.mesh_parent.name} and {self.mesh_stranger.name}."]
-            # 'from' corresponds to a 'read' mapping
             elif self.direction == Direction.READ:
                 sol += [f"Either change direction=\"read\" to direction=\"write\", or swap meshes "
                         f"{self.mesh_parent.name} and {self.mesh_stranger.name}."]
@@ -82,14 +82,11 @@ class MappingRule(Rule):
             if mapping.just_in_time:
                 direction: Direction = mapping.direction
                 # JIT mappings are missing either 'to' or 'from' attributes
-                connector: str = ""
                 mesh: MeshNode = None
                 # Find out which
                 if mapping.from_mesh:
-                    connector = "from"
                     mesh = mapping.from_mesh
                 elif mapping.to_mesh:
-                    connector = "to"
                     mesh = mapping.to_mesh
 
                 # Check if participant receives mesh with api-access true
