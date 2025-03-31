@@ -20,6 +20,3 @@ class Rule_3(Rule):
     def check(self, graph) -> list[Violation]:
         #Find violations in the graph and return them.
         return [ self.MyViolation("Node-M") ]
-
-
-Rule_3()
