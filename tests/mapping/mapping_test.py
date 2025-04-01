@@ -21,6 +21,8 @@ def test_mapping():
                 p_propagator = node
             elif node.name == "Instigator":
                 p_instigator = node
+            elif node.name == "Elevator":
+                p_elevator = node
         elif isinstance(node, MeshNode):
             if node.name == "Alligator-Mesh":
                 m_alligator = node
@@ -30,6 +32,8 @@ def test_mapping():
                 m_propagator = node
             elif node.name == "Instigator-Mesh":
                 m_instigator = node
+            elif node.name == "Elevator-Mesh":
+                m_elevator = node
 
     violations_expected = []
 
@@ -47,5 +51,9 @@ def test_mapping():
     violations_expected += [
         m.JustInTimeMappingDirectionConstraintViolation(p_instigator, m_alligator,
                                                         Direction.WRITE, MappingConstraint.CONSISTENT)]
+
+    violations_expected += [
+        m.ParallelParticipantsMappingViolation(p_elevator, p_instigator, m_elevator, m_instigator, Direction.READ,
+                                               MappingConstraint.CONSERVATIVE)]
 
     assert_equal_violations("Mapping-test", violations_expected, violations_actual)
