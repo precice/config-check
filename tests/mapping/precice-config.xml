@@ -9,6 +9,10 @@
 
     <data:scalar name="Color"/>
 
+    <mesh name="Instigator-Mesh" dimensions="2">
+        <use-data name="Color"/>
+    </mesh>
+
     <mesh name="Generator-Mesh" dimensions="2">
         <use-data name="Color"/>
     </mesh>
@@ -47,7 +51,21 @@
                 constraint="consistent"/>
     </participant>
 
-
+    <participant name="Instigator">
+        <provide-mesh name="Instigator-Mesh"/>
+        <provide-mesh name="Instigator-Mesh"/>
+        <receive-mesh name="Alligator-Mesh" from="Alligator" api-access="true"/>
+        <!-- JIT with unsupported type and wrong direction+constraint combination -->
+        <mapping:radial-geometric-multiscale
+            direction="read"
+            from="Alligator-Mesh"
+            constraint="scaled-consistent-surface"/>
+        <!-- JIT with unsupported direction+constraint combination -->
+        <mapping:nearest-neighbor
+            direction="write"
+            to="Alligator-Mesh"
+            constraint="consistent"/>
+    </participant>
 
     <m2n:sockets acceptor="Generator" connector="Propagator" exchange-directory=".."/>
 
