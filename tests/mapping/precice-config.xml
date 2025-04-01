@@ -9,6 +9,10 @@
 
     <data:scalar name="Color"/>
 
+    <mesh name="Elevator-Mesh" dimensions="2">
+        <use-data name="Color"/>
+    </mesh>
+
     <mesh name="Instigator-Mesh" dimensions="2">
         <use-data name="Color"/>
     </mesh>
@@ -53,7 +57,6 @@
 
     <participant name="Instigator">
         <provide-mesh name="Instigator-Mesh"/>
-        <provide-mesh name="Instigator-Mesh"/>
         <receive-mesh name="Alligator-Mesh" from="Alligator" api-access="true"/>
         <!-- JIT with unsupported type and wrong direction+constraint combination -->
         <mapping:radial-geometric-multiscale
@@ -67,7 +70,47 @@
             constraint="consistent"/>
     </participant>
 
+    <participant name="Elevator">
+        <provide-mesh name="Elevator-Mesh"/>
+        <receive-mesh name="Instigator-Mesh" from="Instigator"/>
+        <!-- there is a parallel coupling scheme between Elevator and Instigator, meaning that read-conservative is
+        invalid -->
+        <mapping:linear-cell-interpolation
+            direction="read"
+            from="Instigator-Mesh"
+            to="Elevator-Mesh"
+            constraint="conservative"/>
+    </participant>
+
+    <m2n:sockets acceptor="Generator" connector="Alligator" exchange-directory=".."/>
     <m2n:sockets acceptor="Generator" connector="Propagator" exchange-directory=".."/>
+    <m2n:sockets acceptor="Generator" connector="Instigator" exchange-directory=".."/>
+    <m2n:sockets acceptor="Elevator" connector="Instigator" exchange-directory=".."/>
+    <m2n:sockets acceptor="Alligator" connector="Instigator" exchange-directory=".."/>
+
+    <!-- mostly copied from multi coupling test in config-graph -->
+    <coupling-scheme:multi>
+        <participant name="Elevator" control="yes"/>
+        <participant name="Instigator"/>
+        <participant name="Alligator"/>
+        <max-time value="40.0" />
+        <time-window-size value="1e-4" />
+        <exchange data="Color" mesh="Instigator-Mesh" from="Instigator" to="Elevator"/>
+        <exchange data="Color" mesh="Alligator-Mesh" from="Alligator" to="Instigator"/>
+        <exchange data="Color" mesh="Alligator-Mesh" from="Instigator" to="Alligator"/>
+        <max-iterations value="50" />
+        <relative-convergence-measure data="Color" mesh="Instigator-Mesh" limit="1e-4"/>
+        <relative-convergence-measure data="Color" mesh="Alligator-Mesh" limit="1e-4"/>
+        <acceleration:IQN-ILS>
+            <data name="Color" mesh="Alligator-Mesh" scaling="1e6" />
+            <data name="Color" mesh="Instigator-Mesh" scaling="1e6" />
+            <preconditioner type="constant" />
+            <filter type="QR1-absolute" limit="1e-12" />
+            <initial-relaxation value="0.001" />
+            <max-used-iterations value="100" />
+            <time-windows-reused value="8" />
+        </acceleration:IQN-ILS>
+    </coupling-scheme:multi>
 
     <coupling-scheme:serial-explicit>
         <participants first="Generator" second="Propagator"/>
