@@ -1,5 +1,7 @@
+from typing import List
+
 from networkx.classes import Graph
-from precice_config_graph.nodes import ParticipantNode, MeshNode, MappingNode, Direction
+from precice_config_graph.nodes import ParticipantNode, MeshNode, MappingNode, Direction, MappingConstraint, MappingType
 
 from preciceconfigchecker.rule import Rule
 from preciceconfigchecker.severity import Severity
@@ -9,6 +11,79 @@ from preciceconfigchecker.violation import Violation
 class MappingRule(Rule):
     name = "Mapping rules."
     severity = Severity.ERROR
+
+    class JustInTimeMappingTypeViolation(Violation):
+        """
+            This class handles the just-in-time mapping being of the wrong type,
+            i.e., not of one of the following types:
+            nearest-neighbor, rbf-pum-direct and rbf.
+        """
+
+        def __init__(self, participant: ParticipantNode, mesh: MeshNode, direction: Direction, type: MappingType):
+            self.participant = participant
+            self.mesh = mesh
+            self.direction = direction
+            if self.direction == Direction.READ:
+                self.connecting_word = "from"
+            elif self.direction == Direction.WRITE:
+                self.connecting_word = "to"
+            self.type = type
+
+        def format_explanation(self) -> str:
+            out: str = (f"The just-in-time mapping of participant {self.participant.name} {self.connecting_word} mesh "
+                        f"{self.mesh.name} is of type {self.type.value} and is invalid.")
+            out += ("Currently, only just-in-time mappings of the types \"nearest-neighbor\", \"rbf-pum-direct\" and "
+                    "\"rbf\" are supported.")
+            return out
+
+        def format_possible_solutions(self) -> list[str]:
+            return [f"Please change the type of the mapping from {self.type.value} to one of the types "
+                    f"\"nearest-neighbor\", \"rbf-pum-direct\" and \"rbf\"."]
+
+    class JustInTimeMappingDirectionConstraintViolation(Violation):
+        """
+            This class handles a just-in-time mapping being of the wrong form,
+            i.e., neither of the form read-consistent nor write-conservative.
+        """
+
+        def __init__(self, participant: ParticipantNode, mesh: MeshNode, direction: Direction,
+                     constraint: MappingConstraint):
+            self.participant = participant
+            self.mesh = mesh
+            self.direction = direction
+            self.connecting_word: str = ""
+            if self.direction == Direction.READ:
+                self.connecting_word = "from"
+            elif self.direction == Direction.WRITE:
+                self.connecting_word = "to"
+            self.constraint = constraint
+
+        def format_explanation(self) -> str:
+            out: str = (f"The just-in-time mapping of participant {self.participant.name} {self.connecting_word} mesh "
+                        f"{self.mesh.name} is invalid.")
+            out += f"The mapping is in direction=\"{self.direction.value}\" and has constraint=\"{self.constraint.value}\"."
+            out += ("Currently, only just-in-time mappings of the form read-consistent and write-conservative are "
+                    "supported.")
+            return out
+
+        def format_possible_solutions(self) -> list[str]:
+            out: list[str] = []
+            # One parameter is correct
+            if self.direction == Direction.READ and self.constraint == MappingConstraint.CONSERVATIVE:
+                out += [
+                    f"Consider changing either the direction of the mapping to direction=\"write\" or the constraint"
+                    f"of the mapping to constraint=\"consistent\"."]
+            # One parameter is correct
+            elif self.direction == Direction.WRITE and self.constraint == MappingConstraint.CONSISTENT:
+                out += [
+                    f"Consider changing either the direction of the mapping to direction=\"read\" or the constraint "
+                    f"of the mapping to constraint=\"conservative\"."]
+            # Both parameters are incorrect
+            else:
+                out += ("Please change the direction of the mapping to direction=\"write\" and the constraint of the "
+                        "mapping to constraint=\"conservative\" or change the direction of the mapping to direction="
+                        "\"read\" and the constraint of the mapping to constraint=\"consistent\".")
+            return out
 
     class JustInTimeMappingViolation(Violation):
         """
@@ -80,7 +155,9 @@ class MappingRule(Rule):
 
             # Only consider just-in-time mappings here
             if mapping.just_in_time:
+                type: MappingType = mapping.type
                 direction: Direction = mapping.direction
+
                 # JIT mappings are missing either 'to' or 'from' attributes
                 mesh: MeshNode = None
                 # Find out which
@@ -89,6 +166,25 @@ class MappingRule(Rule):
                 elif mapping.to_mesh:
                     mesh = mapping.to_mesh
 
+                # Only the types nearest-neighbor, rbf-pum-direct and rbf are supported
+                supported_types = [MappingType.NEAREST_NEIGHBOR, MappingType.RBF_PUM_DIRECT, MappingType.RBF]
+                if type not in supported_types:
+                    violations.append(self.JustInTimeMappingTypeViolation(mapping.parent_participant, mesh, direction, type))
+
+                constraint: MappingConstraint = mapping.constraint
+
+                if direction == Direction.WRITE and constraint == MappingConstraint.CONSERVATIVE:
+                    # This is fine
+                    pass
+                elif direction == Direction.READ and constraint == MappingConstraint.CONSISTENT:
+                    # This is fine
+                    pass
+                else:
+                    # This is not fine anymore 😡
+                    violations.append(
+                        self.JustInTimeMappingDirectionConstraintViolation(mapping.parent_participant, mesh, direction,
+                                                                           constraint))
+
                 # Check if participant receives mesh with api-access true
                 receive_meshes = mapping.parent_participant.receive_meshes
                 for receive_mesh in receive_meshes:
@@ -96,7 +192,7 @@ class MappingRule(Rule):
                         # If api-access != true, then participant does not have permission to read/write from/to it
                         if not receive_mesh.api_access:
                             violations.append(
-                                self.JustInTimeMappingViolation(mapping.parent_participant, mesh,direction))
+                                self.JustInTimeMappingViolation(mapping.parent_participant, mesh, direction))
 
             # 'just-in-time' mappings have already been handled
             elif not mapping.just_in_time:
@@ -105,10 +201,16 @@ class MappingRule(Rule):
                 participant_parent: ParticipantNode = mapping.parent_participant
                 if mapping.from_mesh in participant_parent.provide_meshes:
                     mesh_parent: MeshNode = mapping.from_mesh
-                    mesh_stranger = mapping.to_mesh
-                else:
+                    mesh_stranger: MeshNode = mapping.to_mesh
+                elif mapping.to_mesh in participant_parent.provide_meshes:
                     mesh_parent: MeshNode = mapping.to_mesh
-                    mesh_stranger = mapping.from_mesh
+                    mesh_stranger: MeshNode = mapping.from_mesh
+                else:
+                    # TODO A violation: One mesh needs to be by parent.
+                    #  continue, to exit current loop iteration
+
+                    pass
+
                 participant_stranger: ParticipantNode = get_participant_of_mesh(graph, mesh_stranger)
                 # TODO: Error if stranger = parent? Mappings should probably not be on the same participant
                 if direction == Direction.WRITE:
