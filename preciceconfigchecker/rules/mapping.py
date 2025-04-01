@@ -32,8 +32,9 @@ class MappingRule(Rule):
         def format_explanation(self) -> str:
             out: str = (f"The just-in-time mapping of participant {self.participant.name} {self.connecting_word} mesh "
                         f"{self.mesh.name} is of type {self.type.value} and is invalid.")
-            out += ("Currently, only just-in-time mappings of the types \"nearest-neighbor\", \"rbf-pum-direct\" and "
-                    "\"rbf\" are supported.")
+            out += (
+                "\n     Currently, only just-in-time mappings of the types \"nearest-neighbor\", \"rbf-pum-direct\" and "
+                "\"rbf\" are supported.")
             return out
 
         def format_possible_solutions(self) -> list[str]:
@@ -60,10 +61,11 @@ class MappingRule(Rule):
 
         def format_explanation(self) -> str:
             out: str = (f"The just-in-time mapping of participant {self.participant.name} {self.connecting_word} mesh "
-                        f"{self.mesh.name} is invalid.")
-            out += f"The mapping is in direction=\"{self.direction.value}\" and has constraint=\"{self.constraint.value}\"."
-            out += ("Currently, only just-in-time mappings of the form read-consistent and write-conservative are "
-                    "supported.")
+                        f"{self.mesh.name} has direction=\"{self.direction.value}\" and has constraint=\""
+                        f"{self.constraint.value}\" and is invalid.")
+            out += (
+                "\n     Currently, only just-in-time mappings of the form read-consistent and write-conservative are "
+                "supported.")
             return out
 
         def format_possible_solutions(self) -> list[str]:
@@ -80,9 +82,9 @@ class MappingRule(Rule):
                     f"of the mapping to constraint=\"conservative\"."]
             # Both parameters are incorrect
             else:
-                out += ("Please change the direction of the mapping to direction=\"write\" and the constraint of the "
+                out += ["Please change the direction of the mapping to direction=\"write\" and the constraint of the "
                         "mapping to constraint=\"conservative\" or change the direction of the mapping to direction="
-                        "\"read\" and the constraint of the mapping to constraint=\"consistent\".")
+                        "\"read\" and the constraint of the mapping to constraint=\"consistent\"."]
             return out
 
     class JustInTimeMappingViolation(Violation):
@@ -125,14 +127,21 @@ class MappingRule(Rule):
             if self.direction == Direction.READ:
                 # X reads "from" Y
                 self.connecting_word = "from"
+                self.inverse_connector = "to"
+                self.inverse_direction = Direction.WRITE
             elif self.direction == Direction.WRITE:
                 # X writes "to" Y
                 self.connecting_word = "to"
+                self.inverse_connector = "from"
+                self.inverse_direction = Direction.READ
 
         def format_explanation(self) -> str:
-            return (f"The {self.direction.value}-mapping of participant {self.participant_parent.name} and mesh "
-                    f"{self.mesh_parent.name} {self.connecting_word} participant {self.participant_stranger.name} and "
-                    f"mesh {self.mesh_stranger.name} is in the wrong direction.")
+            out: str = (f"The {self.direction.value}-mapping of participant {self.participant_parent.name} and mesh "
+                        f"{self.mesh_parent.name} {self.connecting_word} participant {self.participant_stranger.name} and "
+                        f"mesh {self.mesh_stranger.name} is in the wrong direction.")
+            out += (f"\n     In {self.direction.value}-mappings, the {self.inverse_connector}=\"mesh\" has to be on a "
+                    f"mesh that the participant provides.")
+            return out
 
         def format_possible_solutions(self) -> list[str]:
             sol: list[str] = []
@@ -169,7 +178,8 @@ class MappingRule(Rule):
                 # Only the types nearest-neighbor, rbf-pum-direct and rbf are supported
                 supported_types = [MappingType.NEAREST_NEIGHBOR, MappingType.RBF_PUM_DIRECT, MappingType.RBF]
                 if type not in supported_types:
-                    violations.append(self.JustInTimeMappingTypeViolation(mapping.parent_participant, mesh, direction, type))
+                    violations.append(
+                        self.JustInTimeMappingTypeViolation(mapping.parent_participant, mesh, direction, type))
 
                 constraint: MappingConstraint = mapping.constraint
 
