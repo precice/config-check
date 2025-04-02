@@ -164,11 +164,11 @@ class MappingRule(Rule):
             self.constraint = constraint
 
         def format_explanation(self) -> str:
-            out: str = (f"The participants {self.parent.name} and "
-                        f"{self.stranger.name} are executing in parallel.")
+            out: str = f"The participants {self.parent.name} and {self.stranger.name} are executing in parallel."
             out += (
-                f"\n     Their {self.direction.value}-mapping on meshes {self.mesh_parent.name} and {self.mesh_stranger.name} "
-                f"with constraint=\"{self.constraint.value}\" is is invalid.")
+                f"\n     The {self.direction.value}-mapping specified by participant {self.parent.name} on meshes "
+                f"{self.mesh_parent.name} and {self.mesh_stranger.name} with constraint=\"{self.constraint.value}\" "
+                f"is is invalid.")
             out += (
                 "\n     For parallel participants, only mappings of the form read-consistent and write-conservative are "
                 "allowed.")
@@ -176,7 +176,6 @@ class MappingRule(Rule):
 
         def format_possible_solutions(self) -> list[str]:
             out: list[str] = []
-            # Mapping format is "almost" correct
             # Mapping format is "almost" correct
             if self.direction == Direction.READ and self.constraint == MappingConstraint.CONSERVATIVE:
                 out += [
@@ -342,13 +341,13 @@ class MappingRule(Rule):
             return out
 
         def format_possible_solutions(self) -> list[str]:
-            sol: list[str] = []
-            sol += [f"Change direction=\"{self.direction.value}\" to direction=\"{self.inverse_direction.value}\"."]
-            sol += [f"Move the mapping from participant {self.parent.name} to participant "
+            out: list[str] = []
+            out += [f"Change direction=\"{self.direction.value}\" to direction=\"{self.inverse_direction.value}\"."]
+            out += [f"Move the mapping from participant {self.parent.name} to participant "
                     f"{self.stranger.name} and change its direction and remember to switch the mesh used in the "
                     f"<exchange .../> tag in their coupling scheme."]
-            sol += ["Otherwise, please remove it to improve readability."]
-            return sol
+            out += [f"Otherwise, change the {self.connecting_word}-mesh to a mesh by participant {self.stranger.name}."]
+            return out
 
     class JustInTimeMappingFormatDirectionViolation(Violation):
         """
@@ -365,28 +364,40 @@ class MappingRule(Rule):
             self.direction = direction
             if self.direction == Direction.READ:
                 self.connecting_word = "from"
+                self.inverse_direction = Direction.WRITE
             elif self.direction == Direction.WRITE:
                 self.connecting_word = "to"
+                self.inverse_direction = Direction.READ
             self.constraint = constraint
             self.type = type
 
         def format_explanation(self) -> str:
-            out: str = (f"The just-in-time-{self.direction.value}-mapping of type {self.type.value} with constraint "
-                        f"{self.constraint.value} between participants {self.parent.name} and {self.stranger.name} is "
-                        f"invalid.")
-            out += (f"\n    Currently, only just-in-time mappings of the type \"nearest-neigbor\", \"rbf-pum-direct\" "
-                    f"and \"rbf\" are supported.")
-            out += (f"Additionally, only the formats \"write-conservative\" or \"read-consistent\" are implemented for "
-                    f"just-in-time mappings.")
+            out: str = (
+                f"The just-in-time {self.direction.value}-mapping with constraint "
+                f"\"{self.constraint.value}\" between participants {self.parent.name} and {self.stranger.name} has an"
+                f" invalid format and is in the wrong direction.")
+            out += (
+                f"\n    Currently, only the formats \"write-conservative\" and \"read-consistent\" are implemented for "
+                f"just-in-time mappings.")
+            out += (
+                f"\n     In just-in-time {self.direction.value}-mappings, the {self.connecting_word}=\"mesh\" has to "
+                f"be on a stranger participants mesh.")
+            return out
 
         def format_possible_solutions(self) -> list[str]:
             out: list[str] = []
-            out += [f"Please update the type of the mapping between participants {self.parent.name} and "
-                    f"{self.stranger.name} from {self.type.value} to one of \"nearest-neighbor\", \"rbf-pum-direct\" "
-                    f"or \"rbf\"."]
-            out += [f"Please update the format of the mapping between participants {self.parent.name} and "
-                    f"{self.stranger.name} from {self.direction.value}-{self.constraint.value} to one of "
-                    f"\"write-conservative\" or \"read-consistent\"."]
+            out += [f"Change direction=\"{self.direction.value}\" to direction=\"{self.inverse_direction.value}\"."]
+            out += [f"Move the mapping from participant {self.parent.name} to participant "
+                    f"{self.stranger.name} and change its direction and remember to switch the mesh used in the "
+                    f"<exchange .../> tag in their coupling scheme."]
+            if self.direction == Direction.WRITE:
+                out += [f"Please update the constraint of the mapping between participants {self.parent.name} and "
+                        f"{self.stranger.name} from \"{self.constraint.value}\" to \"conservative\"."]
+            elif self.direction == Direction.READ:
+                out += [f"Please update the constraint of the mapping between participants {self.parent.name} and "
+                        f"{self.stranger.name} from \"{self.constraint.value}\" to \"consistent\"."]
+            out += [f"Otherwise, change the {self.connecting_word}-mesh to a mesh by participant {self.stranger.name}."]
+            return out
 
     class JustInTimeMappingTypeViolation(Violation):
         """
