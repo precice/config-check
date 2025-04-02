@@ -22,11 +22,25 @@ class DisjointSimulationsRule(Rule):
             self.participant_sets = participant_sets
 
         def format_explanation(self) -> str:
+            explanation = f"There are {len(self.participant_sets)} simulations that do not interact with each other. "
+
+            def format_set(set: frozenset[str]) -> str:
+                return ", ".join(sorted(set))
+
             if len(self.participant_sets) == 2:
                 [participants_a, participants_b] = list(self.participant_sets)
-                return f"There are multiple simulations that do not interact with each other, as participants {list(participants_a)} do not communicate with participants {list(participants_b)}."
+
+                participants_a_label = "Participants" if len(participants_a) > 1 else "Participant"
+                do_str = "do" if len(participants_a) > 1 else "does"
+                participants_b_label = "participants" if len(participants_b) > 1 else "participant"
+
+                explanation += f"{participants_a_label} {format_set(participants_a)} {do_str} not communicate with {participants_b_label} {format_set(participants_b)}."
             else:
-                return f"There are multiple simulations that do not interact with each other. Disjoint groups: {list(self.participant_sets)}."
+                explanation += f"Disjoint groups:"
+                for component in self.participant_sets:
+                    explanation += f"\n- {format_set(component)}"
+
+            return explanation
 
         def format_possible_solutions(self) -> List[str]:
             return [
