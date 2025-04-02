@@ -23,6 +23,8 @@ def test_mapping():
                 p_instigator = node
             elif node.name == "Elevator":
                 p_elevator = node
+            elif node.name == "Incinerator":
+                p_incinerator = node
         elif isinstance(node, MeshNode):
             if node.name == "Alligator-Mesh":
                 m_alligator = node
@@ -34,26 +36,32 @@ def test_mapping():
                 m_instigator = node
             elif node.name == "Elevator-Mesh":
                 m_elevator = node
+            elif node.name == "Incinerator-Mesh":
+                m_incinerator = node
 
-    violations_expected = []
+    violations_expected = [
 
-    violations_expected += [m.JustInTimeMappingViolation(p_alligator, m_generator, Direction.READ)]
+        m.MappingDirectionViolation(p_propagator, p_generator, m_propagator, m_generator, Direction.WRITE),
 
-    violations_expected += [
-        m.MappingDirectionViolation(p_propagator, p_generator, m_propagator, m_generator, Direction.WRITE)]
+        m.IncorrectExchangeMappingViolation(p_propagator, p_generator, m_generator, Direction.WRITE),
 
-    violations_expected += [m.JustInTimeMappingTypeViolation(p_instigator, m_alligator, Direction.READ,
-                                                             MappingType.RADIAL_GEOMETRIC_MULTISCALE)]
+        m.JustInTimeMappingPermissionViolation(p_alligator, p_generator, m_generator, Direction.READ),
 
-    violations_expected += [m.JustInTimeMappingDirectionConstraintViolation(p_instigator, m_alligator, Direction.READ,
-                                                                            MappingConstraint.SCALED_CONSISTENT_SURFACE)]
+        m.MissingCouplingSchemeMappingViolation(p_alligator, p_generator, m_generator, Direction.READ),
 
-    violations_expected += [
-        m.JustInTimeMappingDirectionConstraintViolation(p_instigator, m_alligator,
-                                                        Direction.WRITE, MappingConstraint.CONSISTENT)]
+        m.JustInTimeMappingTypeViolation(p_instigator, p_alligator, m_alligator, Direction.READ,
+                                         MappingType.RADIAL_GEOMETRIC_MULTISCALE),
+        m.JustInTimeMappingFormatViolation(p_instigator, p_alligator, m_alligator, Direction.READ,
+                                           MappingConstraint.SCALED_CONSISTENT_SURFACE),
+        m.JustInTimeMappingFormatViolation(p_instigator, p_alligator, m_alligator, Direction.WRITE,
+                                           MappingConstraint.CONSISTENT),
+        m.ParallelCouplingMappingFormatViolation(p_elevator, p_instigator, m_elevator, m_instigator, Direction.READ,
+                                                 MappingConstraint.CONSERVATIVE),
+        m.JustInTimeMappingFormatDirectionViolation(p_incinerator, p_propagator, m_propagator, Direction.READ,
+                                                    MappingConstraint.SCALED_CONSISTENT_VOLUME),
+        m.MissingExchangeMappingViolation(p_elevator, p_instigator, m_instigator, Direction.READ),
 
-    violations_expected += [
-        m.ParallelParticipantsMappingViolation(p_elevator, p_instigator, m_elevator, m_instigator, Direction.READ,
-                                               MappingConstraint.CONSERVATIVE)]
+        m.IncorrectExchangeMappingViolation(p_incinerator, p_propagator, m_propagator, Direction.READ)
+    ]
 
     assert_equal_violations("Mapping-test", violations_expected, violations_actual)
