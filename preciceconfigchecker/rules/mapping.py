@@ -71,8 +71,9 @@ class MappingRule(Rule):
             out: str = (f"The participant {self.parent.name} is specifying a {self.direction.value}-mapping "
                         f"{self.connecting_word} participant {self.stranger.name}, but there is no exchange for it in "
                         f"the coupling-scheme between them.")
-            out += (f"     For a {self.direction.value}-mapping, the mesh {self.mesh.name} should be used to exchange "
-                    f"data.")
+            out += (
+                f"\n     For a {self.direction.value}-mapping, the mesh {self.mesh.name} should be used to exchange "
+                f"data.")
             return out
 
         def format_possible_solutions(self) -> list[str]:
@@ -332,9 +333,9 @@ class MappingRule(Rule):
                 self.inverse_direction = Direction.READ
 
         def format_explanation(self) -> str:
-            out: str = (f"The {self.direction.value}-mapping of participant {self.parent.name} "
-                        f"{self.connecting_word} participant {self.stranger.name} and "
-                        f"mesh {self.mesh.name} is in the wrong direction.")
+            out: str = (f"The just-in-time {self.direction.value}-mapping of participant {self.parent.name} "
+                        f"{self.connecting_word} participant {self.stranger.name} and mesh {self.mesh.name} is in "
+                        f"the wrong direction.")
             out += (
                 f"\n     In just-in-time{self.direction.value}-mappings, the {self.connecting_word}=\"mesh\" has to "
                 f"be on a stranger participants mesh.")
@@ -357,7 +358,7 @@ class MappingRule(Rule):
         """
 
         def __init__(self, parent: ParticipantNode, stranger: ParticipantNode, mesh: MeshNode, direction: Direction,
-                     constraint: MappingConstraint, type: MappingType):
+                     constraint: MappingConstraint):
             self.parent = parent
             self.stranger = stranger
             self.mesh = mesh
@@ -369,18 +370,17 @@ class MappingRule(Rule):
                 self.connecting_word = "to"
                 self.inverse_direction = Direction.READ
             self.constraint = constraint
-            self.type = type
 
         def format_explanation(self) -> str:
             out: str = (
-                f"The just-in-time {self.direction.value}-mapping with constraint "
-                f"\"{self.constraint.value}\" between participants {self.parent.name} and {self.stranger.name} has an"
-                f" invalid format and is in the wrong direction.")
+                f"The just-in-time {self.direction.value}-mapping with constraint \"{self.constraint.value}\" between "
+                f"participant {self.parent.name} and participant {self.stranger.name}'s mesh {self.mesh.name} has an "
+                f"invalid format and is in the wrong direction.")
             out += (
                 f"\n    Currently, only the formats \"write-conservative\" and \"read-consistent\" are implemented for "
                 f"just-in-time mappings.")
             out += (
-                f"\n     In just-in-time {self.direction.value}-mappings, the {self.connecting_word}=\"mesh\" has to "
+                f"\n    In just-in-time {self.direction.value}-mappings, the {self.connecting_word}=\"mesh\" has to "
                 f"be on a stranger participants mesh.")
             return out
 
@@ -388,7 +388,7 @@ class MappingRule(Rule):
             out: list[str] = []
             out += [f"Change direction=\"{self.direction.value}\" to direction=\"{self.inverse_direction.value}\"."]
             out += [f"Move the mapping from participant {self.parent.name} to participant "
-                    f"{self.stranger.name} and change its direction and remember to switch the mesh used in the "
+                    f"{self.stranger.name}, change its direction and remember to switch the mesh used in the "
                     f"<exchange .../> tag in their coupling scheme."]
             if self.direction == Direction.WRITE:
                 out += [f"Please update the constraint of the mapping between participants {self.parent.name} and "
@@ -495,8 +495,7 @@ class MappingRule(Rule):
                             # DONE TODO: Wrong direction+format violation
                             violations.append(
                                 self.JustInTimeMappingFormatDirectionViolation(participant_parent, participant_stranger,
-                                                                               mesh_stranger, direction, constraint,
-                                                                               type))
+                                                                               mesh_stranger, direction, constraint))
                 elif direction == Direction.WRITE:
                     # For a write-mapping, the 'to' mesh needs to be defined
                     if mapping.to_mesh:
@@ -524,8 +523,7 @@ class MappingRule(Rule):
                             # DONE TODO: Wrong direction+format violation
                             violations.append(
                                 self.JustInTimeMappingFormatDirectionViolation(participant_parent, participant_stranger,
-                                                                               mesh_stranger, direction, constraint,
-                                                                               type))
+                                                                               mesh_stranger, direction, constraint))
 
                 # Check if participant receives mesh with api-access true
                 receive_meshes = mapping.parent_participant.receive_meshes
