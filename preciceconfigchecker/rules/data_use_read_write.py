@@ -175,14 +175,16 @@ class DataUseReadWriteRule(Rule):
                     # Check if data gets read and written by the same participant.
                     # If so, then no exchange is needed.
                     # Otherwise, an exchange is needed.
-                    for writer in writers:
-                        for reader in readers:
+                    writer_s = set(writers)
+                    reader_s = set(readers)
+                    for writer in writer_s:
+                        for reader in reader_s:
                             # If they are the same, then everything is fine.
                             if reader == writer:
                                 continue
                             # Otherwise, there needs to be an exchange of data between them.
                             else:
-                                if writer not in data_flow_graph or reader not in data_flow_graph:
+                                if writer not in data_flow_graph.nodes or reader not in data_flow_graph.nodes:
                                     # One of writer/reader is not connected through an exchange involving data_node
                                     violations.append(self.DataNotExchangedViolation(data_node, writer, reader))
                                 else:
