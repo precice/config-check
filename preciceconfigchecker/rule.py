@@ -27,7 +27,6 @@ class Rule(ABC):
         """
         Initializes a Rule object.
         """
-        rules.append(self)
 
     @abstractmethod
     def check(self, graph: Graph) -> list[Violation]:
@@ -37,8 +36,3 @@ class Rule(ABC):
         Hint: Implement Violations as inner classes in the rule of type Violation.
         """
         pass
-
-
-# To handle all the rules
-rules: list[Rule] = []
-"""List of all initialized rules. Info: Each rule puts itself on this list when initialized."""

@@ -21,5 +21,3 @@ class Rule_5(Rule):
     def check(self, graph) -> list[Violation]:
         #Find violations in the graph and return them.
         return [ self.MyViolation(42) ]
-    
-Rule_5()

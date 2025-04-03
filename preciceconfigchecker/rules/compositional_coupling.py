@@ -59,9 +59,6 @@ class CompositionalCouplingRule(Rule):
         return violations
 
 
-CompositionalCouplingRule()
-
-
 # Helper functions
 def filter_coupling_scheme_nodes(node) -> bool:
     """
