@@ -78,7 +78,9 @@ def test_mapping():
 
         m.MissingM2NMappingViolation(p_incinerator,p_propagator,m_propagator,Direction.READ),
 
-        mn.MissingM2NEchangeViolation(p_incinerator)
+        mn.MissingM2NEchangeViolation(p_incinerator),
+
+        m.MappingMissingDataProcessingViolation(p_propagator,p_generator,m_propagator,m_generator,Direction.WRITE)
     ]
 
     assert_equal_violations("Mapping-test", violations_expected, violations_actual)
