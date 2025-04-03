@@ -2,7 +2,7 @@ import sys
 
 from networkx.classes import Graph
 from precice_config_graph.nodes import ParticipantNode, MeshNode, MappingNode, Direction, MappingConstraint, \
-    MappingType, CouplingSchemeNode, MultiCouplingSchemeNode, CouplingSchemeType, ExchangeNode
+    MappingType, CouplingSchemeNode, MultiCouplingSchemeNode, CouplingSchemeType, ExchangeNode, M2NNode
 
 from preciceconfigchecker.rule import Rule
 from preciceconfigchecker.severity import Severity
@@ -116,8 +116,36 @@ class MappingRule(Rule):
 
         def format_possible_solutions(self) -> list[str]:
             out: list[str] = []
-            out += [f"Create a coupling scheme between participants {self.parent.name} and {self.stranger.name} with an"
+            out += [f"Create a coupling-scheme between participants {self.parent.name} and {self.stranger.name} with an"
                     f"exchange to exchange data between them."]
+            out += ["Otherwise, please remove the mapping to improve readability."]
+            return out
+
+    class MissingM2NMappingViolation(Violation):
+        """
+            This class handles two participants specifying a mapping between them, but no m2n-exchange alongside it,
+            i.e., no m2n-exchange exists between the two to exchange data.
+        """
+
+        def __init__(self, parent: ParticipantNode, stranger: ParticipantNode, mesh: MeshNode, direction: Direction):
+            self.parent = parent
+            self.stranger = stranger
+            self.mesh = mesh
+            self.direction = direction
+            if self.direction == Direction.READ:
+                self.connecting_word = "from"
+            elif self.direction == Direction.WRITE:
+                self.connecting_word = "to"
+
+        def format_explanation(self) -> str:
+            return (f"The participant {self.parent.name} is specifying a {self.direction.value}-mapping "
+                    f"{self.connecting_word} participant {self.stranger.name}, but there does not exist an "
+                    f"m2n-exchange between them.")
+
+        def format_possible_solutions(self) -> list[str]:
+            out: list[str] = []
+            out += [f"Create an m2n-exchange between participants {self.parent.name} and {self.stranger.name}"
+                    f" to exchange data between them."]
             out += ["Otherwise, please remove the mapping to improve readability."]
             return out
 
@@ -506,6 +534,7 @@ class MappingRule(Rule):
     def check(self, graph: Graph) -> list[Violation]:
         violations: list[Violation] = []
 
+        m2ns: list[M2NNode] = filter_m2n_nodes(graph)
         couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode] = filter_coupling_nodes(graph)
         parallel_couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode] = filter_parallel_coupling_nodes(graph)
 
@@ -632,6 +661,13 @@ class MappingRule(Rule):
                                 self.JustInTimeMappingPermissionViolation(participant_parent, participant_stranger,
                                                                           mesh_stranger, direction))
 
+                # TODO get m2n exchanges between participants
+                m2n = get_m2n_of_participants(m2ns, participant_parent, participant_stranger)
+                if not m2n:
+                    violations.append(
+                        self.MissingM2NMappingViolation(participant_parent, participant_stranger,
+                                                        mesh_stranger, direction))
+
                 # Check if mapping-participants also have a coupling scheme and then also an exchange
                 coupling = get_coupling_scheme_of_mapping(couplings, participant_parent, participant_stranger)
                 if not coupling:
@@ -713,6 +749,13 @@ class MappingRule(Rule):
                             self.MappingDirectionViolation(participant_parent, participant_stranger, mesh_parent,
                                                            mesh_stranger, direction))
 
+                # TODO get m2n exchanges between participants
+                m2n = get_m2n_of_participants(m2ns, participant_parent, participant_stranger)
+                if not m2n:
+                    violations.append(
+                        self.MissingM2NMappingViolation(participant_parent, participant_stranger,
+                                                        mesh_stranger, direction))
+
                 # Check if there exists a coupling-scheme between Parent and Stranger
                 coupling = get_coupling_scheme_of_mapping(couplings, participant_parent, participant_stranger)
                 if not coupling:
@@ -762,10 +805,26 @@ class MappingRule(Rule):
         return violations
 
 
-MappingRule()
-
+# MappingRule()
 
 # Helper functions
+def get_m2n_of_participants(m2ns: list[M2NNode], participant_a: ParticipantNode,
+                            participant_b: ParticipantNode) -> M2NNode | None:
+    """
+        This function returns the m2n-node connecting two participants if one exists.
+        :param m2ns: All m2n nodes that get searched.
+        :param participant_a: The first participant for which the m2n node is needed.
+        :param participant_b: The other participant.
+        :return: The m2n node between the given participants if it exists, None otherwise.
+    """
+    for m2n in m2ns:
+        if m2n.acceptor == participant_a and m2n.connector == participant_b:
+            return m2n
+        elif m2n.acceptor == participant_b and m2n.connector == participant_a:
+            return m2n
+    return None
+
+
 def exchange_belongs_to_mapping(exchange: ExchangeNode, direction: Direction, participant_stranger: ParticipantNode,
                                 mesh_stranger: MeshNode) -> bool:
     """
@@ -815,8 +874,8 @@ def get_participants_of_mesh(graph: Graph, mesh: MeshNode) -> list[ParticipantNo
     return participants
 
 
-def get_coupling_scheme_of_mapping(couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode], participant_a,
-                                   participant_b
+def get_coupling_scheme_of_mapping(couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode],
+                                   participant_a: ParticipantNode, participant_b: ParticipantNode,
                                    ) -> CouplingSchemeNode | MultiCouplingSchemeNode | None:
     """
         This method returns the coupling scheme between the given participants.
@@ -895,3 +954,16 @@ def filter_parallel_coupling_nodes(graph: Graph) -> list[CouplingSchemeNode | Mu
         elif isinstance(node, MultiCouplingSchemeNode):
             couplings.append(node)
     return couplings
+
+
+def filter_m2n_nodes(graph: Graph) -> list[M2NNode]:
+    """
+        This function returns all m2n nodes of the given graph.
+        :param graph:The graph to check.
+        :return: All m2n nodes of the graph.
+    """
+    m2ns: list[M2NNode] = []
+    for node in graph.nodes:
+        if isinstance(node, M2NNode):
+            m2ns.append(node)
+    return m2ns
