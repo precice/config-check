@@ -477,7 +477,31 @@ class MappingRule(Rule):
                     f"{self.parent.name} gets provided by participants {self.names}.")
 
         def format_possible_solutions(self) -> list[str]:
-            return [f"Please remove the mesh {self.mesh.name} from all but one participants provided meshes.", ]
+            return [f"Please remove the mesh {self.mesh.name} from all but one participants provided meshes."]
+
+    class SameParticipantMappingViolation(Violation):
+        """
+            This class handles a mapping between two meshes of the same participant being specified.
+        """
+
+        def __init__(self, participant: ParticipantNode, mesh: MeshNode, direction: Direction):
+            self.participant = participant
+            self.mesh = mesh
+            self.direction = direction
+            if self.direction == Direction.READ:
+                self.connecting_word = "from"
+            elif self.direction == Direction.WRITE:
+                self.connecting_word = "to"
+
+        def format_explanation(self) -> str:
+            out: str = (f"The participant {self.participant.name} is specifying a {self.direction.value}-mapping "
+                        f"{self.connecting_word} mesh {self.mesh.name}, which is his own mesh.")
+            out += f"The mapping is from participant {self.participant.name} to participant {self.participant.name}."
+            return out
+
+        def format_possible_solutions(self) -> list[str]:
+            return [f"Please change the {self.connecting_word}-mesh to a mesh by a different participant.",
+                    "Otherwise, please remove the mapping to improve readability."]
 
     def check(self, graph: Graph) -> list[Violation]:
         violations: list[Violation] = []
@@ -523,7 +547,14 @@ class MappingRule(Rule):
 
                 # There is only one participant claiming the mesh
                 participant_stranger = participant_strangers[0]
-                print("Stranger", participant_stranger.name)
+
+                if participant_parent == participant_stranger:
+                    # This mapping is broken
+                    # TODO: Mapping on own meshes Violation
+                    violations.append(
+                        self.SameParticipantMappingViolation(participant_parent, mesh_stranger, direction))
+                    continue
+
                 # Only the types nearest-neighbor, rbf-pum-direct and rbf are supported
                 supported_types = [MappingType.NEAREST_NEIGHBOR, MappingType.RBF_PUM_DIRECT, MappingType.RBF]
                 if type not in supported_types:
@@ -659,7 +690,13 @@ class MappingRule(Rule):
 
                 # There is only one participant claiming the mesh
                 participant_stranger = participant_strangers[0]
-                print("!= JIT Stranger", participant_stranger.name)
+
+                if participant_parent == participant_stranger:
+                    # This mapping is broken
+                    # TODO: Mapping on own meshes Violation
+                    violations.append(
+                        self.SameParticipantMappingViolation(participant_parent, mesh_stranger, direction))
+                    continue
 
                 if direction == Direction.READ:
                     # In a read-mapping, the 'to'-mesh has to be by the parent, the 'from'-mesh by Stranger
