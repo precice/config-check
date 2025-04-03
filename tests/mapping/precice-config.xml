@@ -67,6 +67,7 @@
     <participant name="Propagator">
         <receive-mesh name="Generator-Mesh" from="Generator"/>
         <provide-mesh name="Propagator-Mesh"/>
+        <!-- write mapping without write-data element -->
         <mapping:nearest-neighbor
                 direction="write"
                 to="Propagator-Mesh"
@@ -83,6 +84,7 @@
                 direction="read"
                 from="Generator-Mesh"
                 constraint="consistent"/>
+        <read-data name="Color" mesh="Generator-Mesh"/>
     </participant>
 
     <participant name="Instigator">
@@ -98,6 +100,8 @@
             direction="write"
             to="Alligator-Mesh"
             constraint="consistent"/>
+        <read-data name="Color" mesh="Alligator-Mesh"/>
+        <write-data name="Color" mesh="Alligator-Mesh"/>
     </participant>
 
     <participant name="Elevator">
@@ -110,6 +114,7 @@
             from="Instigator-Mesh"
             to="Elevator-Mesh"
             constraint="conservative"/>
+        <read-data name="Color" mesh="Elevator-Mesh"/>
     </participant>
 
     <participant name="Incinerator">
@@ -127,6 +132,8 @@
             from="Impostor-Mesh"
             to="Incinerator-Mesh"
             constraint="consistent"/>
+        <read-data name="Color" mesh="Propagator-Mesh"/>
+        <read-data name="Color" mesh="Incinerator-Mesh"/>
     </participant>
 
     <m2n:sockets acceptor="Generator" connector="Alligator" exchange-directory=".."/>
