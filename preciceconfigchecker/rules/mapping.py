@@ -1,3 +1,5 @@
+import sys
+
 from networkx.classes import Graph
 from precice_config_graph.nodes import ParticipantNode, MeshNode, MappingNode, Direction, MappingConstraint, \
     MappingType, CouplingSchemeNode, MultiCouplingSchemeNode, CouplingSchemeType, ExchangeNode
@@ -5,6 +7,7 @@ from precice_config_graph.nodes import ParticipantNode, MeshNode, MappingNode, D
 from preciceconfigchecker.rule import Rule
 from preciceconfigchecker.severity import Severity
 from preciceconfigchecker.violation import Violation
+import preciceconfigchecker.color as c
 
 
 class MappingRule(Rule):
@@ -431,6 +434,51 @@ class MappingRule(Rule):
             return [f"Please change the type of the mapping from \"{self.type.value}\" to one of the types "
                     f"\"nearest-neighbor\", \"rbf-pum-direct\" or \"rbf\"."]
 
+    class UnclaimedMeshMappingViolation(Violation):
+        """
+            This class handles a mesh being mentioned in a mapping, but no participant providing it.
+        """
+
+        def __init__(self, parent: ParticipantNode, mesh: MeshNode, direction: Direction):
+            self.parent = parent
+            self.mesh = mesh
+            self.direction = direction
+
+        def format_explanation(self) -> str:
+            return (f"The mesh {self.mesh.name} in the {self.direction.value}-mapping specified by participant "
+                    f"{self.parent.name} does not get provided by any participant.")
+
+        def format_possible_solutions(self) -> list[str]:
+            return [f"Please let any participant provide the mesh {self.mesh.name}.",
+                    "Otherwise, please remove it to improve readability."]
+
+    class RepeatedlyClaimedMeshMappingViolation(Violation):
+        """
+            This class handles a mesh being mentioned in a mapping, but multiple participant providing it.
+        """
+
+        def __init__(self, parent: ParticipantNode, participants: list[ParticipantNode], mesh: MeshNode,
+                     direction: Direction):
+            self.parent = parent
+            self.mesh = mesh
+            self.direction = direction
+            participants_s = sorted(participants, key=lambda participant: participant.name)
+            self.names = participants_s[0].name
+            for i in range(1, len(participants_s) - 1):
+                self.names += ", "
+                self.names += participants_s[i].name
+            # Last participant has to be connected with "and", the others with a comma.
+            self.names += " and "
+            # Name of last participant
+            self.names += participants_s[-1].name
+
+        def format_explanation(self) -> str:
+            return (f"The mesh {self.mesh.name} in the {self.direction.value}-mapping specified by participant "
+                    f"{self.parent.name} gets provided by participants {self.names}.")
+
+        def format_possible_solutions(self) -> list[str]:
+            return [f"Please remove the mesh {self.mesh.name} from all but one participants provided meshes.", ]
+
     def check(self, graph: Graph) -> list[Violation]:
         violations: list[Violation] = []
 
@@ -456,13 +504,30 @@ class MappingRule(Rule):
                     mesh_stranger = mapping.to_mesh
                 else:
                     # This case should not exist, if precice-tools --check ran.
-                    pass
-                participant_stranger = get_participant_of_mesh(graph, mesh_stranger)
+                    sys.exit(c.dyeing("Exiting check...\nDid you execute precice-tools --check?", c.red))
+                participant_strangers = get_participants_of_mesh(graph, mesh_stranger)
 
+                if len(participant_strangers) == 0:
+                    # This mapping is broken
+                    # TODO: Mapping is using mesh stranger not provided by any participant
+                    violations.append(self.UnclaimedMeshMappingViolation(participant_parent, mesh_stranger, direction))
+                    continue
+
+                if len(participant_strangers) > 1:
+                    # This mapping is broken
+                    # TODO: Mapping is using mesh_stranger claimed by more than one participant
+                    violations.append(
+                        self.RepeatedlyClaimedMeshMappingViolation(participant_parent, participant_strangers,
+                                                                   mesh_stranger, direction))
+                    continue
+
+                # There is only one participant claiming the mesh
+                participant_stranger = participant_strangers[0]
+                print("Stranger", participant_stranger.name)
                 # Only the types nearest-neighbor, rbf-pum-direct and rbf are supported
                 supported_types = [MappingType.NEAREST_NEIGHBOR, MappingType.RBF_PUM_DIRECT, MappingType.RBF]
                 if type not in supported_types:
-                    # DONE TODO: JIT wrong type Violation DONE
+                    # DONE TODO: JIT wrong type Violation
                     violations.append(
                         self.JustInTimeMappingTypeViolation(participant_parent, participant_stranger, mesh_stranger,
                                                             direction, type))
@@ -567,7 +632,6 @@ class MappingRule(Rule):
 
             # JIT-mappings have been handled
             else:
-
                 if mapping.from_mesh in participant_parent.provide_meshes:
                     mesh_parent = mapping.from_mesh
                     mesh_stranger = mapping.to_mesh
@@ -576,8 +640,26 @@ class MappingRule(Rule):
                     mesh_stranger = mapping.from_mesh
                 else:
                     # This case should not exist, if precice-tools --check ran.
-                    pass
-                participant_stranger = get_participant_of_mesh(graph, mesh_stranger)
+                    sys.exit(c.dyeing("Exiting check...\nDid you execute precice-tools --check?", c.red))
+                participant_strangers = get_participants_of_mesh(graph, mesh_stranger)
+
+                if len(participant_strangers) == 0:
+                    # This mapping is broken
+                    # DONE TODO: Mapping is using mesh stranger not provided by any participant
+                    violations.append(self.UnclaimedMeshMappingViolation(participant_parent, mesh_stranger, direction))
+                    continue
+
+                if len(participant_strangers) > 1:
+                    # This mapping is broken
+                    # TODO: Mapping is using mesh_stranger claimed by more than one participant
+                    violations.append(
+                        self.RepeatedlyClaimedMeshMappingViolation(participant_parent, participant_strangers,
+                                                                   mesh_stranger, direction))
+                    continue
+
+                # There is only one participant claiming the mesh
+                participant_stranger = participant_strangers[0]
+                print("!= JIT Stranger", participant_stranger.name)
 
                 if direction == Direction.READ:
                     # In a read-mapping, the 'to'-mesh has to be by the parent, the 'from'-mesh by Stranger
@@ -680,23 +762,20 @@ def exchange_belongs_to_mapping(exchange: ExchangeNode, direction: Direction, pa
     return ex_dir and ex_mesh
 
 
-def get_participant_of_mesh(graph: Graph, mesh: MeshNode) -> ParticipantNode:
+def get_participants_of_mesh(graph: Graph, mesh: MeshNode) -> list[ParticipantNode]:
     """
         This method returns the participant who owns the given mesh.
         :param graph: The graph of the preCICE config.
         :param mesh: The mesh of which the participant is needed.
         :return: The participant who owns the mesh.
     """
-    participant: ParticipantNode = None
+    participants: list[ParticipantNode] = []
     for node in graph.nodes:
         if isinstance(node, ParticipantNode):
-            if mesh in node.provide_meshes and participant is None:
-                participant = node
-            elif mesh in node.provide_meshes and participant is not None:
-                # TODO: Error here? A mesh should not be provided by more than one participant
-                pass
-    # TODO: Error if participant does not exist?
-    return participant
+            if mesh in node.provide_meshes:
+                participants.append(node)
+    # If participant does not exist, this will lead to a violation later
+    return participants
 
 
 def get_coupling_scheme_of_mapping(couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode], participant_a,
