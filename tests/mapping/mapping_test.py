@@ -1,7 +1,8 @@
-from precice_config_graph.nodes import ParticipantNode, MeshNode, Direction, MappingConstraint, MappingType
+from precice_config_graph.nodes import ParticipantNode, MeshNode, Direction, MappingConstraint, MappingType, DataNode
 
 from preciceconfigchecker.rules.mapping import MappingRule as m
 from preciceconfigchecker.rules.m2n_exchange import M2NExchangeRule as mn
+from preciceconfigchecker.rules.data_use_read_write import DataUseReadWriteRule as d
 
 from tests.test_utils import assert_equal_violations, get_actual_violations, create_graph
 
@@ -13,7 +14,10 @@ def test_mapping():
 
     # extract nodes from graph to build expected violations
     for node in graph.nodes():
-        if isinstance(node, ParticipantNode):
+        if isinstance(node, DataNode):
+            if node.name == "Color":
+                d_color = node
+        elif isinstance(node, ParticipantNode):
             if node.name == "Alligator":
                 p_alligator = node
             elif node.name == "Generator":
@@ -76,11 +80,15 @@ def test_mapping():
 
         m.SameParticipantMappingViolation(p_incinerator, m_incinerator, Direction.READ),
 
-        m.MissingM2NMappingViolation(p_incinerator,p_propagator,m_propagator,Direction.READ),
+        m.MissingM2NMappingViolation(p_incinerator, p_propagator, m_propagator, Direction.READ),
 
         mn.MissingM2NEchangeViolation(p_incinerator),
 
-        m.MappingMissingDataProcessingViolation(p_propagator,p_generator,m_propagator,m_generator,Direction.WRITE)
+        m.MappingMissingDataProcessingViolation(p_propagator, p_generator, m_propagator, m_generator, Direction.WRITE),
+
+        d.DataNotExchangedViolation(d_color, p_generator, p_alligator),
+
+        d.DataNotExchangedViolation(d_color, p_instigator, p_elevator)
     ]
 
     assert_equal_violations("Mapping-test", violations_expected, violations_actual)
