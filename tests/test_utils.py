@@ -33,8 +33,8 @@ def assert_equal_violations(test_name: str, violations_expected: list[Violation]
         :return: AssertionError, if the violations are not equal
     """
     # Sort them so that violations of the same type are in the same order
-    violations_expected_s = sorted(violations_expected, key=lambda obj: type(obj).__name__)
-    violations_actual_s = sorted(violations_actual, key=lambda obj: type(obj).__name__)
+    violations_expected_s = sorted(violations_expected, key=sort_key)
+    violations_actual_s = sorted(violations_actual, key=sort_key)
 
     assert len(violations_actual_s) == len(violations_expected_s), (
         f"[{test_name}] Different number of expected- and actual violations.\n"
@@ -78,3 +78,6 @@ def create_graph(path: str) -> Graph:
     xml = xml_processing.parse_file(path)
     graph = g.get_graph(xml)
     return graph
+
+def sort_key(obj):
+    return obj.format_explanation()
