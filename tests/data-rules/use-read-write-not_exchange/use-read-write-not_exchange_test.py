@@ -7,6 +7,8 @@ from tests.test_utils import assert_equal_violations, get_actual_violations, cre
 
 def test_data_not_use_not_read_not_write():
 
+    graph = create_graph("tests/data-rules/use-read-write-not_exchange/precice-config.xml")
+
     violations_actual = get_actual_violations(graph)
 
     for node in graph.nodes:
