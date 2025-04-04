@@ -73,8 +73,8 @@ class MappingRule(Rule):
 
         def format_explanation(self) -> str:
             out: str = (f"The participant {self.parent.name} is specifying a {self.direction.value}-mapping "
-                        f"{self.connecting_word} participant {self.stranger.name}, but there is no exchange for it in "
-                        f"the coupling-scheme between them.")
+                        f"{self.connecting_word} participant {self.stranger.name}'s mesh {self.mesh.name}, "
+                        f"but there is no exchange for it in the coupling-scheme between them.")
             out += (
                 f"\n     For a {self.direction.value}-mapping, the mesh {self.mesh.name} should be used to exchange "
                 f"data.")
