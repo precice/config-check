@@ -8,7 +8,7 @@ from preciceconfigchecker.violation import Violation
 
 
 class DisjointSimulationsRule(Rule):
-    severity = Severity.WARNING
+    severity = Severity.DEBUG
     name = "Couplings must not be disjoint"
 
     class DisjointSimulationsViolation(Violation):
