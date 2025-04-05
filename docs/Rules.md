@@ -139,9 +139,11 @@ This does not necessarily cause the simulation to malfunction or misbehave.
 
 ## Rules with severity `debug`
 
-### (1) `TODO` Disjoint simulations
+### (1) Disjoint simulations
 
 A simulation between participants A and B and a second one between participants C and D can run simultaneously, but will
 deteriorate the readability of the preCICE-config and will make it more prone to errors.
+More precisely, simulations are considered disjoint, if there are no connections (data written to/read by, exchanges,
+coupling schemes, etc.) between groups of participants.
 
-In most cases, however, running multiple “disjoint simulations” simultaneously is intended.   
+In most cases, running multiple “disjoint simulations” simultaneously is intended.
