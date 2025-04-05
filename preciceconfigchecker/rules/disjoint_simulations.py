@@ -1,5 +1,3 @@
-from typing import List
-
 import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import ParticipantNode
@@ -42,7 +40,7 @@ class DisjointSimulationsRule(Rule):
 
             return explanation
 
-        def format_possible_solutions(self) -> List[str]:
+        def format_possible_solutions(self) -> list[str]:
             return [
                 "Consider splitting up the simulation into multiple configurations to improve maintainability of each simulation.",
                 "Add some data to be exchanged between these simulations.",
