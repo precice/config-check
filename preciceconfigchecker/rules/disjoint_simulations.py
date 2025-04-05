@@ -47,7 +47,7 @@ class DisjointSimulationsRule(Rule):
             ]
 
     def check(self, graph: Graph) -> list[Violation]:
-        def is_participant(node: ParticipantNode) -> bool:
+        def is_participant(node) -> bool:
             return isinstance(node, ParticipantNode)
 
         def has_participant(component) -> bool:
