@@ -96,6 +96,8 @@ def print_result(rule: Rule, violations: list[Violation], debug: bool):
 
     for violation in violations:
         formatted_violation = violation.format()
-        print(formatted_violation)
-
+        if (debug):
+            print(f"[{c.dyeing(violation.__class__.__name__, c.purple)}]", "\n", formatted_violation)
+        else:
+            print(formatted_violation)
     print("")

@@ -10,6 +10,14 @@
   <data:scalar name="Color" />
   <data:scalar name="ErrorColor" />
 
+  <mesh name="Alligator-Mesh" dimensions="2">
+    <use-data name="Color" />
+  </mesh>
+
+  <mesh name="Instigator-Mesh" dimensions="2">
+    <use-data name="Color" />
+  </mesh>
+
   <mesh name="Generator-Mesh" dimensions="2">
     <use-data name="Color" />
     <use-data name="ErrorColor" />
@@ -38,12 +46,50 @@
     <read-data name="ErrorColor" mesh="Propagator-Mesh" />
   </participant>
 
-  <m2n:sockets acceptor="Generator" connector="Propagator" exchange-directory=".." />
+  <participant name="Alligator">
+    <provide-mesh name="Alligator-Mesh"/>
+    <receive-mesh name="Generator-Mesh" from="Generator" api-access="true"/>
+    <!-- just-in-time mapping -->
+    <mapping:nearest-neighbor
+            direction="read"
+            from="Generator-Mesh"
+            constraint="consistent"/>
+    <read-data name="Color" mesh="Generator-Mesh"/>
+  </participant>
 
-  <coupling-scheme:serial-explicit>
-    <participants first="Generator" second="Propagator" />
+  <participant name="Instigator">
+    <provide-mesh name="Instigator-Mesh"/>
+    <receive-mesh name="Generator-Mesh" from="Generator" api-access="true"/>
+    <!-- regular mapping -->
+    <mapping:nearest-neighbor
+            direction="read"
+            to="Instigator-Mesh"
+            from="Generator-Mesh"
+            constraint="consistent"/>
+    <read-data name="Color" mesh="Instigator-Mesh"/>
+  </participant>
+
+  <m2n:sockets acceptor="Generator" connector="Propagator" exchange-directory=".." />
+  <m2n:sockets acceptor="Generator" connector="Alligator" exchange-directory=".." />
+  <m2n:sockets acceptor="Generator" connector="Instigator" exchange-directory=".." />
+
+
+  <coupling-scheme:multi>
+    <participant name="Generator" control="yes" />
+    <participant name="Propagator"/>
+    <participant name="Alligator"/>
+    <participant name="Instigator"/>
     <time-window-size value="0.01" />
     <max-time value="0.3" />
+    <acceleration:IQN-ILS>
+      <data name="Color" mesh="Generator-Mesh" scaling="1e6" />
+      <preconditioner type="constant" />
+      <filter type="QR1-absolute" limit="1e-12" />
+      <initial-relaxation value="0.001" />
+      <max-used-iterations value="100" />
+      <time-windows-reused value="8" />
+    </acceleration:IQN-ILS>
     <exchange data="Color" mesh="Generator-Mesh" from="Generator" to="Propagator" />
-  </coupling-scheme:serial-explicit>
+  </coupling-scheme:multi>
+
 </precice-configuration>

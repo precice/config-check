@@ -1,4 +1,3 @@
-import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import ParticipantNode, M2NNode
 from preciceconfigchecker.rule import Rule
@@ -66,8 +65,6 @@ class M2NExchangeRule(Rule):
         for participant in participants:
             if participant not in m2n_participants:
                 violations.append(self.MissingM2NEchangeViolation(participant))
-                # Remove this participant to make the following calculations easier
-                participants.remove(participant)
 
         # Check every M2N for duplicates
         for m2n in m2ns:

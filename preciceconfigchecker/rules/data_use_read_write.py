@@ -1,7 +1,7 @@
 import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import DataNode, MeshNode, ReadDataNode, WriteDataNode, WatchPointNode, ExportNode, \
-    WatchIntegralNode, ParticipantNode, ExchangeNode, ActionNode
+    WatchIntegralNode, ParticipantNode, ExchangeNode, ActionNode, ReceiveMeshNode
 from preciceconfigchecker.rule import Rule
 from preciceconfigchecker.severity import Severity
 from preciceconfigchecker.violation import Violation
@@ -104,7 +104,6 @@ class DataUseReadWriteRule(Rule):
 
     def check(self, graph: Graph) -> list[Violation]:
         violations: list[Violation] = []
-
         g1 = nx.subgraph_view(graph, filter_node=filter_use_read_write_data)
         for data_node in g1.nodes:
             # We only need to test data nodes here
@@ -115,6 +114,7 @@ class DataUseReadWriteRule(Rule):
                 meshes: list[MeshNode] = []
                 writers: list[ParticipantNode] = []
                 readers: list[ParticipantNode] = []
+                readers_per_writer: map[ParticipantNode: list[ParticipantNode]] = {}
 
                 # Check all neighbors of the data node for use-, reader- and writer-nodes
                 for neighbor in g1.neighbors(data_node):
@@ -126,16 +126,14 @@ class DataUseReadWriteRule(Rule):
                         # Check if mesh gets observed by export, action, watchpoint or watch-integral.
                         # These types of reader nodes do not read the data itself, but only "read" the mesh and all of
                         # its used data.
-                        # They are thus less important than a read-data node (which represents a participant),
-                        # so only check them if no read-data node has been found.
                         for mesh_neighbor in mesh_neighbors:
-                            if isinstance(mesh_neighbor, ExportNode) and not read_data:
+                            if isinstance(mesh_neighbor, ExportNode):
                                 read_data = True
                                 readers += [mesh_neighbor.participant]
-                            elif isinstance(mesh_neighbor, WatchPointNode) and not read_data:
+                            elif isinstance(mesh_neighbor, WatchPointNode):
                                 read_data = True
                                 readers += [mesh_neighbor.participant]
-                            elif isinstance(mesh_neighbor, WatchIntegralNode) and not read_data:
+                            elif isinstance(mesh_neighbor, WatchIntegralNode):
                                 read_data = True
                                 readers += [mesh_neighbor.participant]
                             elif isinstance(mesh_neighbor, ActionNode):
@@ -152,7 +150,8 @@ class DataUseReadWriteRule(Rule):
                                     # Use the participant associated with the action
                                     writers += [mesh_neighbor.participant]
 
-                    # Check if data gets read by a participant
+                    # Check if data gets read by a participant.
+                    # Only read-data nodes reading current data_node are connected to it
                     elif isinstance(neighbor, ReadDataNode):
                         read_data = True
                         readers += [neighbor.participant]
@@ -161,9 +160,57 @@ class DataUseReadWriteRule(Rule):
                         write_data = True
                         writers += [neighbor.participant]
 
+                # For every writer, identify the corresponding set of readers
+                for writer in writers:
+                    readers_per_writer[writer] = []
+                    # Meshes that the participant provides can be read directly through just-in-time mappings
+                    provide_meshes = get_provide_meshes_for_data(writer, data_node)
+                    for provide_mesh in provide_meshes:
+                        # Check all neighbors of the mesh: A jit-mapping will read directly from it
+                        for provide_mesh_neighbor in graph.neighbors(provide_mesh):
+                            # Only use read-data if it reads current data_node
+                            if isinstance(provide_mesh_neighbor,
+                                          ReadDataNode) and provide_mesh_neighbor.data == data_node:
+                                readers_per_writer[writer].append(provide_mesh_neighbor.participant)
+                            elif isinstance(provide_mesh_neighbor, WatchPointNode):
+                                readers_per_writer[writer].append(provide_mesh_neighbor.participant)
+                            elif isinstance(provide_mesh_neighbor, WatchIntegralNode):
+                                readers_per_writer[writer].append(provide_mesh_neighbor.participant)
+                            elif isinstance(provide_mesh_neighbor, ExportNode):
+                                readers_per_writer[writer].append(provide_mesh_neighbor.participant)
+                            elif isinstance(provide_mesh_neighbor, ActionNode):
+                                # Check if action reads or writes data (corresponds to source or target data)
+                                # Check all source-data nodes if they correspond to the current data node
+                                for source in provide_mesh_neighbor.source_data:
+                                    if source == data_node:
+                                        # Use the participant associated with the action
+                                        readers_per_writer[writer].append(provide_mesh_neighbor.participant)
+
+                            # If the provided mesh gets received somewhere, it might get read there
+                            elif isinstance(provide_mesh_neighbor, ReceiveMeshNode):
+                                potential_reader = provide_mesh_neighbor.participant
+                                # Check all potential readers
+                                for potential_reader_neighbor in graph.neighbors(potential_reader):
+                                    if isinstance(potential_reader_neighbor,
+                                                  ReadDataNode) and potential_reader_neighbor.data == data_node:
+                                        readers_per_writer[writer].append(potential_reader)
+                                    # Watchpoint, Watch-integral and export do not specify data
+                                    elif isinstance(potential_reader_neighbor, WatchPointNode):
+                                        readers_per_writer[writer].append(potential_reader)
+                                    elif isinstance(potential_reader_neighbor, WatchIntegralNode):
+                                        readers_per_writer[writer].append(potential_reader)
+                                    elif isinstance(potential_reader_neighbor, ExportNode):
+                                        readers_per_writer[writer].append(potential_reader)
+                                    elif isinstance(potential_reader_neighbor, ActionNode):
+                                        # Actions can have many source datas; check for current data_node
+                                        for source in potential_reader_neighbor.source_data:
+                                            if source == data_node:
+                                                readers_per_writer[writer].append(potential_reader)
+
                 # Add violations according to use/read/write
                 if use_data and read_data and write_data:
-                    # Check if there exists a path from writer to reader or if they are the same
+                    # If all three, use_data, read_data and write_data, are true, then there must be paths from every
+                    # writer to all of his readers
                     data_flow_edges = []
                     # Build a graph from participants involved in exchanges of data node
                     exchanges = [node for node in graph.nodes
@@ -172,17 +219,19 @@ class DataUseReadWriteRule(Rule):
                         data_flow_edges += [(exchange.from_participant, exchange.to_participant)]
                     data_flow_graph = nx.DiGraph()
                     data_flow_graph.add_edges_from(data_flow_edges)
+                    writer_s = set(writers)
                     # Check if data gets read and written by the same participant.
                     # If so, then no exchange is needed.
                     # Otherwise, an exchange is needed.
-                    for writer in writers:
-                        for reader in readers:
+                    for writer in writer_s:
+                        reader_s = set(readers_per_writer[writer])
+                        for reader in reader_s:
                             # If they are the same, then everything is fine.
                             if reader == writer:
                                 continue
                             # Otherwise, there needs to be an exchange of data between them.
                             else:
-                                if writer not in data_flow_graph or reader not in data_flow_graph:
+                                if writer not in data_flow_graph.nodes or reader not in data_flow_graph.nodes:
                                     # One of writer/reader is not connected through an exchange involving data_node
                                     violations.append(self.DataNotExchangedViolation(data_node, writer, reader))
                                 else:
@@ -218,6 +267,22 @@ class DataUseReadWriteRule(Rule):
         return violations
 
 
+# Helper functions
+
+def get_provide_meshes_for_data(participant: ParticipantNode, data: DataNode) -> list[MeshNode]:
+    """
+    This method returns all meshes provided by the given participant that use the given data.
+    :param participant: The participant from which to get the meshes.
+    :param data: The data that the meshes use.
+    :return: A list of all meshes provided by the given participant using the given data.
+    """
+    provide_meshes = []
+    for mesh in participant.provide_meshes:
+        if data in mesh.use_data:
+            provide_meshes.append(mesh)
+    return provide_meshes
+
+
 def filter_use_read_write_data(node) -> bool:
     """
     This method filters nodes, that could potentially use data, read data or write data.
@@ -245,5 +310,10 @@ def filter_use_read_write_data(node) -> bool:
 
 
 def filter_data_exchange(node) -> bool:
+    """
+        This method filters data- and exchange-nodes.
+        :param node: The node to check.
+        :return: True, if the node is a data- or exchange-node, False otherwise.
+    """
     return (isinstance(node, DataNode) or
             isinstance(node, ExchangeNode))
