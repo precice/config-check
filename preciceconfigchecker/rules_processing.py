@@ -1,5 +1,3 @@
-import sys
-
 from networkx import Graph
 
 import preciceconfigchecker.color as c

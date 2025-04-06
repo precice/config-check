@@ -1,14 +1,11 @@
-import sys
-
 from networkx.classes import Graph
 from precice_config_graph.nodes import ParticipantNode, MeshNode, MappingNode, Direction, MappingConstraint, \
     MappingType, CouplingSchemeNode, MultiCouplingSchemeNode, CouplingSchemeType, ExchangeNode, M2NNode, WriteDataNode, \
     ReadDataNode
-from preciceconfigchecker.rules_processing import rule_error_message
+from preciceconfigchecker.rule_utils import rule_error_message
 from preciceconfigchecker.rule import Rule
 from preciceconfigchecker.severity import Severity
 from preciceconfigchecker.violation import Violation
-import preciceconfigchecker.color as c
 
 
 class MappingRule(Rule):
@@ -614,7 +611,7 @@ class MappingRule(Rule):
                 elif not mapping.from_mesh and mapping.to_mesh:
                     mesh_stranger = mapping.to_mesh
                 else:
-                    rule_error_message("Mapping must have attribute \"to\" or \"from\".")
+                    rule_error_message("Mapping must have attribute \"to\" or \"from\"")
                 participant_strangers = get_participants_of_mesh(graph, mesh_stranger)
 
                 if len(participant_strangers) == 0:
@@ -773,14 +770,16 @@ class MappingRule(Rule):
 
             # JIT-mappings have been handled
             else:
-                if mapping.from_mesh in participant_parent.provide_meshes:
+                if (mapping.from_mesh in participant_parent.provide_meshes and
+                        not mapping.to_mesh in participant_parent.provide_meshes):
                     mesh_parent = mapping.from_mesh
                     mesh_stranger = mapping.to_mesh
-                elif mapping.to_mesh in participant_parent.provide_meshes:
+                elif (mapping.to_mesh in participant_parent.provide_meshes and
+                      not mapping.from_mesh in participant_parent.provide_meshes):
                     mesh_parent = mapping.to_mesh
                     mesh_stranger = mapping.from_mesh
                 else:
-                    rule_error_message("One mesh in mapping must be by parent participant.")
+                    rule_error_message("One mesh in mapping must be provided by parent participant")
                 participant_strangers = get_participants_of_mesh(graph, mesh_stranger)
 
                 if len(participant_strangers) == 0:
