@@ -770,12 +770,10 @@ class MappingRule(Rule):
 
             # JIT-mappings have been handled
             else:
-                if (mapping.from_mesh in participant_parent.provide_meshes and
-                        not mapping.to_mesh in participant_parent.provide_meshes):
+                if mapping.from_mesh in participant_parent.provide_meshes:
                     mesh_parent = mapping.from_mesh
                     mesh_stranger = mapping.to_mesh
-                elif (mapping.to_mesh in participant_parent.provide_meshes and
-                      not mapping.from_mesh in participant_parent.provide_meshes):
+                elif mapping.to_mesh in participant_parent.provide_meshes:
                     mesh_parent = mapping.to_mesh
                     mesh_stranger = mapping.from_mesh
                 else:
