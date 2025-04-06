@@ -28,7 +28,7 @@
     <mapping:nearest-neighbor
       direction="read"
       from="Generator-Mesh"
-      to="Generator-Mesh"
+      to="Propagator-Mesh"
       constraint="consistent" />
     <read-data name="Color" mesh="Propagator-Mesh" />
   </participant>
