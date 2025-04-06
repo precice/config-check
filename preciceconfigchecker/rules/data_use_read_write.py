@@ -1,3 +1,4 @@
+from collections import defaultdict
 import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import DataNode, MeshNode, ReadDataNode, WriteDataNode, WatchPointNode, ExportNode, \
@@ -32,12 +33,25 @@ class DataUseReadWriteRule(Rule):
             This violation handles someone using a data node, but nobody is reading and writing said data node.
         """
 
-        def __init__(self, data_node: DataNode, mesh: MeshNode):
+        def __init__(self, data_node: DataNode, meshes: list[MeshNode]):
             self.data_node = data_node
-            self.mesh = mesh
+            self.form = ""
+            if len(meshes) > 1:
+                self.form = "es"
+            meshes_s = sorted(meshes, key=lambda x: x.name)
+            self.names = meshes_s[0].name
+            if len(meshes) > 1:
+                for i in range(1, len(meshes_s) - 1):
+                    self.names += ", "
+                    self.names += meshes_s[i].name
+                # Last mesh has to be connected with "and", the others with a comma.
+                self.names += " and "
+                # Name of last mesh
+                self.names += meshes_s[-1].name
 
         def format_explanation(self) -> str:
-            return f"Data {self.data_node.name} gets used in mesh {self.mesh.name}, but nobody is reading or writing it."
+            # self.form ensures the correct number (multiplicity) for the word mesh (i.e., mesh or meshes)
+            return f"Data {self.data_node.name} gets used in mesh{self.form} {self.names}, but nobody is reading or writing it."
 
         def format_possible_solutions(self) -> list[str]:
             return [f"Consider having a participant read data {self.data_node.name}.",
@@ -49,15 +63,31 @@ class DataUseReadWriteRule(Rule):
             This class handles someone using and writing a data node, but nobody reading said data node.
         """
 
-        def __init__(self, data_node: DataNode, mesh: MeshNode, writer: ParticipantNode):
+        def __init__(self, data_node: DataNode, mesh: MeshNode, writers: list[ParticipantNode]):
             self.data_node = data_node
             self.mesh = mesh
-            self.writer = writer
+            self.writers = writers
+            # Correct grammar for output
+            self.form = ""
+            self.form2 = "is"
+            if len(writers) > 1:
+                self.form = "s"
+                self.form2 = "are"
+            writers_s = sorted(writers, key=lambda x: x.name)
+            self.names = writers_s[0].name
+            if len(writers) > 1:
+                for i in range(1, len(writers_s) - 1):
+                    self.names += ", "
+                    self.names += writers_s[i].name
+                # Last mesh has to be connected with "and", the others with a comma.
+                self.names += " and "
+                # Name of last mesh
+                self.names += writers_s[-1].name
 
         def format_explanation(self) -> str:
             return (
-                f"Data {self.data_node.name} is used in mesh {self.mesh.name} and participant {self.writer.name} "
-                f"is writing it, but nobody is reading it.")
+                f"Data {self.data_node.name} is used in mesh {self.mesh.name} and participant{self.form} {self.names} "
+                f"{self.form2} writing it, but nobody is reading it.")
 
         def format_possible_solutions(self) -> list[str]:
             return [f"Consider having a participant read data {self.data_node.name}.",
@@ -70,14 +100,29 @@ class DataUseReadWriteRule(Rule):
             This class handles a mesh using and someone reading a data node, but nobody writing said data node.
         """
 
-        def __init__(self, data_node: DataNode, mesh: MeshNode, reader: ParticipantNode):
+        def __init__(self, data_node: DataNode, mesh: MeshNode, readers: list[ParticipantNode]):
             self.data_node = data_node
             self.mesh = mesh
-            self.reader = reader
+            # Correct grammar for output
+            self.form = ""
+            self.form2 = "is"
+            if len(readers) > 1:
+                self.form = "s"
+                self.form2 = "are"
+            readers_s = sorted(readers, key=lambda x: x.name)
+            self.names = readers_s[0].name
+            if len(readers) > 1:
+                for i in range(1, len(readers_s) - 1):
+                    self.names += ", "
+                    self.names += readers_s[i].name
+                # Last mesh has to be connected with "and", the others with a comma.
+                self.names += " and "
+                # Name of last mesh
+                self.names += readers_s[-1].name
 
         def format_explanation(self) -> str:
-            return (f"Data {self.data_node.name} is being used in mesh {self.mesh.name} and participant "
-                    f"{self.reader.name} is reading it, but nobody is writing it.")
+            return (f"Data {self.data_node.name} is being used in mesh {self.mesh.name} and participant{self.form} "
+                    f"{self.names} {self.form2} reading it, but nobody is writing it.")
 
         def format_possible_solutions(self) -> list[str]:
             return [f"Consider having a participant write {self.data_node.name}.",
@@ -114,7 +159,9 @@ class DataUseReadWriteRule(Rule):
                 meshes: list[MeshNode] = []
                 writers: list[ParticipantNode] = []
                 readers: list[ParticipantNode] = []
-                readers_per_writer: map[ParticipantNode: list[ParticipantNode]] = {}
+                readers_per_writer: dict[ParticipantNode: list[ParticipantNode]] = {}
+                readers_per_mesh: dict[MeshNode: list[ParticipantNode]] = {}
+                writers_per_mesh: dict[MeshNode: list[ParticipantNode]] = {}
 
                 # Check all neighbors of the data node for use-, reader- and writer-nodes
                 for neighbor in g1.neighbors(data_node):
@@ -130,12 +177,15 @@ class DataUseReadWriteRule(Rule):
                             if isinstance(mesh_neighbor, ExportNode):
                                 read_data = True
                                 readers += [mesh_neighbor.participant]
+                                append_participant_to_map(readers_per_mesh, neighbor, mesh_neighbor.participant)
                             elif isinstance(mesh_neighbor, WatchPointNode):
                                 read_data = True
                                 readers += [mesh_neighbor.participant]
+                                append_participant_to_map(readers_per_mesh, neighbor, mesh_neighbor.participant)
                             elif isinstance(mesh_neighbor, WatchIntegralNode):
                                 read_data = True
                                 readers += [mesh_neighbor.participant]
+                                append_participant_to_map(readers_per_mesh, neighbor, mesh_neighbor.participant)
                             elif isinstance(mesh_neighbor, ActionNode):
                                 # Check if action reads or writes data (corresponds to source or target data)
                                 # Check all source-data nodes if they correspond to the current data node
@@ -144,21 +194,25 @@ class DataUseReadWriteRule(Rule):
                                         read_data = True
                                         # Use the participant associated with the action
                                         readers += [mesh_neighbor.participant]
+                                        append_participant_to_map(readers_per_mesh, neighbor, mesh_neighbor.participant)
                                 # Check if the target data corresponds to the current data node
                                 if mesh_neighbor.target_data == data_node:
                                     write_data = True
                                     # Use the participant associated with the action
                                     writers += [mesh_neighbor.participant]
+                                    append_participant_to_map(writers_per_mesh, neighbor, mesh_neighbor.participant)
 
                     # Check if data gets read by a participant.
                     # Only read-data nodes reading current data_node are connected to it
                     elif isinstance(neighbor, ReadDataNode):
                         read_data = True
                         readers += [neighbor.participant]
+                        append_participant_to_map(readers_per_mesh, neighbor.mesh, neighbor.participant)
                     # Check if data gets written by a participant
                     elif isinstance(neighbor, WriteDataNode):
                         write_data = True
                         writers += [neighbor.participant]
+                        append_participant_to_map(writers_per_mesh, neighbor.mesh, neighbor.participant)
 
                 # For every writer, identify the corresponding set of readers
                 for writer in writers:
@@ -206,7 +260,7 @@ class DataUseReadWriteRule(Rule):
                                         for source in potential_reader_neighbor.source_data:
                                             if source == data_node:
                                                 readers_per_writer[writer].append(potential_reader)
-
+                                                
                 # Add violations according to use/read/write
                 if use_data and read_data and write_data:
                     # If all three, use_data, read_data and write_data, are true, then there must be paths from every
@@ -242,16 +296,13 @@ class DataUseReadWriteRule(Rule):
                                         violations.append(self.DataNotExchangedViolation(data_node, writer, reader))
 
                 elif use_data and read_data and not write_data:
-                    for mesh in meshes:
-                        for reader in readers:
-                            violations.append(self.DataUsedReadNotWrittenViolation(data_node, mesh, reader))
+                    for mesh in readers_per_mesh.keys():
+                        violations.append(self.DataUsedReadNotWrittenViolation(data_node, mesh, readers_per_mesh[mesh]))
                 elif use_data and not read_data and write_data:
-                    for mesh in meshes:
-                        for writer in writers:
-                            violations.append(self.DataUsedNotReadWrittenViolation(data_node, mesh, writer))
+                    for mesh in writers_per_mesh.keys():
+                        violations.append(self.DataUsedNotReadWrittenViolation(data_node, mesh, writers_per_mesh[mesh]))
                 elif use_data and not read_data and not write_data:
-                    for mesh in meshes:
-                        violations.append(self.DataUsedNotReadNotWrittenViolation(data_node, mesh))
+                    violations.append(self.DataUsedNotReadNotWrittenViolation(data_node, meshes))
 
                 elif not use_data and read_data and write_data:
                     # This case gets handled by precice-tools check
@@ -317,3 +368,17 @@ def filter_data_exchange(node) -> bool:
     """
     return (isinstance(node, DataNode) or
             isinstance(node, ExchangeNode))
+
+
+def append_participant_to_map(dictionary: dict[MeshNode: list[ParticipantNode]], mesh, participant):
+    """
+        This method appends the given participant to the given map for an entry 'mesh'.
+        If the map entry for mesh is none, then a new entry is created.
+        :param dictionary: The map to append to.
+        :param mesh: The mesh which entries should be appended.
+        :param participant: The participant to append to the mesh.
+    """
+    try:
+        dictionary[mesh] += [participant]
+    except KeyError:
+        dictionary[mesh] = [participant]

@@ -7,41 +7,65 @@
       enabled="true" />
   </log>
 
-  <data:scalar name="Color" />
+  <data:scalar name="BigMac"/>
   <data:scalar name="ErrorColor" />
 
-  <mesh name="Generator-Mesh" dimensions="2">
-    <use-data name="Color" />
+  <mesh name="Food-Generator-Mesh" dimensions="2">
+    <use-data name="BigMac" />
     <use-data name="ErrorColor" />
   </mesh>
 
+  <mesh name="Water-Generator-Mesh" dimensions="2">
+    <use-data name="BigMac" />
+    <use-data name="ErrorColor" />
+  </mesh>
+
+  <mesh name="Alligator-Mesh" dimensions="2">
+    <use-data name="BigMac"/>
+    <use-data name="ErrorColor"/>
+  </mesh>
+
   <mesh name="Propagator-Mesh" dimensions="2">
-    <use-data name="Color" />
+    <use-data name="BigMac" />
   </mesh>
 
   <participant name="Generator">
-    <provide-mesh name="Generator-Mesh" />
-    <write-data name="Color" mesh="Generator-Mesh" />
-    <read-data name="ErrorColor" mesh="Generator-Mesh" />
+    <provide-mesh name="Food-Generator-Mesh" />
+    <provide-mesh name="Water-Generator-Mesh" />
+    <write-data name="BigMac" mesh="Water-Generator-Mesh" />
+    <read-data name="ErrorColor" mesh="Food-Generator-Mesh" />
+    <read-data name="ErrorColor" mesh="Water-Generator-Mesh" />
   </participant>
 
   <participant name="Propagator">
-    <receive-mesh name="Generator-Mesh" from="Generator" />
+    <receive-mesh name="Water-Generator-Mesh" from="Generator" />
     <provide-mesh name="Propagator-Mesh" />
     <mapping:nearest-neighbor
       direction="read"
-      from="Generator-Mesh"
+      from="Water-Generator-Mesh"
       to="Propagator-Mesh"
       constraint="consistent" />
-    <read-data name="Color" mesh="Propagator-Mesh" />
+    <read-data name="BigMac" mesh="Propagator-Mesh" />
+  </participant>
+
+  <participant name="Alligator">
+    <provide-mesh name="Alligator-Mesh"/>
+    <receive-mesh name="Water-Generator-Mesh" from="Generator" api-access="true"/>
+    <!-- just-in-time mapping -->
+    <mapping:nearest-neighbor
+            direction="read"
+            from="Water-Generator-Mesh"
+            constraint="consistent"/>
+    <read-data name="ErrorColor" mesh="Water-Generator-Mesh"/>
   </participant>
 
   <m2n:sockets acceptor="Generator" connector="Propagator" exchange-directory=".." />
+  <m2n:sockets acceptor="Generator" connector="Alligator" exchange-directory=".." />
 
   <coupling-scheme:serial-explicit>
     <participants first="Generator" second="Propagator" />
     <time-window-size value="0.01" />
     <max-time value="0.3" />
-    <exchange data="Color" mesh="Generator-Mesh" from="Generator" to="Propagator" />
+    <exchange data="BigMac" mesh="Water-Generator-Mesh" from="Generator" to="Propagator" />
   </coupling-scheme:serial-explicit>
 </precice-configuration>

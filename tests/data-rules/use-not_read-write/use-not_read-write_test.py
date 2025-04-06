@@ -23,6 +23,6 @@ def test_data_not_use_not_read_not_write():
 
     violations_expected = []
     # ErrorColor gets used in Generator-Mesh, does not get read, gets written by participant Generator
-    violations_expected += [d.DataUsedNotReadWrittenViolation(n_error_color, n_mesh, n_generator)]
+    violations_expected += [d.DataUsedNotReadWrittenViolation(n_error_color, n_mesh, [n_generator])]
 
     assert_equal_violations("Data used, not read, written-test", violations_actual, violations_expected)
