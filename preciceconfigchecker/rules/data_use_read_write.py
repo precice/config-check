@@ -260,8 +260,7 @@ class DataUseReadWriteRule(Rule):
                                         for source in potential_reader_neighbor.source_data:
                                             if source == data_node:
                                                 readers_per_writer[writer].append(potential_reader)
-                print("readers per mesh", readers_per_mesh)
-                print("writers per mesh", writers_per_mesh)
+                                                
                 # Add violations according to use/read/write
                 if use_data and read_data and write_data:
                     # If all three, use_data, read_data and write_data, are true, then there must be paths from every
