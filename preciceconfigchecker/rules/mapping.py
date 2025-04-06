@@ -619,13 +619,13 @@ class MappingRule(Rule):
 
                 if len(participant_strangers) == 0:
                     # This mapping is broken
-                    # TODO: Mapping is using mesh stranger not provided by any participant
+                    # mesh_stranger is not provided by any participant
                     violations.append(self.UnclaimedMeshMappingViolation(participant_parent, mesh_stranger, direction))
                     continue
 
                 if len(participant_strangers) > 1:
                     # This mapping is broken
-                    # TODO: Mapping is using mesh_stranger claimed by more than one participant
+                    # mesh_stranger gets claimed by more than one participant
                     violations.append(
                         self.RepeatedlyClaimedMeshMappingViolation(participant_parent, participant_strangers,
                                                                    mesh_stranger, direction))
@@ -636,7 +636,7 @@ class MappingRule(Rule):
 
                 if participant_parent == participant_stranger:
                     # This mapping is broken
-                    # TODO: Mapping on own meshes Violation
+                    # The mapping is between meshes of the same participant
                     violations.append(
                         self.SameParticipantMappingViolation(participant_parent, mesh_stranger, direction))
                     continue
@@ -644,7 +644,6 @@ class MappingRule(Rule):
                 # Only the types nearest-neighbor, rbf-pum-direct and rbf are supported
                 supported_types = [MappingType.NEAREST_NEIGHBOR, MappingType.RBF_PUM_DIRECT, MappingType.RBF]
                 if type not in supported_types:
-                    # DONE TODO: JIT wrong type Violation
                     violations.append(
                         self.JustInTimeMappingTypeViolation(participant_parent, participant_stranger, mesh_stranger,
                                                             direction, type))
@@ -660,7 +659,6 @@ class MappingRule(Rule):
                             pass
                         else:
                             # Correct direction, but wrong constraint
-                            # DONE TODO: Wrong format violation
                             violations.append(
                                 self.JustInTimeMappingFormatViolation(participant_parent, participant_stranger,
                                                                       mesh_stranger, direction, constraint))
@@ -668,13 +666,11 @@ class MappingRule(Rule):
                         # Wrong direction
                         if constraint == MappingConstraint.CONSISTENT:
                             # Correct format
-                            # DONE TODO: Wrong direction violation
                             violations.append(
                                 self.JustInTimeMappingDirectionViolation(participant_parent, participant_stranger,
                                                                          mesh_stranger, direction))
                         else:
                             # Wrong format and wrong direction
-                            # DONE TODO: Wrong direction+format violation
                             violations.append(
                                 self.JustInTimeMappingFormatDirectionViolation(participant_parent, participant_stranger,
                                                                                mesh_stranger, direction, constraint))
@@ -688,7 +684,6 @@ class MappingRule(Rule):
                             pass
                         else:
                             # Correct direction, but wrong constraint
-                            # DONE TODO: Wrong format violation
                             violations.append(
                                 self.JustInTimeMappingFormatViolation(participant_parent, participant_stranger,
                                                                       mesh_stranger, direction, constraint))
@@ -696,13 +691,11 @@ class MappingRule(Rule):
                         # Wrong direction
                         if constraint == MappingConstraint.CONSERVATIVE:
                             # Correct format
-                            # DONE TODO: Wrong direction violation
                             violations.append(
                                 self.JustInTimeMappingDirectionViolation(participant_parent, participant_stranger,
                                                                          mesh_stranger, direction))
                         else:
                             # Wrong format and wrong direction
-                            # DONE TODO: Wrong direction+format violation
                             violations.append(
                                 self.JustInTimeMappingFormatDirectionViolation(participant_parent, participant_stranger,
                                                                                mesh_stranger, direction, constraint))
@@ -713,14 +706,12 @@ class MappingRule(Rule):
                     if receive_mesh.mesh == mesh_stranger:
                         # If api-access != true, then participant does not have permission to read from/write to it
                         if not receive_mesh.api_access:
-                            # DONE TODO: NO PERMISSION VIOLATION
                             violations.append(
                                 self.JustInTimeMappingPermissionViolation(participant_parent, participant_stranger,
                                                                           mesh_stranger, direction))
                 if direction == Direction.WRITE:
                     write_datas: list[WriteDataNode] = participant_parent.write_data
                     if len(write_datas) == 0:
-                        # TODO Violation
                         violations.append(
                             self.JustInTimeMappingMissingDataProcessingViolation(participant_parent,
                                                                                  participant_stranger,
@@ -728,7 +719,7 @@ class MappingRule(Rule):
                     if len(write_datas) > 0 and not any(
                             data_processing_belongs_to_mapping(write_data, mesh_stranger) for write_data in
                             write_datas):
-                        # TODO Violation
+                        # Data gets mapped but not written
                         violations.append(
                             self.JustInTimeMappingMissingDataProcessingViolation(participant_parent,
                                                                                  participant_stranger,
@@ -736,20 +727,19 @@ class MappingRule(Rule):
                 elif direction == Direction.READ:
                     read_datas: list[ReadDataNode] = participant_parent.read_data
                     if len(read_datas) == 0:
-                        # TODO Violation
                         violations.append(
                             self.JustInTimeMappingMissingDataProcessingViolation(participant_parent,
                                                                                  participant_stranger,
                                                                                  mesh_stranger, direction))
                     if len(read_datas) > 0 and not any(
                             data_processing_belongs_to_mapping(read_data, mesh_stranger) for read_data in read_datas):
-                        # TODO violation
+                        # Data gets mapped, but not read
                         violations.append(
                             self.JustInTimeMappingMissingDataProcessingViolation(participant_parent,
                                                                                  participant_stranger,
                                                                                  mesh_stranger, direction))
 
-                # TODO get m2n exchanges between participants
+                # Check for correct m2n between mapping participants
                 m2n = get_m2n_of_participants(m2ns, participant_parent, participant_stranger)
                 if not m2n:
                     violations.append(
@@ -760,7 +750,6 @@ class MappingRule(Rule):
                 coupling = get_coupling_scheme_of_mapping(couplings, participant_parent, participant_stranger)
                 if not coupling:
                     # Participants try to map data, but there exists no coupling scheme between them
-                    # DONE TODO: NO COUPLING VIOLATION
                     violations.append(
                         self.MissingCouplingSchemeMappingViolation(participant_parent, participant_stranger,
                                                                    mesh_stranger, direction))
@@ -768,7 +757,7 @@ class MappingRule(Rule):
                     continue
                 exchanges = get_exchange_of_participants(participant_parent, participant_stranger, coupling)
                 if not exchanges:
-                    # DONE TODO: NO EXCHANGE VIOLATION
+                    # Participants try to map data and there exists a coupling-scheme between them, but not any exchanges
                     violations.append(
                         self.MissingExchangeMappingViolation(participant_parent, participant_stranger, mesh_stranger,
                                                              direction))
@@ -777,10 +766,7 @@ class MappingRule(Rule):
                 # Check if any exchange of the participants coupling-scheme is “correct”, i.e., on the strangers mesh
                 if not any(exchange_belongs_to_mapping(exchange, direction, participant_stranger, mesh_stranger) for
                            exchange in exchanges):
-                    # No correct exchange:
-                    # DONE TODO: Exchange incorrect violation
-                    #  Differentiate between incorrect direction / incorrect mesh ?
-                    #  Maybe not, as they are connected
+                    # No correct exchange, i.e. using correct mesh
                     violations.append(
                         self.IncorrectExchangeMappingViolation(participant_parent, participant_stranger, mesh_stranger,
                                                                direction))
@@ -799,13 +785,13 @@ class MappingRule(Rule):
 
                 if len(participant_strangers) == 0:
                     # This mapping is broken
-                    # DONE TODO: Mapping is using mesh stranger not provided by any participant
+                    # mesh_stranger does not get provided by any participant
                     violations.append(self.UnclaimedMeshMappingViolation(participant_parent, mesh_stranger, direction))
                     continue
 
                 if len(participant_strangers) > 1:
                     # This mapping is broken
-                    # TODO: Mapping is using mesh_stranger claimed by more than one participant
+                    # mesh_stranger gets claimed by more than one participant
                     violations.append(
                         self.RepeatedlyClaimedMeshMappingViolation(participant_parent, participant_strangers,
                                                                    mesh_stranger, direction))
@@ -816,7 +802,7 @@ class MappingRule(Rule):
 
                 if participant_parent == participant_stranger:
                     # This mapping is broken
-                    # TODO: Mapping on own meshes Violation
+                    # Mapping is on meshes of the same participant
                     violations.append(
                         self.SameParticipantMappingViolation(participant_parent, mesh_stranger, direction))
                     continue
@@ -824,14 +810,12 @@ class MappingRule(Rule):
                 if direction == Direction.READ:
                     # In a read-mapping, the 'to'-mesh has to be by the parent, the 'from'-mesh by Stranger
                     if not mesh_parent == mapping.to_mesh:
-                        # DONE TODO: Wrong direction violation
                         violations.append(
                             self.MappingDirectionViolation(participant_parent, participant_stranger, mesh_parent,
                                                            mesh_stranger, direction))
                 elif direction == Direction.WRITE:
                     # In a write-mapping, the 'from'-mesh has to be by the parent, the 'to'-mesh by stranger
                     if not mesh_parent == mapping.from_mesh:
-                        # DONE TODO: Wrong direction violation
                         violations.append(
                             self.MappingDirectionViolation(participant_parent, participant_stranger, mesh_parent,
                                                            mesh_stranger, direction))
@@ -840,33 +824,31 @@ class MappingRule(Rule):
                 if direction == Direction.WRITE:
                     write_datas: list[WriteDataNode] = participant_parent.write_data
                     if len(write_datas) == 0:
-                        # TODO: Violation
+                        # In a write-mapping, Parent has to write the data
                         violations.append(
                             self.MappingMissingDataProcessingViolation(participant_parent, participant_stranger,
                                                                        mesh_parent, mesh_stranger, direction))
                     # In a write-mapping, Parent should write to their own mesh
                     if len(write_datas) > 0 and not any(
                             data_processing_belongs_to_mapping(write_data, mesh_parent) for write_data in write_datas):
-                        # TODO Violation
                         violations.append(
                             self.MappingMissingDataProcessingViolation(participant_parent, participant_stranger,
                                                                        mesh_parent, mesh_stranger, direction))
                 elif direction == Direction.READ:
                     read_datas: list[ReadDataNode] = participant_parent.read_data
                     if len(read_datas) == 0:
-                        # TODO: Violation
+                        # In a read mapping, Parent should read data
                         violations.append(
                             self.MappingMissingDataProcessingViolation(participant_parent, participant_stranger,
                                                                        mesh_parent, mesh_stranger, direction))
                     # In a read-mapping, Parent should read from their own mesh
                     if len(read_datas) > 0 and not any(
                             data_processing_belongs_to_mapping(read_data, mesh_parent) for read_data in read_datas):
-                        # TODO: Violation
                         violations.append(
                             self.MappingMissingDataProcessingViolation(participant_parent, participant_stranger,
                                                                        mesh_parent, mesh_stranger, direction))
 
-                # TODO get m2n exchanges between participants
+                # Check fo m2n exchanges between participants
                 m2n = get_m2n_of_participants(m2ns, participant_parent, participant_stranger)
                 if not m2n:
                     violations.append(
@@ -876,7 +858,6 @@ class MappingRule(Rule):
                 # Check if there exists a coupling-scheme between Parent and Stranger
                 coupling = get_coupling_scheme_of_mapping(couplings, participant_parent, participant_stranger)
                 if not coupling:
-                    # DONE TODO: No coupling violation
                     violations.append(
                         self.MissingCouplingSchemeMappingViolation(participant_parent, participant_stranger,
                                                                    mesh_stranger, direction))
@@ -889,22 +870,20 @@ class MappingRule(Rule):
                     #  allowed for parallel couplings
                     if direction == Direction.READ:
                         if not constraint == MappingConstraint.CONSISTENT:
-                            # DONE TODO: Parallel participants wrong format violation
                             violations.append(
                                 self.ParallelCouplingMappingFormatViolation(participant_parent,
                                                                             participant_stranger, mesh_parent,
                                                                             mesh_stranger, direction, constraint))
                     elif direction == Direction.WRITE:
                         if not constraint == MappingConstraint.CONSERVATIVE:
-                            # DONE TODO: Parallel participants wrong format violation
                             violations.append(
                                 self.ParallelCouplingMappingFormatViolation(participant_parent,
                                                                             participant_stranger, mesh_parent,
                                                                             mesh_stranger, direction, constraint))
 
+                # Check for exchanges in the coupling scheme between the participants
                 exchanges = get_exchange_of_participants(participant_parent, participant_stranger, coupling)
                 if not exchanges:
-                    # DONE TODO: No exchange violation
                     violations.append(
                         self.MissingExchangeMappingViolation(participant_parent, participant_stranger, mesh_stranger,
                                                              direction))
@@ -914,15 +893,13 @@ class MappingRule(Rule):
                 # Depending on the direction of the mapping, 'from'- and 'to'-mesh are defined differently
                 if not any(exchange_belongs_to_mapping(exchange, direction, participant_stranger, mesh_stranger) for
                            exchange in exchanges):
-                    # DONE TODO: EXCHANGE INCORRECT VIOLATION
+                    # There exists an exchange between them, but it is incorrect
                     violations.append(
                         self.IncorrectExchangeMappingViolation(participant_parent, participant_stranger, mesh_stranger,
                                                                direction))
 
         return violations
 
-
-# MappingRule()
 
 # Helper functions
 def get_m2n_of_participants(m2ns: list[M2NNode], participant_a: ParticipantNode,
