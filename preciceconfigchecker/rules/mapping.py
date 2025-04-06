@@ -4,7 +4,7 @@ from networkx.classes import Graph
 from precice_config_graph.nodes import ParticipantNode, MeshNode, MappingNode, Direction, MappingConstraint, \
     MappingType, CouplingSchemeNode, MultiCouplingSchemeNode, CouplingSchemeType, ExchangeNode, M2NNode, WriteDataNode, \
     ReadDataNode
-
+from preciceconfigchecker.rules_processing import rule_error_message
 from preciceconfigchecker.rule import Rule
 from preciceconfigchecker.severity import Severity
 from preciceconfigchecker.violation import Violation
@@ -614,8 +614,7 @@ class MappingRule(Rule):
                 elif not mapping.from_mesh and mapping.to_mesh:
                     mesh_stranger = mapping.to_mesh
                 else:
-                    # This case should not exist, if precice-tools --check ran.
-                    sys.exit(c.dyeing("Exiting check...\nDid you execute precice-tools --check?", c.red))
+                    rule_error_message("Mapping must have attribute \"to\" or \"from\".")
                 participant_strangers = get_participants_of_mesh(graph, mesh_stranger)
 
                 if len(participant_strangers) == 0:
@@ -795,8 +794,7 @@ class MappingRule(Rule):
                     mesh_parent = mapping.to_mesh
                     mesh_stranger = mapping.from_mesh
                 else:
-                    # This case should not exist, if precice-tools --check ran.
-                    sys.exit(c.dyeing("Exiting check...\nDid you execute precice-tools --check?", c.red))
+                    rule_error_message("One mesh in mapping must be by parent participant.")
                 participant_strangers = get_participants_of_mesh(graph, mesh_stranger)
 
                 if len(participant_strangers) == 0:
