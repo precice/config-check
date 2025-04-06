@@ -453,7 +453,7 @@ class MappingRule(Rule):
         def format_explanation(self) -> str:
             out: str = (
                 f"The just-in-time {self.direction.value}-mapping of participant {self.parent.name} {self.connecting_word} "
-                f"{self.stranger.name}'s mesh {self.mesh.name} is of type {self.type.value}, which is invalid.")
+                f"{self.stranger.name}'s mesh {self.mesh.name} is of type \"{self.type.value}\", which is invalid.")
             out += (
                 "\n     Currently, only just-in-time mappings of the types \"nearest-neighbor\", \"rbf-pum-direct\" and "
                 "\"rbf\" are supported.")
