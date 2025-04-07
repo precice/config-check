@@ -147,7 +147,7 @@ class MappingRule(Rule):
             out += ["Otherwise, please remove the mapping to improve readability."]
             return out
 
-    class JustInTimeMappingPermissionViolation(Violation):
+    class JustInTimeMappingApiAccessViolation(Violation):
         """
             This class handles a participant (parent) specifying a just-in-time mapping with another participant
             (stranger), but the parent not having permission to read from/write to Stranger's mesh, i.e., Parent does
@@ -652,10 +652,7 @@ class MappingRule(Rule):
                     if mapping.from_mesh:
                         # Correct direction
                         # For a JIT-read-mapping, the constraint has to be consistent
-                        if constraint == MappingConstraint.CONSISTENT:
-                            # This is fine
-                            pass
-                        else:
+                        if constraint != MappingConstraint.CONSISTENT:
                             # Correct direction, but wrong constraint
                             violations.append(
                                 self.JustInTimeMappingFormatViolation(participant_parent, participant_stranger,
@@ -677,10 +674,7 @@ class MappingRule(Rule):
                     if mapping.to_mesh:
                         # Correct direction
                         # For a JIT-write-mapping, the constraint has to be conservative
-                        if constraint == MappingConstraint.CONSERVATIVE:
-                            # This is fine
-                            pass
-                        else:
+                        if constraint != MappingConstraint.CONSERVATIVE:
                             # Correct direction, but wrong constraint
                             violations.append(
                                 self.JustInTimeMappingFormatViolation(participant_parent, participant_stranger,
@@ -705,7 +699,7 @@ class MappingRule(Rule):
                         # If api-access != true, then participant does not have permission to read from/write to it
                         if not receive_mesh.api_access:
                             violations.append(
-                                self.JustInTimeMappingPermissionViolation(participant_parent, participant_stranger,
+                                self.JustInTimeMappingApiAccessViolation(participant_parent, participant_stranger,
                                                                           mesh_stranger, direction))
                 if direction == Direction.WRITE:
                     write_datas: list[WriteDataNode] = participant_parent.write_data
