@@ -428,15 +428,16 @@ class MappingRule(Rule):
             out += [f"Otherwise, change the {self.connecting_word}-mesh to a mesh by participant {self.stranger.name}."]
             return out
 
-    class JustInTimeMappingTypeViolation(Violation):
+    class JustInTimeMappingMethodViolation(Violation):
         """
-            This class handles a just-in-time mapping being specified between two participants, but its type is incorrect.
-            Currently, for just-time-mappings, only the mapping-types nearest-neighbor, rbf-pum-direct and rbf are
+            This class handles a just-in-time mapping being specified between two participants,
+            but its mapping-method is incorrect.
+            Currently, for just-time-mappings, only the mapping-methods nearest-neighbor, rbf-pum-direct and rbf are
             supported.
         """
 
         def __init__(self, parent: ParticipantNode, stranger: ParticipantNode, mesh: MeshNode, direction: Direction,
-                     type: MappingType):
+                     method: MappingType):
             self.parent = parent
             self.stranger = stranger
             self.mesh = mesh
@@ -445,19 +446,19 @@ class MappingRule(Rule):
                 self.connecting_word = "from"
             elif self.direction == Direction.WRITE:
                 self.connecting_word = "to"
-            self.type = type
+            self.method = method
 
         def format_explanation(self) -> str:
             out: str = (
                 f"The just-in-time {self.direction.value}-mapping of participant {self.parent.name} {self.connecting_word} "
-                f"{self.stranger.name}'s mesh {self.mesh.name} is of type \"{self.type.value}\", which is invalid.")
+                f"{self.stranger.name}'s mesh {self.mesh.name} has mapping-mehtod \"{self.method.value}\", which is invalid.")
             out += (
-                "\n     Currently, only just-in-time mappings of the types \"nearest-neighbor\", \"rbf-pum-direct\" and "
+                "\n     Currently, only just-in-time mappings with methods \"nearest-neighbor\", \"rbf-pum-direct\" and "
                 "\"rbf\" are supported.")
             return out
 
         def format_possible_solutions(self) -> list[str]:
-            return [f"Please change the type of the mapping from \"{self.type.value}\" to one of the types "
+            return [f"Please change the method of the mapping from \"{self.method.value}\" to one of the methods "
                     f"\"nearest-neighbor\", \"rbf-pum-direct\" or \"rbf\"."]
 
     class JustInTimeMappingMissingDataProcessingViolation(Violation):
@@ -595,7 +596,7 @@ class MappingRule(Rule):
 
         mappings: list[MappingNode] = filter_mapping_nodes(graph)
         for mapping in mappings:
-            type: MappingType = mapping.type
+            method: MappingType = mapping.type
             direction: Direction = mapping.direction
             constraint: MappingConstraint = mapping.constraint
             participant_parent: ParticipantNode = mapping.parent_participant
@@ -638,12 +639,12 @@ class MappingRule(Rule):
                         self.SameParticipantMappingViolation(participant_parent, mesh_stranger, direction))
                     continue
 
-                # Only the types nearest-neighbor, rbf-pum-direct and rbf are supported
-                supported_types = [MappingType.NEAREST_NEIGHBOR, MappingType.RBF_PUM_DIRECT, MappingType.RBF]
-                if type not in supported_types:
+                # Only the methods nearest-neighbor, rbf-pum-direct and rbf are supported
+                supported_methods = [MappingType.NEAREST_NEIGHBOR, MappingType.RBF_PUM_DIRECT, MappingType.RBF]
+                if method not in supported_methods:
                     violations.append(
-                        self.JustInTimeMappingTypeViolation(participant_parent, participant_stranger, mesh_stranger,
-                                                            direction, type))
+                        self.JustInTimeMappingMethodViolation(participant_parent, participant_stranger, mesh_stranger,
+                                                              direction, method))
 
                 # Only read-consistent and write-conservative are supported
                 if direction == Direction.READ:
