@@ -56,7 +56,7 @@ def test_mapping():
 
         m.IncorrectExchangeMappingViolation(p_propagator, p_generator, m_generator, Direction.WRITE),
 
-        m.JustInTimeMappingPermissionViolation(p_alligator, p_generator, m_generator, Direction.READ),
+        m.JustInTimeMappingApiAccessViolation(p_alligator, p_generator, m_generator, Direction.READ),
 
         m.MissingCouplingSchemeMappingViolation(p_alligator, p_generator, m_generator, Direction.READ),
 
