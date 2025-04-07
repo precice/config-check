@@ -604,41 +604,56 @@ class MappingRule(Rule):
             mesh_parent: MeshNode = None
             mesh_stranger: MeshNode = None
 
-            # Check only just-in-time (JIT) mappings here
+            # Determine which tags exist and thus which meshes belong to which participant
             if mapping.just_in_time:
-                # Either 'to' or 'from' tag does not exist
+                # Either 'to' or 'from' tag does not exist in JIT mappings
                 if mapping.from_mesh and not mapping.to_mesh:
                     mesh_stranger = mapping.from_mesh
                 elif not mapping.from_mesh and mapping.to_mesh:
                     mesh_stranger = mapping.to_mesh
                 else:
                     rule_error_message("Mapping must have attribute \"to\" or \"from\"")
-                participant_strangers = get_participants_of_mesh(graph, mesh_stranger)
 
-                if len(participant_strangers) == 0:
-                    # This mapping is broken
-                    # mesh_stranger is not provided by any participant
-                    violations.append(self.UnclaimedMeshMappingViolation(participant_parent, mesh_stranger, direction))
-                    continue
+            # "regular" mappings
+            else:
+                if mapping.from_mesh in participant_parent.provide_meshes:
+                    mesh_parent = mapping.from_mesh
+                    mesh_stranger = mapping.to_mesh
+                elif mapping.to_mesh in participant_parent.provide_meshes:
+                    mesh_parent = mapping.to_mesh
+                    mesh_stranger = mapping.from_mesh
+                else:
+                    rule_error_message("One mesh in mapping must be provided by parent participant")
 
-                if len(participant_strangers) > 1:
-                    # This mapping is broken
-                    # mesh_stranger gets claimed by more than one participant
-                    violations.append(
-                        self.RepeatedlyClaimedMeshMappingViolation(participant_parent, participant_strangers,
-                                                                   mesh_stranger, direction))
-                    continue
+            # These violations are the same for both JIT and regular mappings
+            participant_strangers = get_participants_of_mesh(graph, mesh_stranger)
 
-                # There is only one participant claiming the mesh
-                participant_stranger = participant_strangers[0]
+            if len(participant_strangers) == 0:
+                # This mapping is broken
+                # mesh_stranger is not provided by any participant
+                violations.append(self.UnclaimedMeshMappingViolation(participant_parent, mesh_stranger, direction))
+                continue
 
-                if participant_parent == participant_stranger:
-                    # This mapping is broken
-                    # The mapping is between meshes of the same participant
-                    violations.append(
-                        self.SameParticipantMappingViolation(participant_parent, mesh_stranger, direction))
-                    continue
+            if len(participant_strangers) > 1:
+                # This mapping is broken
+                # mesh_stranger gets claimed by more than one participant
+                violations.append(
+                    self.RepeatedlyClaimedMeshMappingViolation(participant_parent, participant_strangers,
+                                                               mesh_stranger, direction))
+                continue
 
+            # There is only one participant claiming the mesh
+            participant_stranger = participant_strangers[0]
+
+            if participant_parent == participant_stranger:
+                # This mapping is broken
+                # The mapping is between meshes of the same participant
+                violations.append(
+                    self.SameParticipantMappingViolation(participant_parent, mesh_stranger, direction))
+                continue
+
+            # Check JIT mapping specific violations
+            if mapping.just_in_time:
                 # Only the methods nearest-neighbor, rbf-pum-direct and rbf are supported
                 supported_methods = [MappingType.NEAREST_NEIGHBOR, MappingType.RBF_PUM_DIRECT, MappingType.RBF]
                 if method not in supported_methods:
@@ -692,7 +707,7 @@ class MappingRule(Rule):
                                 self.JustInTimeMappingFormatDirectionViolation(participant_parent, participant_stranger,
                                                                                mesh_stranger, direction, constraint))
 
-                # Check if participant receives mesh with api-access true
+                # Check if participant receives mesh with api-access="true"
                 receive_meshes = mapping.parent_participant.receive_meshes
                 for receive_mesh in receive_meshes:
                     if receive_mesh.mesh == mesh_stranger:
@@ -700,7 +715,7 @@ class MappingRule(Rule):
                         if not receive_mesh.api_access:
                             violations.append(
                                 self.JustInTimeMappingApiAccessViolation(participant_parent, participant_stranger,
-                                                                          mesh_stranger, direction))
+                                                                         mesh_stranger, direction))
                 if direction == Direction.WRITE:
                     write_datas: list[WriteDataNode] = participant_parent.write_data
                     if len(write_datas) == 0:
@@ -730,75 +745,8 @@ class MappingRule(Rule):
                             self.JustInTimeMappingMissingDataProcessingViolation(participant_parent,
                                                                                  participant_stranger,
                                                                                  mesh_stranger, direction))
-
-                # Check for correct m2n between mapping participants
-                m2n = get_m2n_of_participants(m2ns, participant_parent, participant_stranger)
-                if not m2n:
-                    violations.append(
-                        self.MissingM2NMappingViolation(participant_parent, participant_stranger,
-                                                        mesh_stranger, direction))
-
-                # Check if mapping-participants also have a coupling scheme and then also an exchange
-                coupling = get_coupling_scheme_of_mapping(couplings, participant_parent, participant_stranger)
-                if not coupling:
-                    # Participants try to map data, but there exists no coupling scheme between them
-                    violations.append(
-                        self.MissingCouplingSchemeMappingViolation(participant_parent, participant_stranger,
-                                                                   mesh_stranger, direction))
-                    # Continue with next mapping; this one cannot cause more violations
-                    continue
-                exchanges = get_exchange_of_participants(participant_parent, participant_stranger, coupling)
-                if not exchanges:
-                    # Participants try to map data and there exists a coupling-scheme between them, but not any exchanges
-                    violations.append(
-                        self.MissingExchangeMappingViolation(participant_parent, participant_stranger, mesh_stranger,
-                                                             direction))
-                    # Continue with next mapping; this one cannot cause more violations
-                    continue
-                # Check if any exchange of the participants coupling-scheme is “correct”, i.e., on the strangers mesh
-                if not any(exchange_belongs_to_mapping(exchange, direction, participant_stranger, mesh_stranger) for
-                           exchange in exchanges):
-                    # No correct exchange, i.e. using correct mesh
-                    violations.append(
-                        self.IncorrectExchangeMappingViolation(participant_parent, participant_stranger, mesh_stranger,
-                                                               direction))
-
-            # JIT-mappings have been handled
+            # Only regular mappings here
             else:
-                if mapping.from_mesh in participant_parent.provide_meshes:
-                    mesh_parent = mapping.from_mesh
-                    mesh_stranger = mapping.to_mesh
-                elif mapping.to_mesh in participant_parent.provide_meshes:
-                    mesh_parent = mapping.to_mesh
-                    mesh_stranger = mapping.from_mesh
-                else:
-                    rule_error_message("One mesh in mapping must be provided by parent participant")
-                participant_strangers = get_participants_of_mesh(graph, mesh_stranger)
-
-                if len(participant_strangers) == 0:
-                    # This mapping is broken
-                    # mesh_stranger does not get provided by any participant
-                    violations.append(self.UnclaimedMeshMappingViolation(participant_parent, mesh_stranger, direction))
-                    continue
-
-                if len(participant_strangers) > 1:
-                    # This mapping is broken
-                    # mesh_stranger gets claimed by more than one participant
-                    violations.append(
-                        self.RepeatedlyClaimedMeshMappingViolation(participant_parent, participant_strangers,
-                                                                   mesh_stranger, direction))
-                    continue
-
-                # There is only one participant claiming the mesh
-                participant_stranger = participant_strangers[0]
-
-                if participant_parent == participant_stranger:
-                    # This mapping is broken
-                    # Mapping is on meshes of the same participant
-                    violations.append(
-                        self.SameParticipantMappingViolation(participant_parent, mesh_stranger, direction))
-                    continue
-
                 if direction == Direction.READ:
                     # In a read-mapping, the 'to'-mesh has to be by the parent, the 'from'-mesh by Stranger
                     if not mesh_parent == mapping.to_mesh:
@@ -840,22 +788,26 @@ class MappingRule(Rule):
                             self.MappingMissingDataProcessingViolation(participant_parent, participant_stranger,
                                                                        mesh_parent, mesh_stranger, direction))
 
-                # Check fo m2n exchanges between participants
-                m2n = get_m2n_of_participants(m2ns, participant_parent, participant_stranger)
-                if not m2n:
-                    violations.append(
-                        self.MissingM2NMappingViolation(participant_parent, participant_stranger,
-                                                        mesh_stranger, direction))
+            # Both JIT and regular mappings share these violations
+            # Check for correct m2n between mapping participants
+            m2n = get_m2n_of_participants(m2ns, participant_parent, participant_stranger)
+            if not m2n:
+                violations.append(
+                    self.MissingM2NMappingViolation(participant_parent, participant_stranger,
+                                                    mesh_stranger, direction))
 
-                # Check if there exists a coupling-scheme between Parent and Stranger
-                coupling = get_coupling_scheme_of_mapping(couplings, participant_parent, participant_stranger)
-                if not coupling:
-                    violations.append(
-                        self.MissingCouplingSchemeMappingViolation(participant_parent, participant_stranger,
-                                                                   mesh_stranger, direction))
-                    # Continue with next mapping; this one cannot cause more violations
-                    continue
+            # Check if mapping-participants also have a coupling scheme and then also an exchange
+            coupling = get_coupling_scheme_of_mapping(couplings, participant_parent, participant_stranger)
+            if not coupling:
+                # Participants try to map data, but there exists no coupling scheme between them
+                violations.append(
+                    self.MissingCouplingSchemeMappingViolation(participant_parent, participant_stranger,
+                                                               mesh_stranger, direction))
+                # Continue with next mapping; this one cannot cause more violations
+                continue
 
+            # Regular mappings between parallel participants have to be either read-consistent or write-conservative
+            if not mapping.just_in_time:
                 # Check if the coupling-scheme between the participants is parallel
                 if coupling in parallel_couplings:
                     # Now, check whether it has the correct format: Only read-consistent and write-conservative are
@@ -872,23 +824,22 @@ class MappingRule(Rule):
                                 self.ParallelCouplingMappingFormatViolation(participant_parent,
                                                                             participant_stranger, mesh_parent,
                                                                             mesh_stranger, direction, constraint))
-
-                # Check for exchanges in the coupling scheme between the participants
-                exchanges = get_exchange_of_participants(participant_parent, participant_stranger, coupling)
-                if not exchanges:
-                    violations.append(
-                        self.MissingExchangeMappingViolation(participant_parent, participant_stranger, mesh_stranger,
-                                                             direction))
-                    # Continue with next mapping; this one cannot cause more violations
-                    continue
-
-                # Depending on the direction of the mapping, 'from'- and 'to'-mesh are defined differently
-                if not any(exchange_belongs_to_mapping(exchange, direction, participant_stranger, mesh_stranger) for
-                           exchange in exchanges):
-                    # There exists an exchange between them, but it is incorrect
-                    violations.append(
-                        self.IncorrectExchangeMappingViolation(participant_parent, participant_stranger, mesh_stranger,
-                                                               direction))
+            # Both JIT and regular mappings
+            exchanges = get_exchange_of_participants(participant_parent, participant_stranger, coupling)
+            if not exchanges:
+                # Participants try to map data, and there exists a coupling-scheme between them, but not any exchanges
+                violations.append(
+                    self.MissingExchangeMappingViolation(participant_parent, participant_stranger, mesh_stranger,
+                                                         direction))
+                # Continue with the next mapping; this one cannot cause more violations
+                continue
+            # Check if any exchange of the participants coupling-scheme is “correct”, i.e., on the strangers mesh
+            if not any(exchange_belongs_to_mapping(exchange, direction, participant_stranger, mesh_stranger) for
+                       exchange in exchanges):
+                # No correct exchange, i.e., using correct mesh
+                violations.append(
+                    self.IncorrectExchangeMappingViolation(participant_parent, participant_stranger, mesh_stranger,
+                                                           direction))
 
         return violations
 
