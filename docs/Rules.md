@@ -133,12 +133,12 @@ as specified in the mapping.
 
 For a "regular" (non-JIT) mapping, the direction `read` means, that Parent wants to read data from Stranger's mesh. 
 For this to work, data from Stranger's mesh has to be mapped to Parent's mesh.
-This means, the `from="..."`-mesh has to be by Stranger and the `to="..."`-mesh has to be provided by Parent.
+This means, the `from="..."`-mesh has to be by provided Stranger and the `to="..."`-mesh has to be provided by Parent.
 If the from-mesh is _not_ by Stranger and the to-mesh not by Parent, then the direction is wrong. 
 
 Similarly, a `write`-mapping indicates that Parent wants to write data to Stranger's mesh. 
 For this to work, data from Parent's mesh has to be mapped to Stranger's mesh.
-This means, the `from="..."`-mesh has to be by Parent and the `to="..."`-mesh has to be by Parent.
+This means, the `from="..."`-mesh has to be provided by Parent and the `to="..."`-mesh has to be provided by Parent.
 Otherwise, the direction of the mapping is wrong.
 
 #### Mapping between parallel participants has a wrong format
