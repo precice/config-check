@@ -11,12 +11,12 @@ from preciceconfigchecker.violation import Violation
 class DataUseReadWriteRule(Rule):
     name = "Utilization of data."
     # These are oversights, but do not necessarily cause the simulation to malfunction.
-    severity = Severity.WARNING
 
     class DataNotUsedNotReadNotWrittenViolation(Violation):
         """
             This violation handles nobody using, reading or writing a data node.
         """
+        severity = Severity.WARNING
 
         def __init__(self, data_node: DataNode):
             self.data_node = data_node
@@ -32,6 +32,7 @@ class DataUseReadWriteRule(Rule):
         """
             This violation handles someone using a data node, but nobody is reading and writing said data node.
         """
+        severity = Severity.WARNING
 
         def __init__(self, data_node: DataNode, meshes: list[MeshNode]):
             self.data_node = data_node
@@ -62,6 +63,7 @@ class DataUseReadWriteRule(Rule):
         """
             This class handles someone using and writing a data node, but nobody reading said data node.
         """
+        severity = Severity.WARNING
 
         def __init__(self, data_node: DataNode, mesh: MeshNode, writers: list[ParticipantNode]):
             self.data_node = data_node
@@ -99,6 +101,7 @@ class DataUseReadWriteRule(Rule):
         """
             This class handles a mesh using and someone reading a data node, but nobody writing said data node.
         """
+        severity = Severity.WARNING
 
         def __init__(self, data_node: DataNode, mesh: MeshNode, readers: list[ParticipantNode]):
             self.data_node = data_node
@@ -133,6 +136,7 @@ class DataUseReadWriteRule(Rule):
             This class handles data being used in a mesh, read and written by different participants,
             but not being exchanged between them.
         """
+        severity = Severity.WARNING
 
         def __init__(self, data_node: DataNode, writer: ParticipantNode, reader: ParticipantNode):
             self.data_node = data_node
