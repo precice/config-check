@@ -7,6 +7,7 @@ from preciceconfigchecker.rule import Rule
 # noinspection PyUnresolvedReferences
 #from preciceconfigchecker.rules import missing_coupling, missing_exchange, data_use_read_write, compositional_coupling, \
 #    m2n_exchange
+from preciceconfigchecker.rules.examples import example_1, example_2, example_3, example_4, example_5
 from preciceconfigchecker.severity import Severity
 from preciceconfigchecker.violation import Violation
 
@@ -16,6 +17,11 @@ rules: list[Rule] = [
 #    data_use_read_write.DataUseReadWriteRule(),
 #    compositional_coupling.CompositionalCouplingRule(),
 #    m2n_exchange.M2NExchangeRule()
+    example_1.Rule_1(),
+    example_2.Rule_2(),
+    example_3.Rule_3(),
+    example_4.Rule_4(),
+    example_5.Rule_5()
 ]
 
 
