@@ -12,6 +12,75 @@ class MappingRule(Rule):
     name = "Mapping rules."
     severity = Severity.ERROR
 
+    class UnclaimedMeshMappingViolation(Violation):
+        """
+            This class handles a mesh being mentioned in a mapping, but no participant providing it.
+        """
+
+        def __init__(self, parent: ParticipantNode, mesh: MeshNode, direction: Direction):
+            self.parent = parent
+            self.mesh = mesh
+            self.direction = direction
+
+        def format_explanation(self) -> str:
+            return (f"The mesh {self.mesh.name} in the {self.direction.value}-mapping specified by participant "
+                    f"{self.parent.name} does not get provided by any participant.")
+
+        def format_possible_solutions(self) -> list[str]:
+            return [f"Please let any participant provide the mesh {self.mesh.name}.",
+                    "Otherwise, please remove it to improve readability."]
+
+    class RepeatedlyClaimedMeshMappingViolation(Violation):
+        """
+            This class handles a mesh being mentioned in a mapping, but multiple participant providing it.
+        """
+
+        def __init__(self, parent: ParticipantNode, participants: list[ParticipantNode], mesh: MeshNode,
+                     direction: Direction):
+            self.parent = parent
+            self.mesh = mesh
+            self.direction = direction
+            participants_s = sorted(participants, key=lambda participant: participant.name)
+            self.names = participants_s[0].name
+            for i in range(1, len(participants_s) - 1):
+                self.names += ", "
+                self.names += participants_s[i].name
+            # Last participant has to be connected with "and", the others with a comma.
+            self.names += " and "
+            # Name of last participant
+            self.names += participants_s[-1].name
+
+        def format_explanation(self) -> str:
+            return (f"The mesh {self.mesh.name} in the {self.direction.value}-mapping specified by participant "
+                    f"{self.parent.name} gets provided by participants {self.names}.")
+
+        def format_possible_solutions(self) -> list[str]:
+            return [f"Please remove the mesh {self.mesh.name} from all but one participants provided meshes."]
+
+    class SameParticipantMappingViolation(Violation):
+        """
+            This class handles a mapping between two meshes of the same participant being specified.
+        """
+
+        def __init__(self, participant: ParticipantNode, mesh: MeshNode, direction: Direction):
+            self.participant = participant
+            self.mesh = mesh
+            self.direction = direction
+            if self.direction == Direction.READ:
+                self.connecting_word = "from"
+            elif self.direction == Direction.WRITE:
+                self.connecting_word = "to"
+
+        def format_explanation(self) -> str:
+            out: str = (f"The participant {self.participant.name} is specifying a {self.direction.value}-mapping "
+                        f"{self.connecting_word} mesh {self.mesh.name}, which is his own mesh.")
+            out += f"The mapping is from participant {self.participant.name} to participant {self.participant.name}."
+            return out
+
+        def format_possible_solutions(self) -> list[str]:
+            return [f"Please change the {self.connecting_word}-mesh to a mesh by a different participant.",
+                    "Otherwise, please remove the mapping to improve readability."]
+
     class IncorrectExchangeMappingViolation(Violation):
         """
             This class handles two participants specifying a mapping between them, but only an incorrect exchange
@@ -147,36 +216,6 @@ class MappingRule(Rule):
             out += ["Otherwise, please remove the mapping to improve readability."]
             return out
 
-    class JustInTimeMappingApiAccessViolation(Violation):
-        """
-            This class handles a participant (parent) specifying a just-in-time mapping with another participant
-            (stranger), but the parent not having permission to read from/write to Stranger's mesh, i.e., Parent does
-            not receive the mesh with api-access=true.
-        """
-
-        def __init__(self, parent: ParticipantNode, stranger: ParticipantNode, mesh: MeshNode, direction: Direction):
-            self.parent = parent
-            self.stranger = stranger
-            self.mesh = mesh
-            self.direction = direction
-            self.connecting_word: str = ""
-            if self.direction == Direction.READ:
-                self.connecting_word = "from"
-            elif self.direction == Direction.WRITE:
-                self.connecting_word = "to"
-
-        def format_explanation(self) -> str:
-            return (f"The participant {self.parent.name} is specifying a just-in-time {self.direction.value}-"
-                    f"mapping {self.connecting_word} participant {self.stranger.name}'s mesh {self.mesh.name}, but "
-                    f"does not have access to it.")
-
-        def format_possible_solutions(self) -> list[str]:
-            return [f"Let participant {self.parent.name} receive mesh {self.mesh.name} from participant "
-                    f"{self.stranger.name} with the attribute api-access=\"true\".",
-                    f"Map the values from mesh {self.mesh.name} to a mesh by participant {self.parent.name}, before"
-                    f" {self.direction.value}ing them.",
-                    "Otherwise, please remove it to improve readability."]
-
     class ParallelCouplingMappingFormatViolation(Violation):
         """
             This class handles a mapping being specified by two participants which are running in parallel,
@@ -278,6 +317,67 @@ class MappingRule(Rule):
                     f"<exchange .../> tag in their coupling scheme."]
             sol += ["Otherwise, please remove it to improve readability."]
             return sol
+
+    class MappingMissingDataProcessingViolation(Violation):
+        """
+            This class handles a "regular" mapping being specified by a participant, but no corresponding
+            read- or write-data element being specified.
+        """
+
+        def __init__(self, parent: ParticipantNode, stranger: ParticipantNode, mesh_parent: MeshNode,
+                     mesh_stranger: MeshNode, direction: Direction):
+            self.parent = parent
+            self.stranger = stranger
+            self.mesh_parent = mesh_parent
+            self.mesh_stranger = mesh_stranger
+            self.direction = direction
+            if self.direction == Direction.READ:
+                self.connecting_word = "from"
+                self.inverse_connector = "to"
+            elif self.direction == Direction.WRITE:
+                self.connecting_word = "to"
+                self.inverse_connector = "from"
+
+        def format_explanation(self) -> str:
+            return (f"Participant {self.parent.name} is specifying a {self.direction.value}-mapping "
+                    f"{self.connecting_word} participant {self.stranger.name}'s mesh {self.mesh_stranger.name} "
+                    f"{self.inverse_connector} participant {self.parent.name}'s mesh {self.mesh_parent.name}, but does "
+                    f"not define a corresponding {self.direction.value}-data element on mesh {self.mesh_parent.name}.")
+
+        def format_possible_solutions(self) -> list[str]:
+            return [f"Please add a {self.direction.value}-data element to participant {self.parent.name}, which uses "
+                    f"mesh {self.mesh_parent.name} by participant {self.parent.name}.",
+                    "Otherwise, please remove the mapping to improve readability."]
+
+    class JustInTimeMappingApiAccessViolation(Violation):
+        """
+            This class handles a participant (parent) specifying a just-in-time mapping with another participant
+            (stranger), but the parent not having permission to read from/write to Stranger's mesh, i.e., Parent does
+            not receive the mesh with api-access=true.
+        """
+
+        def __init__(self, parent: ParticipantNode, stranger: ParticipantNode, mesh: MeshNode, direction: Direction):
+            self.parent = parent
+            self.stranger = stranger
+            self.mesh = mesh
+            self.direction = direction
+            self.connecting_word: str = ""
+            if self.direction == Direction.READ:
+                self.connecting_word = "from"
+            elif self.direction == Direction.WRITE:
+                self.connecting_word = "to"
+
+        def format_explanation(self) -> str:
+            return (f"The participant {self.parent.name} is specifying a just-in-time {self.direction.value}-"
+                    f"mapping {self.connecting_word} participant {self.stranger.name}'s mesh {self.mesh.name}, but "
+                    f"does not have access to it.")
+
+        def format_possible_solutions(self) -> list[str]:
+            return [f"Let participant {self.parent.name} receive mesh {self.mesh.name} from participant "
+                    f"{self.stranger.name} with the attribute api-access=\"true\".",
+                    f"Map the values from mesh {self.mesh.name} to a mesh by participant {self.parent.name}, before"
+                    f" {self.direction.value}ing them.",
+                    "Otherwise, please remove it to improve readability."]
 
     class JustInTimeMappingFormatViolation(Violation):
         """
@@ -485,106 +585,6 @@ class MappingRule(Rule):
         def format_possible_solutions(self) -> list[str]:
             return [f"Please add a {self.direction.value}-data element to participant {self.parent.name}, which uses "
                     f"mesh {self.mesh.name} by participant {self.stranger.name}.",
-                    "Otherwise, please remove the mapping to improve readability."]
-
-    class MappingMissingDataProcessingViolation(Violation):
-        """
-            This class handles a "regular" mapping being specified by a participant, but no corresponding
-            read- or write-data element being specified.
-        """
-
-        def __init__(self, parent: ParticipantNode, stranger: ParticipantNode, mesh_parent: MeshNode,
-                     mesh_stranger: MeshNode, direction: Direction):
-            self.parent = parent
-            self.stranger = stranger
-            self.mesh_parent = mesh_parent
-            self.mesh_stranger = mesh_stranger
-            self.direction = direction
-            if self.direction == Direction.READ:
-                self.connecting_word = "from"
-                self.inverse_connector = "to"
-            elif self.direction == Direction.WRITE:
-                self.connecting_word = "to"
-                self.inverse_connector = "from"
-
-        def format_explanation(self) -> str:
-            return (f"Participant {self.parent.name} is specifying a {self.direction.value}-mapping "
-                    f"{self.connecting_word} participant {self.stranger.name}'s mesh {self.mesh_stranger.name} "
-                    f"{self.inverse_connector} participant {self.parent.name}'s mesh {self.mesh_parent.name}, but does "
-                    f"not define a corresponding {self.direction.value}-data element on mesh {self.mesh_parent.name}.")
-
-        def format_possible_solutions(self) -> list[str]:
-            return [f"Please add a {self.direction.value}-data element to participant {self.parent.name}, which uses "
-                    f"mesh {self.mesh_parent.name} by participant {self.parent.name}.",
-                    "Otherwise, please remove the mapping to improve readability."]
-
-    class UnclaimedMeshMappingViolation(Violation):
-        """
-            This class handles a mesh being mentioned in a mapping, but no participant providing it.
-        """
-
-        def __init__(self, parent: ParticipantNode, mesh: MeshNode, direction: Direction):
-            self.parent = parent
-            self.mesh = mesh
-            self.direction = direction
-
-        def format_explanation(self) -> str:
-            return (f"The mesh {self.mesh.name} in the {self.direction.value}-mapping specified by participant "
-                    f"{self.parent.name} does not get provided by any participant.")
-
-        def format_possible_solutions(self) -> list[str]:
-            return [f"Please let any participant provide the mesh {self.mesh.name}.",
-                    "Otherwise, please remove it to improve readability."]
-
-    class RepeatedlyClaimedMeshMappingViolation(Violation):
-        """
-            This class handles a mesh being mentioned in a mapping, but multiple participant providing it.
-        """
-
-        def __init__(self, parent: ParticipantNode, participants: list[ParticipantNode], mesh: MeshNode,
-                     direction: Direction):
-            self.parent = parent
-            self.mesh = mesh
-            self.direction = direction
-            participants_s = sorted(participants, key=lambda participant: participant.name)
-            self.names = participants_s[0].name
-            for i in range(1, len(participants_s) - 1):
-                self.names += ", "
-                self.names += participants_s[i].name
-            # Last participant has to be connected with "and", the others with a comma.
-            self.names += " and "
-            # Name of last participant
-            self.names += participants_s[-1].name
-
-        def format_explanation(self) -> str:
-            return (f"The mesh {self.mesh.name} in the {self.direction.value}-mapping specified by participant "
-                    f"{self.parent.name} gets provided by participants {self.names}.")
-
-        def format_possible_solutions(self) -> list[str]:
-            return [f"Please remove the mesh {self.mesh.name} from all but one participants provided meshes."]
-
-    class SameParticipantMappingViolation(Violation):
-        """
-            This class handles a mapping between two meshes of the same participant being specified.
-        """
-
-        def __init__(self, participant: ParticipantNode, mesh: MeshNode, direction: Direction):
-            self.participant = participant
-            self.mesh = mesh
-            self.direction = direction
-            if self.direction == Direction.READ:
-                self.connecting_word = "from"
-            elif self.direction == Direction.WRITE:
-                self.connecting_word = "to"
-
-        def format_explanation(self) -> str:
-            out: str = (f"The participant {self.participant.name} is specifying a {self.direction.value}-mapping "
-                        f"{self.connecting_word} mesh {self.mesh.name}, which is his own mesh.")
-            out += f"The mapping is from participant {self.participant.name} to participant {self.participant.name}."
-            return out
-
-        def format_possible_solutions(self) -> list[str]:
-            return [f"Please change the {self.connecting_word}-mesh to a mesh by a different participant.",
                     "Otherwise, please remove the mapping to improve readability."]
 
     def check(self, graph: Graph) -> list[Violation]:
