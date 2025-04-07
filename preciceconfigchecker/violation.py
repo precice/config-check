@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import List
 
 from preciceconfigchecker.severity import Severity
 import preciceconfigchecker.color as c
@@ -45,12 +44,12 @@ class Violation(ABC):
         pass
 
     @abstractmethod
-    def format_possible_solutions(self) -> List[str]:
+    def format_possible_solutions(self) -> list[str]:
         """
         @abstractmethod: Formats multiple possible solutions of 'Violation'.
 
         Returns:
-            List[str]: of formatted possible solutions
+            list[str]: of formatted possible solutions
         
         Hint: Use the attributes defined in '__init__()'.
         """
@@ -71,7 +70,7 @@ class Violation(ABC):
         class_name:str = f"({c.dyeing(self.__class__.__name__, c.purple)}) " if debug else ""
         existing_line: str = f"(Line {self.line}) " if self.line else ""
         explanation: str = self.format_explanation()
-        possible_solutions: List[str] = self.format_possible_solutions()
+        possible_solutions: list[str] = self.format_possible_solutions()
 
         out: str = c.dyeing(" >>> ", c.cyan) + severity_info + class_name + existing_line + explanation
         for possible_solution in possible_solutions:
