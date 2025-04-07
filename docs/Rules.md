@@ -85,7 +85,8 @@ Mappings are a central component of preCICE configs. They define how data is exc
 It gets specified by a participant (here "Parent") and defines how data from Parent's mesh gets mapped to a different 
 participants mesh (here "Stranger"), or vice versa.
 
-A mapping has a type (specified in `<mapping:type .../>`), a direction (`read` or `write`), an origin-mesh (specified 
+A mapping has a mapping-method (specified in `<mapping:method .../>`), 
+a direction (`read` or `write`), an origin-mesh (specified 
 by tag `from="..."`), a destination mesh (specified by tag `to="..."`) and a constraint (`consistent`, `conservative`, 
 `scaled-consistent-surface` or `scaled-consistent-volume`).
 
@@ -97,17 +98,17 @@ mesh to.
 
 #### JIT mapping without permission
 
-A JIT mapping is only valid, if Parent receives Stranger's mesh with the attribute `api-access="true"`.
+A JIT mapping is only valid if Parent receives Stranger's mesh with the attribute `api-access="true"`.
 
-#### JIT mapping has a wrong type
+#### JIT mapping has a wrong mapping-method
 
-For JIT mappings, only the types `nearest-neighbor`, `rbf-pum-direct` and `rbf` are supported.
+For JIT mappings, only the mapping-methods `nearest-neighbor`, `rbf-pum-direct` and `rbf` are supported.
 
 #### JIT mapping has a wrong format
 
-For JIT mappings, only the formats `write-conservative` and `read-consistent` are supported.
+For JIT mappings, the only supported formats are `write-conservative` and `read-consistent`.
 A `read-conservative` mapping can be achieved by switching the direction to `write` and moving the mapping from Parent
-to Stranger. This also works to achieve a `write-consistent` mapping.
+to Stranger. Analogously, this also works to achieve a `write-consistent` mapping.
 
 #### JIT mapping is in the wrong direction
 
@@ -130,12 +131,12 @@ as specified in the mapping.
 
 #### Mapping is in the wrong direction
 
-For a "regular" mapping, the direction `read` means, that Parent wants to read data from Stranger's mesh. 
-For this to work, data from Stranger's mesh has to be mapped to Parent's mesh. 
-This means, the `from="..."`-mesh has to be by Stranger and the `to="..."`-mesh has to be by Parent.
+For a "regular" (non-JIT) mapping, the direction `read` means, that Parent wants to read data from Stranger's mesh. 
+For this to work, data from Stranger's mesh has to be mapped to Parent's mesh.
+This means, the `from="..."`-mesh has to be by Stranger and the `to="..."`-mesh has to be provided by Parent.
 If the from-mesh is _not_ by Stranger and the to-mesh not by Parent, then the direction is wrong. 
 
-Similarly, a `write`-mapping means that Parent wants to write data to Stranger's mesh. 
+Similarly, a `write`-mapping indicates that Parent wants to write data to Stranger's mesh. 
 For this to work, data from Parent's mesh has to be mapped to Stranger's mesh.
 This means, the `from="..."`-mesh has to be by Parent and the `to="..."`-mesh has to be by Parent.
 Otherwise, the direction of the mapping is wrong.
@@ -143,7 +144,7 @@ Otherwise, the direction of the mapping is wrong.
 #### Mapping between parallel participants has a wrong format
 
 Participants which are coupled with a parallel coupling-scheme 
-(i.e., coupling-schemes of types `parallel-explicit`, `parallel-implicit` and `multi`) face the same format restrictions
+(i.e., coupling-schemes of types `parallel-explicit`, `parallel-implicit` and `multi`) have the same format restrictions
 as JIT mappings: Only the formats `read-consistent` and `write-conservative` are supported.
 
 #### Mapping is missing data processing
@@ -180,15 +181,15 @@ otherwise, there exists no correct data-exchange between the participants.
 
 #### Mesh in mapping is not provided by any participant
 
-A mesh in a mapping does not get provided by any participant.
+A mesh that gets mentioned in a mapping does not get provided by any participant.
 
 #### Mesh in mapping gets provided by multiple participants
 
-A mesh in a mapping gets provided by multiple participants.
+A mesh that gets mentioned in a mapping gets provided by multiple participants.
 
 #### Mapping is between the same participant
 
-Both meshes in the mapping get provided by the same participant.
+Both meshes mentioned in the mapping get provided by the same participant.
 
 ## Rules with severity `warning`
 
