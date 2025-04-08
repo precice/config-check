@@ -6,21 +6,25 @@ from preciceconfigchecker.rule import Rule
 from preciceconfigchecker.severity import Severity
 from preciceconfigchecker.violation import Violation
 
+default_possible_solutions = [
+    "Consider splitting up the simulation into multiple configurations to improve maintainability of each simulation.",
+]
+
 
 class DisjointSimulationsRule(Rule):
     severity = Severity.DEBUG
     name = "Couplings must not be disjoint"
 
-    class FullyDisjointSimulationsViolation(Violation):
+    class CommonDisjointSimulationsViolation(Violation):
         participant_sets: frozenset[frozenset[str]]
 
         def __init__(self, participant_sets: frozenset[frozenset[str]]):
             super()
-            assert (len(participant_sets) > 1)
+            assert(len(participant_sets) > 1)
             self.participant_sets = participant_sets
 
-        def format_explanation(self) -> str:
-            explanation = f"There are {len(self.participant_sets)} simulations that do not interact with each other. "
+        def _format_explanation(self, details: str) -> str:
+            explanation = f"There are {len(self.participant_sets)} simulations that do not interact with each other{details}. "
 
             def format_set(set: frozenset[str]) -> str:
                 return ", ".join(sorted(set))
@@ -40,10 +44,31 @@ class DisjointSimulationsRule(Rule):
 
             return explanation
 
+    class FullyDisjointSimulationsViolation(CommonDisjointSimulationsViolation):
+        def __init__(self, participant_sets: frozenset[frozenset[str]]):
+            super().__init__(participant_sets)
+
+        def format_explanation(self) -> str:
+            return self._format_explanation("")
+
         def format_possible_solutions(self) -> list[str]:
-            return [
-                "Consider splitting up the simulation into multiple configurations to improve maintainability of each simulation.",
+            return default_possible_solutions + [
                 "Add some data to be exchanged between these simulations.",
+            ]
+
+    class SharedDataDisjointSimulationsViolation(CommonDisjointSimulationsViolation):
+        shared_data_name: str
+
+        def __init__(self, participant_sets: frozenset[frozenset[str]], shared_data_name: str):
+            super().__init__(participant_sets)
+            self.shared_data_name = shared_data_name
+
+        def format_explanation(self) -> str:
+            return self._format_explanation(f", but share data {self.shared_data_name}")
+
+        def format_possible_solutions(self) -> list[str]:
+            return default_possible_solutions + [
+                "Exchange the data between these simulations.",
             ]
 
     def check(self, graph: Graph) -> list[Violation]:
