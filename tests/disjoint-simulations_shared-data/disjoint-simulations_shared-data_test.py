@@ -4,7 +4,7 @@ from tests.test_utils import assert_equal_violations, get_actual_violations, cre
 
 
 def test_partly_disjoint_simulations():
-    graph = create_graph("tests/shared-data-disjoint-simulations/precice-config.xml")
+    graph = create_graph("tests/disjoint-simulations_shared-data/precice-config.xml")
 
     violations_actual = get_actual_violations(graph)
 
