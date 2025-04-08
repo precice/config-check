@@ -11,7 +11,7 @@ class DisjointSimulationsRule(Rule):
     severity = Severity.DEBUG
     name = "Couplings must not be disjoint"
 
-    class DisjointSimulationsViolation(Violation):
+    class FullyDisjointSimulationsViolation(Violation):
         participant_sets: frozenset[frozenset[str]]
 
         def __init__(self, participant_sets: frozenset[frozenset[str]]):
@@ -61,6 +61,6 @@ class DisjointSimulationsRule(Rule):
                 for component in components_with_participant
             ])
 
-            return [self.DisjointSimulationsViolation(participant_sets)]
+            return [self.FullyDisjointSimulationsViolation(participant_sets)]
         else:
             return []
