@@ -52,6 +52,6 @@ class Rule(ABC):
         if debug and len(violations)>0:
             return False
         for violation in violations:
-            if violation.severity.name != Severity.DEBUG.name:
+            if violation.severity != Severity.DEBUG:
                 return False
         return True

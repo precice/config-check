@@ -66,7 +66,7 @@ class Violation(ABC):
         Returns:
             str: formatted 'Violation'
         """
-        if not debug and (self.severity.name == Severity.DEBUG.name):
+        if not debug and (self.severity == Severity.DEBUG):
             return None
 
         severity_info:str = f"[{self.severity.value}]: "
