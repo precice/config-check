@@ -55,7 +55,7 @@ class Violation(ABC):
         """
         pass
 
-    def format(self, debug:bool) -> str:
+    def format(self, debug:bool) -> str | None:
         """
         Formats the 'Violation' for its attributes.
         If debug mode is enabled, violations with DEBUG severity are also formatted.
@@ -66,6 +66,9 @@ class Violation(ABC):
         Returns:
             str: formatted 'Violation'
         """
+        if not debug and (self.severity.name == Severity.DEBUG.name):
+            return None
+
         severity_info:str = f"[{self.severity.value}]: "
         class_name:str = f"({c.dyeing(self.__class__.__name__, c.purple)}) " if debug else ""
         existing_line: str = f"(Line {self.line}) " if self.line else ""
