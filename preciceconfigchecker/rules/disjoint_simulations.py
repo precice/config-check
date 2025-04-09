@@ -16,9 +16,9 @@ class DisjointSimulationsRule(Rule):
     name = "Couplings must not be disjoint"
 
     class CommonDisjointSimulationsViolation(Violation):
-        participant_sets: frozenset[frozenset[str]]
+        participant_sets: frozenset[frozenset[ParticipantNode]]
 
-        def __init__(self, participant_sets: frozenset[frozenset[str]]):
+        def __init__(self, participant_sets: frozenset[frozenset[ParticipantNode]]):
             super()
             assert (len(participant_sets) > 1)
             self.participant_sets = participant_sets
@@ -26,8 +26,9 @@ class DisjointSimulationsRule(Rule):
         def _format_explanation(self, details: str) -> str:
             explanation = f"There are {len(self.participant_sets)} simulations that do not interact with each other{details}. "
 
-            def format_set(set: frozenset[str]) -> str:
-                return ", ".join(sorted(set))
+            def format_set(participants: frozenset[ParticipantNode]) -> str:
+                value = [ participant.name for participant in participants ]
+                return ", ".join(sorted(value))
 
             if len(self.participant_sets) == 2:
                 [participants_a, participants_b] = list(self.participant_sets)
@@ -45,7 +46,7 @@ class DisjointSimulationsRule(Rule):
             return explanation
 
     class FullyDisjointSimulationsViolation(CommonDisjointSimulationsViolation):
-        def __init__(self, participant_sets: frozenset[frozenset[str]]):
+        def __init__(self, participant_sets: frozenset[frozenset[ParticipantNode]]):
             super().__init__(participant_sets)
 
         def format_explanation(self) -> str:
@@ -59,7 +60,7 @@ class DisjointSimulationsRule(Rule):
     class SharedDataDisjointSimulationsViolation(CommonDisjointSimulationsViolation):
         shared_data_name: str
 
-        def __init__(self, shared_data_name: str, participant_sets: frozenset[frozenset[str]]):
+        def __init__(self, shared_data_name: str, participant_sets: frozenset[frozenset[ParticipantNode]]):
             super().__init__(participant_sets)
             self.shared_data_name = shared_data_name
 
@@ -112,15 +113,11 @@ class DisjointSimulationsRule(Rule):
         violations = []
 
         if len(fully_disjoint_participant_sets) > 1:
-            fully_disjoint_participant_sets = frozenset([
-                frozenset([participant.name for participant in participant_set])
-                for participant_set in fully_disjoint_participant_sets
-            ])
             violations.append(
                 self.FullyDisjointSimulationsViolation(fully_disjoint_participant_sets)
             )
 
-        dataless_components_by_data: dict[str, set[frozenset[str]]] = {}
+        dataless_components_by_data: dict[str, set[frozenset[ParticipantNode]]] = {}
         # for each dataless component, find out which data belongs to it (in order to print that information).
         for dataless_component in shared_data_participant_sets:
             # any node of a dataless component can ever only be in one overall component. So just look at the first.
@@ -139,12 +136,11 @@ class DisjointSimulationsRule(Rule):
                 data_name = related_data.name
                 if data_name not in dataless_components_by_data:
                     dataless_components_by_data[data_name] = set()
-                dataless_component = [p.name for p in dataless_component]
                 dataless_components_by_data[data_name].add(frozenset(dataless_component))
 
-        for (data, components) in dataless_components_by_data.items():
+        for (data, dataless_components) in dataless_components_by_data.items():
             violations.append(
-                self.SharedDataDisjointSimulationsViolation(data, frozenset(components))
+                self.SharedDataDisjointSimulationsViolation(data, frozenset(dataless_components))
             )
 
         return violations

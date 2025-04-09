@@ -17,13 +17,15 @@ def test_m2n_exchange():
                 n_generator = node
             elif node.name == "Propagator":
                 n_propagator = node
+            elif node.name == "Instigator":
+                n_instigator = node
 
     violations_expected = [
         e.MissingM2NEchangeViolation(n_alligator),
         e.DuplicateM2NExchangeViolation(n_generator, n_propagator),
         d.FullyDisjointSimulationsViolation(frozenset([
-            frozenset(["Generator", "Propagator", "Instigator"]),
-            frozenset(["Alligator"])
+            frozenset([n_generator, n_propagator, n_instigator]),
+            frozenset([n_alligator])
         ]))
     ]
 
