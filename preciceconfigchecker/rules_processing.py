@@ -90,11 +90,6 @@ def print_all_results(violations_by_rule: dict[Rule, list[Violation]], debug: bo
     Returns:
         None
     """
-    if not all_rules_satisfied(violations_by_rule, debug):
-        print("The following issues were found:\n")
-    for (rule, violations) in violations_by_rule.items():
-        print_result(rule, violations, debug)
-
     def total_violations_by_severity(severity: Severity) -> int:
         """
         Counts how many violations of a severity type there are.
@@ -112,10 +107,24 @@ def print_all_results(violations_by_rule: dict[Rule, list[Violation]], debug: bo
                     result += 1
         return result
 
-    total_num_errors = total_violations_by_severity(Severity.ERROR)
-    total_num_warnings = total_violations_by_severity(Severity.WARNING)
+    if has_satisfied_rules(violations_by_rule, debug) and debug:
+        print(f"[{Severity.DEBUG.value}]: These rules are satisfied:")
 
-    if total_num_errors != 0 or total_num_warnings != 0:
+        for (rule, violations) in violations_by_rule.items():
+            if rule.satisfied(violations, debug):
+                print_result(rule, violations, debug)
+
+        print("")
+
+    if has_unsatisfied_rules(violations_by_rule, debug):
+        print("The following issues were found:\n")
+
+        for (rule, violations) in violations_by_rule.items():
+            if not rule.satisfied(violations, debug):
+                print_result(rule, violations, debug)
+
+        total_num_errors = total_violations_by_severity(Severity.ERROR)
+        total_num_warnings = total_violations_by_severity(Severity.WARNING)
         error_str: str = Severity.ERROR.value + ("s" if total_num_errors != 1 else "")
         warning_str: str = Severity.WARNING.value + ("s" if total_num_warnings != 1 else "")
         print(f"Your configuration file raised {total_num_errors} {error_str} "
@@ -138,17 +147,17 @@ def print_result(rule: Rule, violations: list[Violation], debug: bool) -> None:
     Returns:
         None
     """
-    if not debug and Rule.satisfied(violations, debug):
-        return
-    elif Rule.satisfied(violations, debug):
-        print(f"[{Severity.DEBUG.value}]: '{c.dyeing(rule.__class__.__name__, c.purple)}' is satisfied.\n")
+    if rule.satisfied(violations, debug):
+        if debug:
+            print(f" - {c.dyeing(rule.__class__.__name__, c.purple)}")
         return
     else:
-        print(f"{rule.name}")
+        rule_name:str = f"({c.dyeing(rule.__class__.__name__, c.purple)}) {rule.name}" if debug else f"{rule.name}"
+        print(rule_name)
 
         for violation in violations:
-            if debug or violation.severity.name != Severity.DEBUG.name:
-                formatted_violation = violation.format(debug)
+            formatted_violation = violation.format(debug)
+            if formatted_violation:
                 print(formatted_violation)
 
         print("")
