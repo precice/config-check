@@ -42,7 +42,7 @@ class Violation(ABC):
         @abstractmethod: Formats multiple possible solutions of 'Violation'.
 
         Returns:
-            List[str]: of formatted possible solutions
+            list[str]: of formatted possible solutions
         
         Hint: Use the attributes defined in '__init__()'.
         """

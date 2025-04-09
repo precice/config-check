@@ -45,7 +45,7 @@ class MappingRule(Rule):
             for i in range(1, len(participants_s) - 1):
                 self.names += ", "
                 self.names += participants_s[i].name
-            # Last participant has to be connected with "and", the others with a comma.
+            # The last participant has to be connected with "and", the others with a comma.
             self.names += " and "
             # Name of last participant
             self.names += participants_s[-1].name
@@ -551,7 +551,7 @@ class MappingRule(Rule):
         def format_explanation(self) -> str:
             out: str = (
                 f"The just-in-time {self.direction.value}-mapping of participant {self.parent.name} {self.connecting_word} "
-                f"{self.stranger.name}'s mesh {self.mesh.name} has mapping-mehtod \"{self.method.value}\", which is invalid.")
+                f"{self.stranger.name}'s mesh {self.mesh.name} has mapping-method \"{self.method.value}\", which is invalid.")
             out += (
                 "\n     Currently, only just-in-time mappings with methods \"nearest-neighbor\", \"rbf-pum-direct\" and "
                 "\"rbf\" are supported.")
@@ -803,7 +803,7 @@ class MappingRule(Rule):
                 violations.append(
                     self.MissingCouplingSchemeMappingViolation(participant_parent, participant_stranger,
                                                                mesh_stranger, direction))
-                # Continue with next mapping; this one cannot cause more violations
+                # Continue with the next mapping; this one cannot cause more violations
                 continue
 
             # Regular mappings between parallel participants have to be either read-consistent or write-conservative
@@ -869,6 +869,7 @@ def data_processing_belongs_to_mapping(data_processing: WriteDataNode | ReadData
         It is assumed that the data_processing node is specified by the parent of the mapping,
         and that the mesh is the mesh that would be expected in a correct data_processing.
         :param data_processing: The data-processing node, either a write-data node or a read-data node.
+        :param mesh: The mesh that would be expected in a correct data_processing.
         :return: True, if the data-processing node is valid for the mapping, False otherwise.
     """
     return mesh == data_processing.mesh
@@ -885,7 +886,7 @@ def exchange_belongs_to_mapping(exchange: ExchangeNode, direction: Direction, pa
         whether the exchange belongs to the mapping or not.
         :param exchange: The exchange to check.
         :param direction: The direction of the mapping to check.
-        :param participant_stranger: The participant which is needed to check, whether the exchange belongs to the mapping
+        :param participant_stranger: The participant which is needed to check whether the exchange belongs to the mapping
         :return: True if the exchange is in the correct direction and uses the correct mesh, False otherwise.
     """
     ex_dir: bool = False
@@ -928,7 +929,7 @@ def get_coupling_scheme_of_mapping(couplings: list[CouplingSchemeNode | MultiCou
                                    ) -> CouplingSchemeNode | MultiCouplingSchemeNode | None:
     """
         This method returns the coupling scheme between the given participants.
-        :param graph: The graph of the preCICE config.
+        :param couplings: All couplings of the preCICE config.
         :param participant_a: One of the participants for which the coupling scheme is needed.
         :param participant_b: The other participant.
         :return:The coupling scheme between the participants; None if there is no coupling-scheme between the participants.
@@ -947,8 +948,7 @@ def get_coupling_scheme_of_mapping(couplings: list[CouplingSchemeNode | MultiCou
 def get_exchange_of_participants(participant_a: ParticipantNode, participant_b: ParticipantNode,
                                  coupling: CouplingSchemeNode | MultiCouplingSchemeNode) -> list[ExchangeNode] | None:
     """
-        This method returns the exchange nodes between the given participants in the given coupling-scheme,
-        if any exist.
+        This method returns the exchange nodes between the given participants in the given coupling-scheme if any exist.
         :param participant_a: One of the participants for which the exchange is needed.
         :param participant_b: The other participant.
         :param coupling: The coupling-scheme between the participants, in which the exchange should exist.
@@ -993,7 +993,7 @@ def filter_parallel_coupling_nodes(graph: Graph) -> list[CouplingSchemeNode | Mu
     """
         This function returns all parallel coupling-scheme nodes of the given graph.
         :param graph:The graph to check.
-        :return: All coupling-scheme nodes of the graph, which are either of type multi or ...-parallel.
+        :return: All coupling-scheme-nodes of the graph, which are either of type multi or ...-parallel.
     """
     couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode] = []
     for node in graph.nodes:
