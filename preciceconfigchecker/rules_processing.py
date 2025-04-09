@@ -69,12 +69,12 @@ def check_all_rules(graph: Graph, debug: bool) -> dict[Rule, list[Violation]]:
         print("Checking rules...")
 
     violations_by_rule = {}
-
     for rule in rules:
         violations_by_rule[rule] = rule.check(graph)
 
     if debug:
         print("Rules checked.\n")
+
     return violations_by_rule
 
 
