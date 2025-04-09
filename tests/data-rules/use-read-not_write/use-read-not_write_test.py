@@ -13,16 +13,23 @@ def test_data_not_use_not_read_not_write():
     for node in graph.nodes:
         if isinstance(node, DataNode):
             if node.name == "ErrorColor":
-                n_error_color = node
-        if isinstance(node, MeshNode):
-            if node.name == "Generator-Mesh":
-                n_mesh = node
-        if isinstance(node, ParticipantNode):
+                d_error_color = node
+        elif isinstance(node, ParticipantNode):
             if node.name == "Generator":
-                n_generator = node
+                p_generator = node
+            elif node.name == "Alligator":
+                p_alligator = node
+        elif isinstance(node, MeshNode):
+            if node.name == "Water-Generator-Mesh":
+                m_water_generator = node
+            elif node.name == "Food-Generator-Mesh":
+                m_food_generator = node
 
     violations_expected = []
     # ErrorColor gets used in Generator-Mesh, gets read by participant Generator, does not get written
-    violations_expected += [d.DataUsedReadNotWrittenViolation(n_error_color, n_mesh, n_generator)]
+    violations_expected += [
+        d.DataUsedReadNotWrittenViolation(d_error_color, m_water_generator, [p_generator, p_alligator]),
+
+        d.DataUsedReadNotWrittenViolation(d_error_color, m_food_generator, [p_generator])]
 
     assert_equal_violations("Data used, read, not written-test", violations_actual, violations_expected)
