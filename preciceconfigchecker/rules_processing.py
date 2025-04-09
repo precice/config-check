@@ -150,4 +150,5 @@ def print_result(rule: Rule, violations: list[Violation], debug: bool) -> None:
             if debug or violation.severity.name != Severity.DEBUG.name:
                 formatted_violation = violation.format(debug)
                 print(formatted_violation)
+
         print("")
