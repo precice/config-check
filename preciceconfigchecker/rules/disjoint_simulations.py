@@ -58,14 +58,14 @@ class DisjointSimulationsRule(Rule):
             ]
 
     class SharedDataDisjointSimulationsViolation(CommonDisjointSimulationsViolation):
-        shared_data_name: str
+        shared_data: DataNode
 
-        def __init__(self, shared_data_name: str, participant_sets: frozenset[frozenset[ParticipantNode]]):
+        def __init__(self, shared_data: DataNode, participant_sets: frozenset[frozenset[ParticipantNode]]):
             super().__init__(participant_sets)
-            self.shared_data_name = shared_data_name
+            self.shared_data = shared_data
 
         def format_explanation(self) -> str:
-            return self._format_explanation(f", but share data {self.shared_data_name}")
+            return self._format_explanation(f", but share data {self.shared_data.name}")
 
         def format_possible_solutions(self) -> list[str]:
             return default_possible_solutions + [
@@ -117,7 +117,7 @@ class DisjointSimulationsRule(Rule):
                 self.FullyDisjointSimulationsViolation(fully_disjoint_participant_sets)
             )
 
-        dataless_components_by_data: dict[str, set[frozenset[ParticipantNode]]] = {}
+        dataless_components_by_data: dict[DataNode, set[frozenset[ParticipantNode]]] = {}
         # for each dataless component, find out which data belongs to it (in order to print that information).
         for dataless_component in shared_data_participant_sets:
             # any node of a dataless component can ever only be in one overall component. So just look at the first.
@@ -133,10 +133,9 @@ class DisjointSimulationsRule(Rule):
             # Now, use this home component to add this dataless component to one or more data names
             related_data = filter(is_data_node, home_component)
             for related_data in related_data:
-                data_name = related_data.name
-                if data_name not in dataless_components_by_data:
-                    dataless_components_by_data[data_name] = set()
-                dataless_components_by_data[data_name].add(frozenset(dataless_component))
+                if related_data not in dataless_components_by_data:
+                    dataless_components_by_data[related_data] = set()
+                dataless_components_by_data[related_data].add(frozenset(dataless_component))
 
         for (data, dataless_components) in dataless_components_by_data.items():
             violations.append(
