@@ -24,7 +24,7 @@ class DisjointSimulationsRule(Rule):
             assert (len(participant_sets) > 1)
             self.participant_sets = participant_sets
 
-        def _format_explanation(self, details: str) -> str:
+        def assemble_from_default_explanation(self, details: str = "") -> str:
             explanation = f"There are {len(self.participant_sets)} simulations that do not interact with each other{details}. "
 
             def format_set(participants: frozenset[ParticipantNode]) -> str:
@@ -51,7 +51,7 @@ class DisjointSimulationsRule(Rule):
             super().__init__(participant_sets)
 
         def format_explanation(self) -> str:
-            return self._format_explanation("")
+            return self.assemble_from_default_explanation()
 
         def format_possible_solutions(self) -> list[str]:
             return default_possible_solutions + [
@@ -66,7 +66,7 @@ class DisjointSimulationsRule(Rule):
             self.shared_data = shared_data
 
         def format_explanation(self) -> str:
-            return self._format_explanation(f", but share data {self.shared_data.name}")
+            return self.assemble_from_default_explanation(f", but share data {self.shared_data.name}")
 
         def format_possible_solutions(self) -> list[str]:
             return default_possible_solutions + [
