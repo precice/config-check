@@ -3,6 +3,7 @@ from networkx import Graph
 from precice_config_graph.nodes import ParticipantNode, DataNode
 
 from preciceconfigchecker.rule import Rule
+from preciceconfigchecker.rule_utils import rule_error_message
 from preciceconfigchecker.severity import Severity
 from preciceconfigchecker.violation import Violation
 
@@ -128,7 +129,8 @@ class DisjointSimulationsRule(Rule):
                 if any_node in potential_home_component:
                     home_component = potential_home_component
 
-            assert home_component is not None
+            assert home_component is not None,\
+                "Any dataless component is always in an overall component"
 
             # Now, use this home component to add this dataless component to one or more data names
             related_data = filter(is_data_node, home_component)
