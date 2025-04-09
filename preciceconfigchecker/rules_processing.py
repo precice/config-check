@@ -18,10 +18,9 @@ rules: list[Rule] = [
     m2n_exchange.M2NExchangeRule()
 ]
 
-
-def all_rules_satisfied(violations_by_rule: dict[Rule, list[Violation]], debug:bool) -> bool:
+def has_satisfied_rules(violations_by_rule: dict[Rule, list[Violation]], debug:bool) -> bool:
     """
-    Checks whether each rule is satisfied.
+    Checks if at least one rule is satisfied.
     If debug mode is enabled, violations with severity level DEBUG are also considered.
 
     Args:
@@ -29,13 +28,29 @@ def all_rules_satisfied(violations_by_rule: dict[Rule, list[Violation]], debug:b
         debug (bool): for debug mode.
 
     Returns:
-        bool: True, if all rules are satisfied.
+        bool: True, if at least one rule is satisfied.
     """
-    for violations in violations_by_rule.values():
-        if not Rule.satisfied(violations, debug):
-            return False
-    return True
+    for (rule, violations) in violations_by_rule.items():
+        if rule.satisfied(violations, debug):
+            return True
+    return False
 
+def has_unsatisfied_rules(violations_by_rule: dict[Rule, list[Violation]], debug:bool):
+    """
+    Checks if at least one rule is unsatisfied.
+    If debug mode is enabled, violations with severity level DEBUG are also considered.
+
+    Args:
+        violations_by_rule (dict[Rule, list[Violation]]): of rules and their violations that need to be checked.
+        debug (bool): for debug mode.
+
+    Returns:
+        bool: True, if at least one rule is unsatisfied.
+    """
+    for (rule, violations) in violations_by_rule.items():
+        if not rule.satisfied(violations, debug):
+            return True
+    return False
 
 def check_all_rules(graph: Graph, debug: bool) -> dict[Rule, list[Violation]]:
     """
