@@ -12,13 +12,13 @@ def test_partly_disjoint_simulations():
     for node in graph.nodes:
         if isinstance(node, ParticipantNode):
             if node.name == "GeneratorA":
-                n_generator_a = node
+                p_generator_a = node
             elif node.name == "PropagatorA":
-                n_propagator_a = node
+                p_propagator_a = node
             elif node.name == "GeneratorB":
-                n_generator_b = node
+                p_generator_b = node
             elif node.name == "PropagatorB":
-                n_propagator_b = node
+                p_propagator_b = node
         elif isinstance(node, DataNode):
             if node.name == "Color":
                 d_color = node
@@ -26,7 +26,7 @@ def test_partly_disjoint_simulations():
     violations_expected = [r.SharedDataDisjointSimulationsViolation(
         d_color,
         frozenset([
-            frozenset([n_generator_a, n_propagator_a]), frozenset([n_generator_b, n_propagator_b])
+            frozenset([p_generator_a, p_propagator_a]), frozenset([p_generator_b, p_propagator_b])
         ])
     )]
 
