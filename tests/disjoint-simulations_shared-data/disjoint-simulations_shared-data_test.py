@@ -9,10 +9,10 @@ def test_partly_disjoint_simulations():
     violations_actual = get_actual_violations(graph)
 
     violations_expected = [r.SharedDataDisjointSimulationsViolation(
+        "Color",
         frozenset([
             frozenset(["GeneratorA", "PropagatorA"]), frozenset(["GeneratorB", "PropagatorB"])
-        ]),
-        "Color"
+        ])
     )]
 
     assert_equal_violations("Disjoint-simulations with shared data test", violations_expected, violations_actual)
