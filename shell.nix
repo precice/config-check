@@ -6,7 +6,7 @@ let
             owner = "precice-forschungsprojekt";
             repo = "config-graph";
             rev = "master"; # TODO: Set a fixed version "refs/tags/v${version}";
-            hash = "sha256-WIc7OGmvHEd2xWT1EIUTefjHtBiWtvtEfu5jHKU95hk=";
+            hash = "sha256-aw7HehFPNOq4l3VfDFrQW5rA9w0P8VpgR7GBz8MeOmY=";
         };
         pyproject = true;
 
