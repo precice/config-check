@@ -1,4 +1,4 @@
-from precice_config_graph.nodes import ParticipantNode, MeshNode, Direction, MappingConstraint, MappingType, DataNode
+from precice_config_graph.nodes import ParticipantNode, MeshNode, Direction, MappingConstraint, MappingMethod, DataNode
 
 from preciceconfigchecker.rules.mapping import MappingRule as m
 from preciceconfigchecker.rules.m2n_exchange import M2NExchangeRule as mn
@@ -61,7 +61,7 @@ def test_mapping():
         m.MissingCouplingSchemeMappingViolation(p_alligator, p_generator, m_generator, Direction.READ),
 
         m.JustInTimeMappingMethodViolation(p_instigator, p_alligator, m_alligator, Direction.READ,
-                                           MappingType.RADIAL_GEOMETRIC_MULTISCALE),
+                                           MappingMethod.RADIAL_GEOMETRIC_MULTISCALE),
         m.JustInTimeMappingFormatViolation(p_instigator, p_alligator, m_alligator, Direction.READ,
                                            MappingConstraint.SCALED_CONSISTENT_SURFACE),
         m.JustInTimeMappingFormatViolation(p_instigator, p_alligator, m_alligator, Direction.WRITE,
