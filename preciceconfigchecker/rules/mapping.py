@@ -1,6 +1,7 @@
 from networkx.classes import Graph
 from precice_config_graph.nodes import ParticipantNode, MeshNode, MappingNode, Direction, MappingConstraint, \
-    MappingMethod, CouplingSchemeNode, MultiCouplingSchemeNode, CouplingSchemeType, ExchangeNode, M2NNode, WriteDataNode, \
+    MappingMethod, CouplingSchemeNode, MultiCouplingSchemeNode, CouplingSchemeType, ExchangeNode, M2NNode, \
+    WriteDataNode, \
     ReadDataNode, ActionNode, ExportNode, WatchPointNode, WatchIntegralNode
 from preciceconfigchecker.rule_utils import rule_error_message
 from preciceconfigchecker.rule import Rule
@@ -867,19 +868,6 @@ def get_m2n_of_participants(m2ns: list[M2NNode], participant_a: ParticipantNode,
         elif m2n.acceptor == participant_b and m2n.connector == participant_a:
             return m2n
     return None
-
-
-def data_processing_belongs_to_mapping(data_processing: WriteDataNode | ReadDataNode, mesh: MeshNode) -> bool:
-    """
-        This function evaluates whether the given data-processing node is valid for a mapping,
-        defined by the given mesh.
-        It is assumed that the data_processing node is specified by the parent of the mapping,
-        and that the mesh is the mesh that would be expected in a correct data_processing.
-        :param data_processing: The data-processing node, either a write-data node or a read-data node.
-        :param mesh: The mesh that would be expected in a correct data_processing.
-        :return: True, if the data-processing node is valid for the mapping, False otherwise.
-    """
-    return mesh == data_processing.mesh
 
 
 def exchange_belongs_to_mapping(exchange: ExchangeNode, direction: Direction, participant_stranger: ParticipantNode,
