@@ -105,7 +105,7 @@ def print_all_results(violations_by_rule: dict[Rule, list[Violation]], debug: bo
         result:int = 0
         for violations in violations_by_rule.values():
             for violation in violations:
-                if violation.severity.name == severity.name:
+                if violation.severity == severity:
                     result += 1
         return result
 
