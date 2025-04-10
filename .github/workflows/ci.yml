@@ -14,10 +14,6 @@ jobs:
         python-version: ["3.12"]
 
     steps:
-      - name: Install preCICE
-        run: |
-          wget https://github.com/precice/precice/releases/download/v3.1.2/libprecice3_3.1.2_noble.deb
-          sudo apt install -y ./libprecice3_3.1.2_noble.deb
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
@@ -25,8 +21,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          sudo apt install -y libopenmpi-dev
-          python -m pip install --upgrade pip setuptools cython
+          python -m pip install --upgrade pip setuptools
           pip install -e .
       - name: Test with pytest
         run: |
