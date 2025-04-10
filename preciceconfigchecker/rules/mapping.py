@@ -1,6 +1,6 @@
 from networkx.classes import Graph
 from precice_config_graph.nodes import ParticipantNode, MeshNode, MappingNode, Direction, MappingConstraint, \
-    MappingType, CouplingSchemeNode, MultiCouplingSchemeNode, CouplingSchemeType, ExchangeNode, M2NNode, WriteDataNode, \
+    MappingMethod, CouplingSchemeNode, MultiCouplingSchemeNode, CouplingSchemeType, ExchangeNode, M2NNode, WriteDataNode, \
     ReadDataNode, ActionNode, ExportNode, WatchPointNode, WatchIntegralNode
 from preciceconfigchecker.rule_utils import rule_error_message
 from preciceconfigchecker.rule import Rule
@@ -556,7 +556,7 @@ class MappingRule(Rule):
         severity = Severity.ERROR
 
         def __init__(self, parent: ParticipantNode, stranger: ParticipantNode, mesh: MeshNode, direction: Direction,
-                     method: MappingType):
+                     method: MappingMethod):
             self.parent = parent
             self.stranger = stranger
             self.mesh = mesh
@@ -623,7 +623,7 @@ class MappingRule(Rule):
 
         mappings: list[MappingNode] = filter_mapping_nodes(graph)
         for mapping in mappings:
-            method: MappingType = mapping.type
+            method: MappingMethod = mapping.method
             direction: Direction = mapping.direction
             constraint: MappingConstraint = mapping.constraint
             participant_parent: ParticipantNode = mapping.parent_participant
@@ -682,7 +682,7 @@ class MappingRule(Rule):
             # Check JIT mapping specific violations
             if mapping.just_in_time:
                 # Only the methods nearest-neighbor, rbf-pum-direct and rbf are supported
-                supported_methods = [MappingType.NEAREST_NEIGHBOR, MappingType.RBF_PUM_DIRECT, MappingType.RBF]
+                supported_methods = [MappingMethod.NEAREST_NEIGHBOR, MappingMethod.RBF_PUM_DIRECT, MappingMethod.RBF]
                 if method not in supported_methods:
                     violations.append(
                         self.JustInTimeMappingMethodViolation(participant_parent, participant_stranger, mesh_stranger,

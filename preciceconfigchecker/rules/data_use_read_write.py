@@ -10,7 +10,6 @@ from preciceconfigchecker.violation import Violation
 
 class DataUseReadWriteRule(Rule):
     name = "Utilization of data."
-    # These are oversights, but do not necessarily cause the simulation to malfunction.
 
     class DataNotUsedNotReadNotWrittenViolation(Violation):
         """
@@ -101,7 +100,7 @@ class DataUseReadWriteRule(Rule):
         """
             This class handles a mesh using and someone reading a data node, but nobody writing said data node.
         """
-        severity = Severity.WARNING
+        severity = Severity.ERROR
 
         def __init__(self, data_node: DataNode, mesh: MeshNode, readers: list[ParticipantNode]):
             self.data_node = data_node
@@ -136,7 +135,7 @@ class DataUseReadWriteRule(Rule):
             This class handles data being used in a mesh, read and written by different participants,
             but not being exchanged between them.
         """
-        severity = Severity.WARNING
+        severity = Severity.ERROR
 
         def __init__(self, data_node: DataNode, writer: ParticipantNode, reader: ParticipantNode):
             self.data_node = data_node
@@ -153,10 +152,12 @@ class DataUseReadWriteRule(Rule):
 
     def check(self, graph: Graph) -> list[Violation]:
         violations: list[Violation] = []
+        parents_of_meshes: dict[MeshNode, ParticipantNode] = find_parents_of_meshes(graph)
         g1 = nx.subgraph_view(graph, filter_node=filter_use_read_write_data)
-        for data_node in g1.nodes:
+        for node in g1.nodes:
             # We only need to test data nodes here
-            if isinstance(data_node, DataNode):
+            if isinstance(node, DataNode):
+                data_node = node
                 use_data: bool = False
                 read_data: bool = False
                 write_data: bool = False
@@ -164,25 +165,35 @@ class DataUseReadWriteRule(Rule):
                 writers: list[ParticipantNode] = []
                 readers: list[ParticipantNode] = []
                 readers_per_writer: dict[ParticipantNode: list[ParticipantNode]] = {}
-                readers_per_mesh: dict[MeshNode: list[ParticipantNode]] = {}
-                writers_per_mesh: dict[MeshNode: list[ParticipantNode]] = {}
+                readers_per_mesh: dict[MeshNode, list[ParticipantNode]] = {}
+                writers_per_mesh: dict[MeshNode, list[ParticipantNode]] = {}
 
                 # Check all neighbors of the data node for use-, reader- and writer-nodes
                 for neighbor in g1.neighbors(data_node):
                     # Check if data gets used by a mesh
                     if isinstance(neighbor, MeshNode):
+                        # else: continue on not found?
+                        try:
+                            parent = parents_of_meshes[neighbor]
+                        except KeyError:
+                            # TODO Will be handled in mesh.py
+                            continue
                         use_data = True
                         meshes += [neighbor]
+
+                        # Check if Parent owns exports
+                        if len(parent.exports) > 0:
+                            # If so, the mesh gets read by this export
+                            read_data = True
+                            readers += [parent]
+                            append_participant_to_map(readers_per_mesh, neighbor, parent)
+
                         mesh_neighbors = g1.neighbors(neighbor)
-                        # Check if mesh gets observed by export, action, watchpoint or watch-integral.
+                        # Check if mesh gets observed by action, watchpoint or watch-integral.
                         # These types of reader nodes do not read the data itself, but only "read" the mesh and all of
                         # its used data.
                         for mesh_neighbor in mesh_neighbors:
-                            if isinstance(mesh_neighbor, ExportNode):
-                                read_data = True
-                                readers += [mesh_neighbor.participant]
-                                append_participant_to_map(readers_per_mesh, neighbor, mesh_neighbor.participant)
-                            elif isinstance(mesh_neighbor, WatchPointNode):
+                            if isinstance(mesh_neighbor, WatchPointNode):
                                 read_data = True
                                 readers += [mesh_neighbor.participant]
                                 append_participant_to_map(readers_per_mesh, neighbor, mesh_neighbor.participant)
@@ -224,17 +235,20 @@ class DataUseReadWriteRule(Rule):
                     # Meshes that the participant provides can be read directly through just-in-time mappings
                     provide_meshes = get_provide_meshes_for_data(writer, data_node)
                     for provide_mesh in provide_meshes:
+                        # An export by the writer will directly read from the mesh
+                        if len(writer.exports) > 0:
+                            readers_per_writer[writer].append(writer)
+
                         # Check all neighbors of the mesh: A jit-mapping will read directly from it
                         for provide_mesh_neighbor in graph.neighbors(provide_mesh):
                             # Only use read-data if it reads current data_node
-                            if isinstance(provide_mesh_neighbor,
-                                          ReadDataNode) and provide_mesh_neighbor.data == data_node:
+                            if (isinstance(provide_mesh_neighbor, ReadDataNode) and
+                                    provide_mesh_neighbor.data == data_node):
                                 readers_per_writer[writer].append(provide_mesh_neighbor.participant)
+                            # Action, Watchpoint and Watch-Integral are directly connected to the provide-mesh
                             elif isinstance(provide_mesh_neighbor, WatchPointNode):
                                 readers_per_writer[writer].append(provide_mesh_neighbor.participant)
                             elif isinstance(provide_mesh_neighbor, WatchIntegralNode):
-                                readers_per_writer[writer].append(provide_mesh_neighbor.participant)
-                            elif isinstance(provide_mesh_neighbor, ExportNode):
                                 readers_per_writer[writer].append(provide_mesh_neighbor.participant)
                             elif isinstance(provide_mesh_neighbor, ActionNode):
                                 # Check if action reads or writes data (corresponds to source or target data)
@@ -248,23 +262,23 @@ class DataUseReadWriteRule(Rule):
                             elif isinstance(provide_mesh_neighbor, ReceiveMeshNode):
                                 potential_reader = provide_mesh_neighbor.participant
                                 # Check all potential readers
+                                if len(potential_reader.exports) > 0:
+                                    readers_per_writer[writer].append(potential_reader)
                                 for potential_reader_neighbor in graph.neighbors(potential_reader):
-                                    if isinstance(potential_reader_neighbor,
-                                                  ReadDataNode) and potential_reader_neighbor.data == data_node:
+                                    if (isinstance(potential_reader_neighbor, ReadDataNode) and
+                                            potential_reader_neighbor.data == data_node):
                                         readers_per_writer[writer].append(potential_reader)
                                     # Watchpoint, Watch-integral and export do not specify data
                                     elif isinstance(potential_reader_neighbor, WatchPointNode):
                                         readers_per_writer[writer].append(potential_reader)
                                     elif isinstance(potential_reader_neighbor, WatchIntegralNode):
                                         readers_per_writer[writer].append(potential_reader)
-                                    elif isinstance(potential_reader_neighbor, ExportNode):
-                                        readers_per_writer[writer].append(potential_reader)
                                     elif isinstance(potential_reader_neighbor, ActionNode):
                                         # Actions can have many source datas; check for current data_node
                                         for source in potential_reader_neighbor.source_data:
                                             if source == data_node:
                                                 readers_per_writer[writer].append(potential_reader)
-                                                
+
                 # Add violations according to use/read/write
                 if use_data and read_data and write_data:
                     # If all three, use_data, read_data and write_data, are true, then there must be paths from every
@@ -386,3 +400,17 @@ def append_participant_to_map(dictionary: dict[MeshNode: list[ParticipantNode]],
         dictionary[mesh] += [participant]
     except KeyError:
         dictionary[mesh] = [participant]
+
+
+def find_parents_of_meshes(graph: Graph) -> dict[MeshNode, ParticipantNode]:
+    """
+        This method finds all parents (participants providing the mesh) of all meshes from the given graph.
+        :param graph: The graph to find parents of meshes of.
+        :return: A dictionary mapping mesh nodes to their parents.
+    """
+    parents_of_meshes: dict[MeshNode, ParticipantNode] = {}
+    for node in graph.nodes:
+        if isinstance(node, ParticipantNode):
+            for mesh in node.provide_meshes:
+                parents_of_meshes[mesh] = node
+    return parents_of_meshes
