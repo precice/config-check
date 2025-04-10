@@ -11,7 +11,7 @@ configuration for logical errors.
 
 ## Requirements
 
-- Python 3.12
+- Python 3.10
 - Pip
 - Git for cloning the repository
 - [precice-config-graph Library](https://github.com/precice-forschungsprojekt/config-graph). This will be installed during the Installation step below.
