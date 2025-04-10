@@ -311,9 +311,24 @@ This does not necessarily cause the simulation to malfunction or misbehave.
 
 - `severity`: `warning`
 
-## (12) `TODO` Disjoint simulations
+## (12) Disjoint simulations
 
-A simulation between participants A and B and a second one between participants C and D can run simultaneously, but will
-deteriorate the readability of the preCICE-config and will make it more prone to errors.
+A simulation between participants A and B and a second one between participants C and D can run simultaneously without
+using any of the coupling features of preCICE. This will however deteriorate the readability of the configuration and
+make it more prone to errors.
 
-In most cases, however, running multiple “disjoint simulations” simultaneously is intended.   
+### Fully disjoint
+
+More precisely, simulations are considered disjoint, if there are no connections (data written to/read by, exchanges,
+coupling schemes, etc.) between groups of participants.
+In most cases, running multiple “disjoint simulations” simultaneously is intended.
+
+- `severity`: `debug`
+
+### Shared data
+
+There can be cases where there are multiple simulations that are mostly disjoint (in that they do not operate on common
+data in any way), but that reference the same data names. This is not considered an error, but it indicates that there
+might be an oversight here and will therefore be warned about.
+
+- `severity`: `warning`

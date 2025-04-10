@@ -105,7 +105,7 @@ class MappingRule(Rule):
                         f"{self.connecting_word} participant {self.stranger.name}, but the exchange in the coupling-"
                         f"scheme between them is incorrect.")
             out += (
-                f"\n     For a {self.direction.value}-mapping, the mesh {self.mesh.name} should be used to exchange "
+                f"\nFor a {self.direction.value}-mapping, the mesh {self.mesh.name} should be used to exchange "
                 f"data and the participant specifying the {self.connecting_word}-mesh should be the "
                 f"{self.connecting_word}-participant in the exchange.")
             return out
@@ -146,7 +146,7 @@ class MappingRule(Rule):
                         f"{self.connecting_word} participant {self.stranger.name}'s mesh {self.mesh.name}, "
                         f"but there is no exchange for it in the coupling-scheme between them.")
             out += (
-                f"\n     For a {self.direction.value}-mapping, the mesh {self.mesh.name} should be used to exchange "
+                f"\nFor a {self.direction.value}-mapping, the mesh {self.mesh.name} should be used to exchange "
                 f"data.")
             return out
 
@@ -242,11 +242,11 @@ class MappingRule(Rule):
         def format_explanation(self) -> str:
             out: str = f"The participants {self.parent.name} and {self.stranger.name} are executing in parallel."
             out += (
-                f"\n     The {self.direction.value}-mapping specified by participant {self.parent.name} on meshes "
+                f"\nThe {self.direction.value}-mapping specified by participant {self.parent.name} on meshes "
                 f"{self.mesh_parent.name} and {self.mesh_stranger.name} with constraint=\"{self.constraint.value}\" "
                 f"is is invalid.")
             out += (
-                "\n     For parallel participants, only mappings of the form read-consistent and write-conservative are "
+                "\nFor parallel participants, only mappings of the form read-consistent and write-conservative are "
                 "allowed.")
             return out
 
@@ -311,7 +311,7 @@ class MappingRule(Rule):
             out: str = (f"The {self.direction.value}-mapping of participant {self.parent.name} and mesh "
                         f"{self.mesh_parent.name} {self.connecting_word} participant {self.stranger.name} and "
                         f"mesh {self.mesh_stranger.name} is in the wrong direction.")
-            out += (f"\n     In {self.direction.value}-mappings, the {self.inverse_connector}=\"mesh\" has to be on a "
+            out += (f"\nIn {self.direction.value}-mappings, the {self.inverse_connector}=\"mesh\" has to be on a "
                     f"mesh that the participant provides.")
             return out
 
@@ -416,7 +416,7 @@ class MappingRule(Rule):
                 f"participant {self.stranger.name}'s mesh {self.mesh.name} is in direction="
                 f"\"{self.direction.value}\" and has constraint=\"{self.constraint.value}\", which is invalid.")
             out += (
-                "\n     Currently, only just-in-time mappings of the form read-consistent and write-conservative are "
+                "\nCurrently, only just-in-time mappings of the form read-consistent and write-conservative are "
                 "supported.")
             return out
 
@@ -478,7 +478,7 @@ class MappingRule(Rule):
                         f"{self.connecting_word} participant {self.stranger.name} and mesh {self.mesh.name} is in "
                         f"the wrong direction.")
             out += (
-                f"\n     In just-in-time{self.direction.value}-mappings, the {self.connecting_word}=\"mesh\" has to "
+                f"\nIn just-in-time{self.direction.value}-mappings, the {self.connecting_word}=\"mesh\" has to "
                 f"be on a stranger participants mesh.")
             return out
 
@@ -519,10 +519,10 @@ class MappingRule(Rule):
                 f"participant {self.parent.name} and participant {self.stranger.name}'s mesh {self.mesh.name} has an "
                 f"invalid format and is in the wrong direction.")
             out += (
-                f"\n    Currently, only the formats \"write-conservative\" and \"read-consistent\" are implemented for "
+                f"\nCurrently, only the formats \"write-conservative\" and \"read-consistent\" are implemented for "
                 f"just-in-time mappings.")
             out += (
-                f"\n    In just-in-time {self.direction.value}-mappings, the {self.connecting_word}=\"mesh\" has to "
+                f"\nIn just-in-time {self.direction.value}-mappings, the {self.connecting_word}=\"mesh\" has to "
                 f"be on a stranger participants mesh.")
             return out
 
@@ -567,7 +567,7 @@ class MappingRule(Rule):
                 f"The just-in-time {self.direction.value}-mapping of participant {self.parent.name} {self.connecting_word} "
                 f"{self.stranger.name}'s mesh {self.mesh.name} has mapping-method \"{self.method.value}\", which is invalid.")
             out += (
-                "\n     Currently, only just-in-time mappings with methods \"nearest-neighbor\", \"rbf-pum-direct\" and "
+                "\nCurrently, only just-in-time mappings with methods \"nearest-neighbor\", \"rbf-pum-direct\" and "
                 "\"rbf\" are supported.")
             return out
 

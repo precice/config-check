@@ -6,7 +6,7 @@ from preciceconfigchecker.rule import Rule
 # SOME IDE's MIGHT REMOVE THEM AS UNUSED IMPORTS
 # noinspection PyUnresolvedReferences
 from preciceconfigchecker.rules import missing_coupling, missing_exchange, data_use_read_write, compositional_coupling, \
-    mapping, m2n_exchange
+    mapping, m2n_exchange, disjoint_simulations
 from preciceconfigchecker.severity import Severity
 from preciceconfigchecker.violation import Violation
 
@@ -16,7 +16,8 @@ rules: list[Rule] = [
     data_use_read_write.DataUseReadWriteRule(),
     compositional_coupling.CompositionalCouplingRule(),
     m2n_exchange.M2NExchangeRule(),
-    mapping.MappingRule()
+    mapping.MappingRule(),
+    disjoint_simulations.DisjointSimulationsRule(),
 ]
 
 def has_satisfied_rules(violations_by_rule: dict[Rule, list[Violation]], debug:bool) -> bool:

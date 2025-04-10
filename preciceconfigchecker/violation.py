@@ -72,7 +72,8 @@ class Violation(ABC):
         severity_info:str = f"[{self.severity.value}]: "
         class_name:str = f"({c.dyeing(self.__class__.__name__, c.purple)}) " if debug else ""
         existing_line: str = f"(Line {self.line}) " if self.line else ""
-        explanation: str = self.format_explanation()
+        # indent additional lines of the explanation to be aligned with first row after ">>> " is added
+        explanation: str = self.format_explanation().replace("\n", "\n     ")
         possible_solutions: list[str] = self.format_possible_solutions()
 
         out: str = c.dyeing(" >>> ", c.cyan) + severity_info + class_name + existing_line + explanation
