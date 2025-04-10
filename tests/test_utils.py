@@ -47,7 +47,8 @@ def assert_equal_violations(test_name: str, violations_expected: list[Violation]
             f"   Expected violation: {violation_e.format_explanation()}\n"
             f"   Actual violation: {violation_a.format_explanation()}")
     # Only gets reached if no AssertionError gets raised
-    print(f"\n[{test_name}] {color.dyeing("Passed", color.green)}.")
+    passed_str: str = color.dyeing("Passed", color.green)
+    print(f"\n[{test_name}] {passed_str}.")
 
 
 def get_actual_violations(graph: Graph) -> list[Violation]:
@@ -78,6 +79,7 @@ def create_graph(path: str) -> Graph:
     xml = xml_processing.parse_file(path)
     graph = g.get_graph(xml)
     return graph
+
 
 def sort_key(obj):
     return obj.format_explanation()
