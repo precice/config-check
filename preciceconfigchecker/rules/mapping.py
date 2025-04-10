@@ -10,12 +10,12 @@ from preciceconfigchecker.violation import Violation
 
 class MappingRule(Rule):
     name = "Mapping rules."
-    severity = Severity.ERROR
 
     class UnclaimedMeshMappingViolation(Violation):
         """
             This class handles a mesh being mentioned in a mapping, but no participant providing it.
         """
+        severity = Severity.ERROR
 
         def __init__(self, parent: ParticipantNode, mesh: MeshNode, direction: Direction):
             self.parent = parent
@@ -34,6 +34,7 @@ class MappingRule(Rule):
         """
             This class handles a mesh being mentioned in a mapping, but multiple participant providing it.
         """
+        severity = Severity.ERROR
 
         def __init__(self, parent: ParticipantNode, participants: list[ParticipantNode], mesh: MeshNode,
                      direction: Direction):
@@ -61,6 +62,7 @@ class MappingRule(Rule):
         """
             This class handles a mapping between two meshes of the same participant being specified.
         """
+        severity = Severity.ERROR
 
         def __init__(self, participant: ParticipantNode, mesh: MeshNode, direction: Direction):
             self.participant = participant
@@ -86,6 +88,7 @@ class MappingRule(Rule):
             This class handles two participants specifying a mapping between them, but only an incorrect exchange
             alongside it, i.e., no exchange on the mesh indicated by the mapping.
         """
+        severity = Severity.ERROR
 
         def __init__(self, parent: ParticipantNode, stranger: ParticipantNode, mesh: MeshNode, direction: Direction):
             self.parent = parent
@@ -126,6 +129,7 @@ class MappingRule(Rule):
             This class handles two participants specifying a mapping between them, but no exchange alongside it,
             i.e., no exchange between the two.
         """
+        severity = Severity.ERROR
 
         def __init__(self, parent: ParticipantNode, stranger: ParticipantNode, mesh: MeshNode, direction: Direction):
             self.parent = parent
@@ -165,6 +169,7 @@ class MappingRule(Rule):
             This class handles two participants specifying a mapping between them, but no coupling-scheme alongside it,
             i.e., no coupling-scheme exists between the two to exchange data.
         """
+        severity = Severity.ERROR
 
         def __init__(self, parent: ParticipantNode, stranger: ParticipantNode, mesh: MeshNode, direction: Direction):
             self.parent = parent
@@ -193,6 +198,7 @@ class MappingRule(Rule):
             This class handles two participants specifying a mapping between them, but no m2n-exchange alongside it,
             i.e., no m2n-exchange exists between the two to exchange data.
         """
+        severity = Severity.ERROR
 
         def __init__(self, parent: ParticipantNode, stranger: ParticipantNode, mesh: MeshNode, direction: Direction):
             self.parent = parent
@@ -222,6 +228,7 @@ class MappingRule(Rule):
             i.e., they are both in the same parallel-coupling-scheme. For such participants, only the mapping
             formats read-consistent and write-conservative are allowed.
         """
+        severity = Severity.ERROR
 
         def __init__(self, parent: ParticipantNode, stranger: ParticipantNode,
                      mesh_parent: MeshNode, mesh_stranger, direction: Direction, constraint: MappingConstraint):
@@ -280,6 +287,7 @@ class MappingRule(Rule):
             This class handles a mapping being specified by two participants, but the to- and from-meshes not being
             according to the specified mapping direction.
         """
+        severity = Severity.ERROR
 
         def __init__(self, parent: ParticipantNode, stranger: ParticipantNode,
                      mesh_parent: MeshNode, mesh_stranger: MeshNode, direction: Direction):
@@ -323,6 +331,7 @@ class MappingRule(Rule):
             This class handles a "regular" mapping being specified by a participant, but no corresponding
             read- or write-data element being specified.
         """
+        severity = Severity.ERROR
 
         def __init__(self, parent: ParticipantNode, stranger: ParticipantNode, mesh_parent: MeshNode,
                      mesh_stranger: MeshNode, direction: Direction):
@@ -355,6 +364,7 @@ class MappingRule(Rule):
             (stranger), but the parent not having permission to read from/write to Stranger's mesh, i.e., Parent does
             not receive the mesh with api-access=true.
         """
+        severity = Severity.ERROR
 
         def __init__(self, parent: ParticipantNode, stranger: ParticipantNode, mesh: MeshNode, direction: Direction):
             self.parent = parent
@@ -384,6 +394,7 @@ class MappingRule(Rule):
             This class handles a just-in-time mapping being specified between two participants. For such mappings,
             only the formats read-consistent and write-conservative are allowed.
         """
+        severity = Severity.ERROR
 
         def __init__(self, parent: ParticipantNode, stranger: ParticipantNode, mesh: MeshNode,
                      direction: Direction,
@@ -446,6 +457,7 @@ class MappingRule(Rule):
             This class handles a just-in-time mapping being specified between two participants, but the to- or from-mesh
             not being according to the specified mapping direction.
         """
+        severity = Severity.ERROR
 
         def __init__(self, parent: ParticipantNode, stranger: ParticipantNode, mesh: MeshNode, direction: Direction):
             self.parent = parent
@@ -485,6 +497,7 @@ class MappingRule(Rule):
             not being according to the specified mapping direction and the format not being either read-consistent or
             write-conservative.
         """
+        severity = Severity.ERROR
 
         def __init__(self, parent: ParticipantNode, stranger: ParticipantNode, mesh: MeshNode, direction: Direction,
                      constraint: MappingConstraint):
@@ -535,6 +548,7 @@ class MappingRule(Rule):
             Currently, for just-time-mappings, only the mapping-methods nearest-neighbor, rbf-pum-direct and rbf are
             supported.
         """
+        severity = Severity.ERROR
 
         def __init__(self, parent: ParticipantNode, stranger: ParticipantNode, mesh: MeshNode, direction: Direction,
                      method: MappingType):
@@ -566,6 +580,7 @@ class MappingRule(Rule):
             This class handles a just-time-mapping being specified by a participant, but no corresponding
             read- or write-data element being specified.
         """
+        severity = Severity.ERROR
 
         def __init__(self, parent: ParticipantNode, stranger: ParticipantNode, mesh: MeshNode, direction: Direction):
             self.parent = parent

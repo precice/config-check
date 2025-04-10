@@ -8,7 +8,6 @@ from preciceconfigchecker.violation import Violation
 
 class CompositionalCouplingRule(Rule):
     # A compositional coupling between participants can lead to a deadlock and will cause errors.
-    severity = Severity.ERROR
     name = "Coupling-schemes cannot be circularly dependent."
 
     class CompositionalDeadlockViolation(Violation):
@@ -16,6 +15,7 @@ class CompositionalCouplingRule(Rule):
             This class handels participants exchanging data through coupling schemes in a circular way, which leads
             to a deadlock.
         """
+        severity = Severity.ERROR
 
         def __init__(self, participants: list[ParticipantNode]) -> None:
             participants_s = sorted(participants, key=lambda participant: participant.name)

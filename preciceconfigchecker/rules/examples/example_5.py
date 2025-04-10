@@ -1,9 +1,11 @@
-from rule import Rule
-from severity import Severity
-from violation import Violation
+from preciceconfigchecker.rule import Rule
+from preciceconfigchecker.severity import Severity
+from preciceconfigchecker.violation import Violation
 
 class Rule_5(Rule):
-    class MyViolation(Violation):
+    class MyViolation1(Violation):
+        severity = Severity.DEBUG
+
         def __init__(self, line: int) -> None:
             super().__init__(line)
 
@@ -14,10 +16,26 @@ class Rule_5(Rule):
             return ["The",
                     "Test"
             ]
+        
+    class MyViolation2(Violation):
+        severity = Severity.DEBUG
+        
+        def __init__(self, test:str, line: int) -> None:
+            self.test = test
+            super().__init__(line)
 
-    severity = Severity.DEBUG
+        def format_explanation(self) -> str:
+            return f"{self.test} Debug"
+        
+        def format_possible_solutions(self) -> list[str]:
+            return ["The",
+                    "Test"
+            ]
+
     name = "5th Example Rule"
 
     def check(self, graph) -> list[Violation]:
         #Find violations in the graph and return them.
-        return [ self.MyViolation(42) ]
+        return [ self.MyViolation1(42),
+                 self.MyViolation2('Testing', 69) 
+                 ]

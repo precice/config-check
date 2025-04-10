@@ -7,12 +7,12 @@ from preciceconfigchecker.violation import Violation
 
 class M2NExchangeRule(Rule):
     name = "M2N Exchange Rule."
-    severity = Severity.ERROR
 
     class MissingM2NEchangeViolation(Violation):
         """
             This class handles a participant not being part of an M2N exchange.
         """
+        severity = Severity.ERROR
 
         def __init__(self, participant: ParticipantNode):
             self.participant = participant
@@ -29,6 +29,7 @@ class M2NExchangeRule(Rule):
         """
             This class handles two participants having more than one M2N exchange between them.
         """
+        severity = Severity.ERROR
 
         def __init__(self, davik_kang: ParticipantNode, calo_nord: ParticipantNode):
             self.participant1 = davik_kang
