@@ -2,9 +2,6 @@ from networkx import Graph
 
 import preciceconfigchecker.color as c
 from preciceconfigchecker.rule import Rule
-# ALL RULES THAT SHOULD BE CHECKED NEED TO BE IMPORTED
-# SOME IDE's MIGHT REMOVE THEM AS UNUSED IMPORTS
-# noinspection PyUnresolvedReferences
 from preciceconfigchecker.rules import missing_coupling, missing_exchange, data_use_read_write, compositional_coupling, \
     mapping, m2n_exchange, disjoint_simulations
 from preciceconfigchecker.severity import Severity
