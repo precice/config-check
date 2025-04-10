@@ -1,10 +1,11 @@
-from rule import Rule
-from severity import Severity
-from violation import Violation
+from preciceconfigchecker.rule import Rule
+from preciceconfigchecker.severity import Severity
+from preciceconfigchecker.violation import Violation
 
 
 class Rule_2(Rule):
     class MyViolation(Violation):
+        severity = Severity.WARNING
 
         def __init__(self, node_a: str, node_b: str, node_c: str) -> None:
             self.node_a = node_a
@@ -23,7 +24,6 @@ class Rule_2(Rule):
                     f"Connect {self.node_a} and {self.node_b} and {self.node_a} and {self.node_c}"
                     ]
 
-    severity = Severity.WARNING
     name = "2nd Example Rule"
 
     def check(self, graph) -> list[Violation]:

@@ -1,9 +1,11 @@
-from rule import Rule
-from severity import Severity
-from violation import Violation
+from preciceconfigchecker.rule import Rule
+from preciceconfigchecker.severity import Severity
+from preciceconfigchecker.violation import Violation
 
 class Rule_4(Rule):
     class MyViolation(Violation):
+        severity = Severity.ERROR
+        
         def __init__(self, node_a:str) -> None:
             self.node_a = node_a
 
@@ -14,7 +16,6 @@ class Rule_4(Rule):
             return [f"Delete {self.node_a}"
             ]
 
-    severity = Severity.ERROR
     name = "4th Example Rule"
 
     def check(self, graph) -> list[Violation]:
