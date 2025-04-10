@@ -59,6 +59,7 @@ config-checker
 │   ├── color.py               # Definition of colors for CLI output
 │   ├── rule.py                # Class of a rule and logic to check all rules
 │   ├── rules_processing.py    # Processes rules and handles output
+│   ├── rules_utils.py         # Utility functions for rules
 │   ├── severity.py            # Enum for specifying severity of output
 │   └── violation.py           # Class of a violation
 │
@@ -74,13 +75,13 @@ config-checker
 To check a preCICE configuration file for logical errors, run the following within the root of this repository:
 
 ```bash
-python preciceconfigchecker/cli.py "/path/to/precice-config.xml"
+python -m preciceconfigchecker.cli "path/to/precice-config.xml"
 ```
 
 If you want more information about the checks that were performed and their results, use
 
 ```bash
-python preciceconfigchecker/cli.py "/path/to/precice-config.xml" --debug
+python -m preciceconfigchecker.cli "path/to/precice-config.xml" --debug
 ```
 
 ## Suggesting new Rules
