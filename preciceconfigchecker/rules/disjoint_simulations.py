@@ -3,7 +3,6 @@ from networkx import Graph
 from precice_config_graph.nodes import ParticipantNode, DataNode
 
 from preciceconfigchecker.rule import Rule
-from preciceconfigchecker.rule_utils import rule_error_message
 from preciceconfigchecker.severity import Severity
 from preciceconfigchecker.violation import Violation
 
@@ -13,7 +12,6 @@ default_possible_solutions = [
 
 
 class DisjointSimulationsRule(Rule):
-    severity = Severity.DEBUG
     name = "Couplings must not be disjoint"
 
     class CommonDisjointSimulationsViolation(Violation):
@@ -47,6 +45,8 @@ class DisjointSimulationsRule(Rule):
             return explanation
 
     class FullyDisjointSimulationsViolation(CommonDisjointSimulationsViolation):
+        severity = Severity.DEBUG
+
         def __init__(self, participant_sets: frozenset[frozenset[ParticipantNode]]):
             super().__init__(participant_sets)
 
@@ -59,6 +59,7 @@ class DisjointSimulationsRule(Rule):
             ]
 
     class SharedDataDisjointSimulationsViolation(CommonDisjointSimulationsViolation):
+        severity = Severity.WARNING
         shared_data: DataNode
 
         def __init__(self, shared_data: DataNode, participant_sets: frozenset[frozenset[ParticipantNode]]):
