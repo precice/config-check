@@ -46,7 +46,7 @@ class ProvideMeshRule(Rule):
             self.names += participants_s[-1].name
 
         def format_explanation(self) -> str:
-            return f"The mesh {self.mesh.name} gets provided by participants {self.names}, which is not allowed."
+            return f"The mesh {self.mesh.name} is provided by participants {self.names}."
 
         def format_possible_solutions(self) -> list[str]:
             return [f"Ensure that only one participant provides {self.mesh.name}."]
