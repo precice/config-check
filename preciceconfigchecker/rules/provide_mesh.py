@@ -49,7 +49,7 @@ class ProvideMeshRule(Rule):
             return f"The mesh {self.mesh.name} gets provided by participants {self.names}, which is not allowed."
 
         def format_possible_solutions(self) -> list[str]:
-            return [f"Please let only one participant provide {self.mesh.name}."]
+            return [f"Ensure that only one participant provides {self.mesh.name}."]
 
     def check(self, graph: Graph) -> list[Violation]:
         violations: list[Violation] = []
