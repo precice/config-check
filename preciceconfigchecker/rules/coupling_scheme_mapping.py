@@ -90,8 +90,6 @@ class CouplingSchemeMappingRule(Rule):
         couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode] = filter_coupling_nodes(graph)
 
         for coupling in couplings:
-            if isinstance(coupling, CouplingSchemeNode):
-
                 # Unknown participants in from=/to= are handled by precice-tools check
 
                 # Check for all exchanges, whether a mapping exists between first and second (in the correct direction)
