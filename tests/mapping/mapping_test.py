@@ -85,7 +85,9 @@ def test_mapping():
 
         csm.MissingMappingCouplingSchemeViolation(p_generator, p_propagator, m_generator),
 
-        csm.MissingMappingCouplingSchemeViolation(p_incinerator, p_propagator, m_incinerator)
+        csm.MissingMappingCouplingSchemeViolation(p_incinerator, p_propagator, m_incinerator),
+
+        csm.MissingMappingCouplingSchemeViolation(p_generator, p_propagator, m_propagator)
     ]
 
     assert_equal_violations("Mapping-test", violations_expected, violations_actual)
