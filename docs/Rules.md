@@ -227,18 +227,6 @@ otherwise, there exists no correct data-exchange between the participants.
 
 - `severity`: `error`
 
-### Mesh in mapping is not provided by any participant
-
-A mesh that gets mentioned in a mapping does not get provided by any participant.
-
-- `severity`: `error`
-
-### Mesh in mapping gets provided by multiple participants
-
-A mesh that gets mentioned in a mapping gets provided by multiple participants.
-
-- `severity`: `error`
-
 ### Mapping is between the same participant
 
 Both meshes mentioned in the mapping get provided by the same participant.
@@ -333,6 +321,23 @@ might be an oversight here and will therefore be warned about.
 
 - `severity`: `warning`
 
+## (13) A mesh must be provided by exactly one participant
+
+Any mesh defined in the configuration must be provided by exactly one participant.
+Only then can the mesh be used in mappings, exchanges et cetera.
+
+### Mesh is not provided by any participant
+
+A mesh that gets mentioned in an arbitrary tag in the config does not get provided by any participant.
+
+- `severity`: `error`
+
+### Mesh gets provided by multiple participants
+
+A mesh that gets mentioned in an arbitrary tag in the config gets provided by multiple participants.
+
+- `severity`: `error`
+
 ## (14) Exchange in coupling-scheme leads to mapping or api-access
 
 If two participants define a coupling-scheme between them, then they need a mapping or api-access to exchange data.
@@ -357,5 +362,3 @@ If `A` or `B` does have api-access to the correct mesh, it might still lead to a
 However, as this is a valid use-case, only in debug mode will a warning be displayed.
 
 - `severity`:`debug`
-
-
