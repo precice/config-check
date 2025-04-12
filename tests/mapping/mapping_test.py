@@ -3,7 +3,6 @@ from precice_config_graph.nodes import ParticipantNode, MeshNode, Direction, Map
 from preciceconfigchecker.rules.mapping import MappingRule as m
 from preciceconfigchecker.rules.m2n_exchange import M2NExchangeRule as mn
 from preciceconfigchecker.rules.data_use_read_write import DataUseReadWriteRule as d
-from preciceconfigchecker.rules_processing import check_all_rules, print_all_results
 from preciceconfigchecker.rules.coupling_scheme_mapping import CouplingSchemeMappingRule as csm
 
 from tests.test_utils import assert_equal_violations, get_actual_violations, create_graph
