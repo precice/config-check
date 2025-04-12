@@ -8,7 +8,7 @@ from preciceconfigchecker.violation import Violation
 
 
 class CouplingSchemeMappingRule(Rule):
-    name = "Coupling-scheme rules."
+    name = "Exchange in a coupling-scheme needs a mapping between involved participants."
 
     class MissingMappingCouplingSchemeViolation(Violation):
         """
