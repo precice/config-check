@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<precice-configuration>
+    <log>
+        <sink
+                filter="%Severity% > debug"
+                format="---[precice] %ColorizedSeverity% %Message%"
+                enabled="true"/>
+    </log>
+
+    <data:scalar name="Color"/>
+
+    <mesh name="Generator-Mesh" dimensions="2">
+        <use-data name="Color"/>
+    </mesh>
+
+    <mesh name="Propagator-Mesh" dimensions="2">
+        <use-data name="Color"/>
+    </mesh>
+
+    <participant name="Generator">
+        <provide-mesh name="Generator-Mesh"/>
+        <receive-mesh name="Propagator-Mesh" from="Propagator"/>
+        <write-data name="Color" mesh="Generator-Mesh"/>
+        <!--<mapping:nearest-neighbor
+                direction="write"
+                from="Generator-Mesh"
+                to="Propagator-Mesh"
+                constraint="conservative"/>-->
+    </participant>
+
+    <participant name="Propagator">
+        <receive-mesh name="Generator-Mesh" from="Generator"/>
+        <provide-mesh name="Propagator-Mesh"/>
+        <read-data name="Color" mesh="Propagator-Mesh"/>
+        <!--<mapping:nearest-neighbor
+                direction="read"
+                from="Generator-Mesh"
+                to="Propagator-Mesh"
+                constraint="consistent"/>-->
+    </participant>
+
+    <m2n:sockets acceptor="Generator" connector="Propagator" exchange-directory=".."/>
+
+    <coupling-scheme:serial-explicit>
+        <participants first="Generator" second="Propagator"/>
+        <time-window-size value="0.01"/>
+        <max-time value="0.3"/>
+        <exchange data="Color" mesh="Generator-Mesh" from="Generator" to="Propagator"/>
+        <exchange data="Color" mesh="Propagator-Mesh" from="Generator" to="Propagator"/>
+    </coupling-scheme:serial-explicit>
+
+    <!-- same but with api-access -->
+
+    <mesh name="Alligator-Mesh" dimensions="2">
+        <use-data name="Color"/>
+    </mesh>
+
+    <mesh name="Instigator-Mesh" dimensions="2">
+        <use-data name="Color"/>
+    </mesh>
+
+    <participant name="Alligator">
+        <provide-mesh name="Alligator-Mesh"/>
+        <receive-mesh name="Instigator-Mesh" from="Instigator" api-access="true"/>
+        <write-data name="Color" mesh="Alligator-Mesh"/>
+        <write-data name="Color" mesh="Instigator-Mesh"/>
+        <!-- This jit-mapping fits the
+        <exchange data="Color" mesh="Instigator-Mesh" from="Alligator" to="Instigator"/>
+        tag, which will not create a violation -->
+        <mapping:nearest-neighbor
+                direction="write"
+                to="Instigator-Mesh"
+                constraint="conservative"/>
+    </participant>
+
+    <participant name="Instigator">
+        <!-- this is valid, but should yield a debug-violation as a warning
+             this corresponds to exchange from Alligator to Instigator with mesh Alligator-Mesh -->
+        <receive-mesh name="Alligator-Mesh" from="Alligator" api-access="true"/>
+        <provide-mesh name="Instigator-Mesh"/>
+        <read-data name="Color" mesh="Alligator-Mesh"/>
+    </participant>
+
+    <m2n:sockets acceptor="Alligator" connector="Instigator" exchange-directory=".."/>
+
+    <coupling-scheme:serial-explicit>
+        <participants first="Alligator" second="Instigator"/>
+        <time-window-size value="0.01"/>
+        <max-time value="0.3"/>
+        <exchange data="Color" mesh="Alligator-Mesh" from="Alligator" to="Instigator"/>
+        <exchange data="Color" mesh="Instigator-Mesh" from="Alligator" to="Instigator"/>
+    </coupling-scheme:serial-explicit>
+
+    <!-- valid part, should not cause any violations -->
+
+    <mesh name="Elevator-Mesh" dimensions="2">
+        <use-data name="Color"/>
+    </mesh>
+
+    <participant name="Elevator">
+        <read-data name="Color" mesh="Elevator-Mesh"/>
+        <receive-mesh name="Generator-Mesh" from="Generator"/>
+        <provide-mesh name="Elevator-Mesh"/>
+        <mapping:nearest-neighbor
+                direction="read"
+                from="Generator-Mesh"
+                to="Elevator-Mesh"
+                constraint="consistent"/>
+    </participant>
+
+    <m2n:mpi acceptor="Elevator" connector="Generator" exchange-directory=".."/>≈@
+
+    <coupling-scheme:serial-explicit>
+        <participants first="Elevator" second="Generator"/>
+        <time-window-size value="0.01"/>
+        <max-time value="0.3"/>
+        <exchange data="Color" mesh="Generator-Mesh" from="Generator" to="Elevator"/>
+    </coupling-scheme:serial-explicit>
+
+</precice-configuration>
+
+        <!-- <exchange data="Color" mesh="Generator-Mesh" from="Generator" to="Propagator"/>
+                indicates a read mapping defined by propagator,
+                because Generator-Mesh gets exchanged from Generator to Propagator,
+                i.e., Generator writes to own mesh, sends it to Propagator, who maps it to his mesh, and reads from it.
+                ==> missing mapping
+            <exchange data="Color" mesh="Propagator-Mesh" from="Generator" to="Propagator"/>
+                would indicate a write-mapping defined by generator,
+                because Propagator-Mesh is exchanged from Generator to Propagator,
+                i.e., Generator writes to own mesh, maps to Propagator mesh, sends it to Propagator, who reads from it
+        -->
