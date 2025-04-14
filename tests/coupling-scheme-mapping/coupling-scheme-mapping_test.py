@@ -1,6 +1,6 @@
 from preciceconfigchecker.rules.disjoint_simulations import DisjointSimulationsRule as d
 from preciceconfigchecker.rules.coupling_scheme_mapping import CouplingSchemeMappingRule as c
-from preciceconfigchecker.rules.mapping import MappingRule as m
+from preciceconfigchecker.rules.mapping import MappingRule as m, MissingDataProcessing as mdp
 from tests.test_utils import assert_equal_violations, create_graph, get_actual_violations
 from precice_config_graph.nodes import ParticipantNode, MeshNode, DataNode, Direction
 
@@ -46,7 +46,7 @@ def test_coupling_scheme_mapping():
         d.SharedDataDisjointSimulationsViolation(d_color, frozenset([frozenset([p_generator, p_propagator, p_elevator]),
                                                                      frozenset([p_alligator, p_instigator])])),
         m.JustInTimeMappingMissingDataProcessingViolation(p_alligator, p_instigator, m_instigator, Direction.WRITE,
-                                                          m.MissingDataProcessing.READ_DATA)
+                                                          mdp.READ_DATA)
     ]
 
     assert_equal_violations("Coupling-scheme-mapping-test", violations_expected, violations_actual)
