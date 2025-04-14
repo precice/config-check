@@ -308,18 +308,10 @@ class MappingRule(Rule):
                 self.connecting_word = "from"
                 self.inverse_connector = "to"
                 self.inverse_direction = Direction.WRITE
-                self.writer = stranger
-                self.reader = parent
-                self.mesh_writer = mesh_stranger
-                self.mesh_reader = mesh_parent
             elif self.direction == Direction.WRITE:
                 self.connecting_word = "to"
                 self.inverse_connector = "from"
                 self.inverse_direction = Direction.READ
-                self.writer = parent
-                self.reader = stranger
-                self.mesh_writer = mesh_parent
-                self.mesh_reader = mesh_stranger
             self.missing_data_processing = missing_data_processing
 
         def format_explanation(self) -> str:
@@ -593,7 +585,8 @@ class MappingRule(Rule):
         """
         severity = Severity.ERROR
 
-        def __init__(self, parent: ParticipantNode, stranger: ParticipantNode, mesh: MeshNode, direction: Direction):
+        def __init__(self, parent: ParticipantNode, stranger: ParticipantNode, mesh: MeshNode, direction: Direction,
+                     missing_data_processing):
             self.parent = parent
             self.stranger = stranger
             self.mesh = mesh
@@ -606,19 +599,53 @@ class MappingRule(Rule):
                 self.connecting_word = "to"
                 self.inverse_connector = "from"
                 self.inverse_direction = Direction.READ
+            self.missing_data_processing = missing_data_processing
 
         def format_explanation(self) -> str:
-            return (f"Participant {self.parent.name} is specifying a just-in-time {self.direction.value}-mapping "
-                    f"{self.connecting_word} participant {self.stranger.name}'s mesh {self.mesh.name}. "
-                    f"\nHowever, it seems like participant {self.parent.name} does not {self.direction.value} "
-                    f"{self.connecting_word} mesh {self.mesh.name} or participant {self.stranger.name} does not "
-                    f"{self.inverse_direction.value} {self.inverse_connector} mesh {self.mesh.name}.")
+            out: str = (f"Participant {self.parent.name} is specifying a just-in-time {self.direction.value}-mapping "
+                        f"{self.connecting_word} participant {self.stranger.name}'s mesh {self.mesh.name}. ")
+            if self.missing_data_processing == MappingRule.MissingDataProcessing.READ_DATA:
+                if self.direction == Direction.WRITE:
+                    out += (f"\nHowever, it seems like {self.stranger.name} does not {self.inverse_direction.value} "
+                            f"{self.inverse_connector} {self.mesh.name}.")
+                elif self.direction == Direction.READ:
+                    out += (f"\nHowever, it seems like {self.parent.name} does not {self.direction.value} "
+                            f"{self.connecting_word} {self.mesh.name}.")
+                elif self.missing_data_processing == MappingRule.MissingDataProcessing.WRITE_DATA:
+                    if self.direction == Direction.WRITE:
+                        out += (f"\nHowever, it seems like {self.parent.name} does not {self.inverse_direction.value} "
+                                f"{self.inverse_connector} {self.mesh.name}.")
+                elif self.direction == Direction.READ:
+                    out += (f"\nHowever, it seems like {self.stranger.name} does not {self.direction.value} "
+                            f"{self.connecting_word} {self.mesh.name}.")
+            elif self.missing_data_processing == MappingRule.MissingDataProcessing.READ_DATA_AND_WRITE_DATA:
+                out += (f"\nHowever, it seems like {self.parent.name} does not {self.direction.value} "
+                        f"{self.connecting_word} {self.mesh.name} and {self.stranger.name} does not "
+                        f"{self.inverse_direction.value} {self.inverse_connector} {self.mesh.name}.")
+            return out
 
         def format_possible_solutions(self) -> list[str]:
-            return [f"Please make sure that {self.parent.name} {self.direction.value}s {self.connecting_word} "
-                    f"{self.mesh.name} and {self.stranger.name} {self.inverse_direction.value}s "
-                    f"{self.inverse_connector} {self.mesh.name}.",
-                    "Otherwise, please remove the mapping to improve readability."]
+            out: list[str] = []
+            if self.missing_data_processing == MappingRule.MissingDataProcessing.READ_DATA:
+                if self.direction == Direction.WRITE:
+                    out = [f"Please ensure that {self.stranger.name} {self.inverse_direction.value}s "
+                           f"{self.inverse_connector} {self.mesh.name}."]
+                elif self.direction == Direction.READ:
+                    out = [f"Please ensure that {self.parent.name} {self.direction.value}s "
+                           f"{self.connecting_word} {self.mesh.name}."]
+            elif self.missing_data_processing == MappingRule.MissingDataProcessing.WRITE_DATA:
+                if self.direction == Direction.WRITE:
+                    out = [f"Please ensure that {self.parent.name} {self.inverse_direction.value}s "
+                           f"{self.inverse_connector} {self.mesh.name}."]
+                elif self.direction == Direction.READ:
+                    out = [f"Please ensure that {self.stranger.name} {self.direction.value}s "
+                           f"{self.connecting_word} {self.mesh.name}."]
+            elif self.missing_data_processing == MappingRule.MissingDataProcessing.READ_DATA_AND_WRITE_DATA:
+                out = [f"Please ensure that {self.parent.name} {self.direction.value}s {self.connecting_word} "
+                       f"{self.mesh.name} and {self.stranger.name} {self.inverse_direction.value}s "
+                       f"{self.inverse_connector} {self.mesh.name}.",
+                       "Otherwise, please remove the mapping to improve readability."]
+            return out
 
     def check(self, graph: Graph) -> list[Violation]:
         violations: list[Violation] = []
@@ -747,25 +774,35 @@ class MappingRule(Rule):
                             violations.append(
                                 self.JustInTimeMappingApiAccessViolation(participant_parent, participant_stranger,
                                                                          mesh_stranger, direction))
+                write_datas = []
+                read_datas = []
                 # Check if there are corresponding read-/write-data elements for the mapping
                 if direction == Direction.WRITE:
                     write_datas = get_write_datas_of_mesh(mesh_stranger, participant_parent)
                     read_datas = get_read_datas_of_mesh(mesh_stranger, participant_stranger)
-                    # In a JIT write-mapping, Parent should write to Stranger's mesh; Stranger should read from their own mesh
-                    if len(write_datas) == 0 or len(read_datas) == 0:
-                        violations.append(
-                            self.JustInTimeMappingMissingDataProcessingViolation(participant_parent,
-                                                                                 participant_stranger,
-                                                                                 mesh_stranger, direction))
                 elif direction == Direction.READ:
-                    # In a JIT read-mapping, Parent should read from Stranger's mesh; Stranger should write to their own mesh
                     read_datas = get_read_datas_of_mesh(mesh_stranger, participant_parent)
                     write_datas = get_write_datas_of_mesh(mesh_stranger, participant_stranger)
-                    if len(read_datas) == 0 or len(write_datas) == 0:
-                        violations.append(
-                            self.JustInTimeMappingMissingDataProcessingViolation(participant_parent,
-                                                                                 participant_stranger,
-                                                                                 mesh_stranger, direction))
+                    # In a JIT write-mapping, Parent should write to Stranger's mesh; Stranger should read from their own mesh
+                    # In a JIT read-mapping, Parent should read from Stranger's mesh; Stranger should write to their own mesh
+                if len(write_datas) == 0 and len(read_datas) == 0:
+                    violations.append(
+                        self.JustInTimeMappingMissingDataProcessingViolation(participant_parent,
+                                                                             participant_stranger,
+                                                                             mesh_stranger, direction,
+                                                                             MappingRule.MissingDataProcessing.READ_DATA_AND_WRITE_DATA))
+                elif len(write_datas) != 0 and len(read_datas) == 0:
+                    violations.append(
+                        self.JustInTimeMappingMissingDataProcessingViolation(participant_parent,
+                                                                             participant_stranger,
+                                                                             mesh_stranger, direction,
+                                                                             MappingRule.MissingDataProcessing.READ_DATA))
+                elif len(write_datas) == 0 and len(read_datas) != 0:
+                    violations.append(
+                        self.JustInTimeMappingMissingDataProcessingViolation(participant_parent,
+                                                                             participant_stranger,
+                                                                             mesh_stranger, direction,
+                                                                             MappingRule.MissingDataProcessing.WRITE_DATA))
             # Only regular mappings here
             else:
                 if direction == Direction.READ:
@@ -780,52 +817,34 @@ class MappingRule(Rule):
                         violations.append(
                             self.MappingDirectionViolation(participant_parent, participant_stranger, mesh_parent,
                                                            mesh_stranger, direction))
-
+                write_datas = []
+                read_datas = []
                 # Check if there are corresponding read-/write-data elements for the mapping
                 if direction == Direction.WRITE:
                     # In a write-mapping, Parent should write to their own mesh; Stranger should read from their own mesh
                     write_datas = get_write_datas_of_mesh(mesh_parent, participant_parent)
                     read_datas = get_read_datas_of_mesh(mesh_stranger, participant_stranger)
-                    print("write_datas", len(write_datas), "read_datas", len(read_datas))
-                    if len(read_datas) == 0 and len(write_datas) == 0:
-                        # only read is missing
-                        violations.append(
-                            self.MappingMissingDataProcessingViolation(participant_parent, participant_stranger,
-                                                                       mesh_parent, mesh_stranger, direction,
-                                                                       MappingRule.MissingDataProcessing.READ_DATA_AND_WRITE_DATA))
-                    elif len(read_datas) == 0 and len(write_datas) != 0:
-                        violations.append(
-                            self.MappingMissingDataProcessingViolation(participant_parent, participant_stranger,
-                                                                       mesh_parent, mesh_stranger, direction,
-                                                                       MappingRule.MissingDataProcessing.READ_DATA))
-                    elif len(read_datas) != 0 and len(write_datas) == 0:
-                        violations.append(
-                            self.MappingMissingDataProcessingViolation(participant_parent, participant_stranger,
-                                                                       mesh_parent, mesh_stranger, direction,
-                                                                       MappingRule.MissingDataProcessing.WRITE_DATA))
                 elif direction == Direction.READ:
                     # In a read-mapping, Parent should read from their own mesh; Stranger should write to their own
                     write_datas = get_write_datas_of_mesh(mesh_stranger, participant_stranger)
                     read_datas = get_read_datas_of_mesh(mesh_parent, participant_parent)
-                    print("write_datas", len(write_datas), "read_datas", len(read_datas))
-                    if len(read_datas) == 0 and len(write_datas) == 0:
-                        # only read is missing
-                        violations.append(
-                            self.MappingMissingDataProcessingViolation(participant_parent, participant_stranger,
-                                                                       mesh_parent, mesh_stranger, direction,
-                                                                       MappingRule.MissingDataProcessing.READ_DATA_AND_WRITE_DATA))
-                    elif len(read_datas) == 0 and len(write_datas) != 0:
-                        violations.append(
-                            self.MappingMissingDataProcessingViolation(participant_parent, participant_stranger,
-                                                                       mesh_parent, mesh_stranger, direction,
-                                                                       MappingRule.MissingDataProcessing.READ_DATA))
-                    elif len(read_datas) != 0 and len(write_datas) == 0:
-                        violations.append(
-                            self.MappingMissingDataProcessingViolation(participant_parent, participant_stranger,
-                                                                       mesh_parent, mesh_stranger, direction,
-                                                                       MappingRule.MissingDataProcessing.WRITE_DATA))
-
-                        # Both JIT and regular mappings share these violations
+                if len(read_datas) == 0 and len(write_datas) == 0:
+                    # only read is missing
+                    violations.append(
+                        self.MappingMissingDataProcessingViolation(participant_parent, participant_stranger,
+                                                                   mesh_parent, mesh_stranger, direction,
+                                                                   MappingRule.MissingDataProcessing.READ_DATA_AND_WRITE_DATA))
+                elif len(read_datas) == 0 and len(write_datas) != 0:
+                    violations.append(
+                        self.MappingMissingDataProcessingViolation(participant_parent, participant_stranger,
+                                                                   mesh_parent, mesh_stranger, direction,
+                                                                   MappingRule.MissingDataProcessing.READ_DATA))
+                elif len(read_datas) != 0 and len(write_datas) == 0:
+                    violations.append(
+                        self.MappingMissingDataProcessingViolation(participant_parent, participant_stranger,
+                                                                   mesh_parent, mesh_stranger, direction,
+                                                                   MappingRule.MissingDataProcessing.WRITE_DATA))
+            # Both JIT and regular mappings share these violations
             # Check for correct m2n between mapping participants
             m2n = get_m2n_of_participants(m2ns, participant_parent, participant_stranger)
             if not m2n:
