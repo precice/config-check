@@ -28,12 +28,16 @@ class CouplingSchemeMappingRule(Rule):
                 self.mapper = to_participant
                 self.non_mapper = from_participant
                 self.mesh_owner = from_participant
+                self.from_string = f"from {self.exchange_mesh.name}"
+                self.to_string = f"to a mesh provided by {to_participant.name}"
             else:
                 # from_participant writes to own mesh, maps it to to_participants mesh, sends it to to_participant, who reads from it
                 self.direction = Direction.WRITE
                 self.mapper = from_participant
                 self.non_mapper = to_participant
                 self.mesh_owner = to_participant
+                self.from_string = f"from a mesh provided by {from_participant.name}"
+                self.to_string = f"to {self.exchange_mesh.name}"
 
         def format_explanation(self) -> str:
             return (f"The exchange belonging to the coupling-scheme between participants "
@@ -41,8 +45,8 @@ class CouplingSchemeMappingRule(Rule):
                     f"mesh {self.exchange_mesh.name} is missing a mapping.")
 
         def format_possible_solutions(self) -> list[str]:
-            return [f"For this exchange, {self.mapper.name} has to define a {self.direction.value}-mapping from a "
-                    f"mesh provided by {self.from_participant.name} to a mesh provided by {self.to_participant.name}.",
+            return [f"For this exchange, {self.mapper.name} has to define a {self.direction.value}-mapping "
+                    f"{self.from_string} {self.to_string}.",
                     "Otherwise, change the mesh used in the exchange and make sure that there exists a corresponding "
                     "mapping for it."]
 
