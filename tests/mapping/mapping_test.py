@@ -9,7 +9,7 @@ from tests.test_utils import assert_equal_violations, get_actual_violations, cre
 
 
 def test_mapping():
-    graph = create_graph("precice-config.xml")
+    graph = create_graph("tests/mapping/precice-config.xml")
 
     violations_actual = get_actual_violations(graph)
 
