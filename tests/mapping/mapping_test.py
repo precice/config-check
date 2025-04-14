@@ -3,6 +3,7 @@ from precice_config_graph.nodes import ParticipantNode, MeshNode, Direction, Map
 from preciceconfigchecker.rules.mapping import MappingRule as m
 from preciceconfigchecker.rules.m2n_exchange import M2NExchangeRule as mn
 from preciceconfigchecker.rules.data_use_read_write import DataUseReadWriteRule as d
+from preciceconfigchecker.rules.coupling_scheme_mapping import CouplingSchemeMappingRule as csm
 
 from tests.test_utils import assert_equal_violations, get_actual_violations, create_graph
 
@@ -43,10 +44,6 @@ def test_mapping():
                 m_elevator = node
             elif node.name == "Incinerator-Mesh":
                 m_incinerator = node
-            elif node.name == "Forsaken-Mesh":
-                m_forsaken = node
-            elif node.name == "Popular-Mesh":
-                m_popular = node
             elif node.name == "Impostor-Mesh":
                 m_impostor = node
 
@@ -74,10 +71,6 @@ def test_mapping():
 
         m.IncorrectExchangeMappingViolation(p_incinerator, p_propagator, m_propagator, Direction.READ),
 
-        m.UnclaimedMeshMappingViolation(p_generator, m_forsaken, Direction.WRITE),
-
-        m.RepeatedlyClaimedMeshMappingViolation(p_generator, [p_generator, p_incinerator], m_popular, Direction.READ),
-
         m.SameParticipantMappingViolation(p_incinerator, m_incinerator, Direction.READ),
 
         m.MissingM2NMappingViolation(p_incinerator, p_propagator, m_propagator, Direction.READ),
@@ -90,7 +83,15 @@ def test_mapping():
 
         d.DataNotExchangedViolation(d_color, p_instigator, p_elevator),
 
-        d.DataNotExchangedViolation(d_color, p_propagator, p_incinerator)
+        d.DataNotExchangedViolation(d_color, p_propagator, p_incinerator),
+
+        d.DataNotExchangedViolation(d_color, p_instigator, p_elevator),
+
+        csm.MissingMappingCouplingSchemeViolation(p_generator, p_propagator, m_generator),
+
+        csm.MissingMappingCouplingSchemeViolation(p_incinerator, p_propagator, m_incinerator),
+
+        csm.MissingMappingCouplingSchemeViolation(p_generator, p_propagator, m_propagator)
     ]
 
     assert_equal_violations("Mapping-test", violations_expected, violations_actual)

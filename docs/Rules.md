@@ -59,7 +59,7 @@ A participant needs to be part of at least one m2n data exchange to exchange dat
 
 - `severity`: `error`
 
-### `Duplicate m2n exchange
+### Duplicate m2n exchange
 
 A participant can be part of more than one m2n exchange,
 but an m2n-exchange between two participants is only allowed to be defined once.
@@ -227,18 +227,6 @@ otherwise, there exists no correct data-exchange between the participants.
 
 - `severity`: `error`
 
-### Mesh in mapping is not provided by any participant
-
-A mesh that gets mentioned in a mapping does not get provided by any participant.
-
-- `severity`: `error`
-
-### Mesh in mapping gets provided by multiple participants
-
-A mesh that gets mentioned in a mapping gets provided by multiple participants.
-
-- `severity`: `error`
-
 ### Mapping is between the same participant
 
 Both meshes mentioned in the mapping get provided by the same participant.
@@ -261,7 +249,7 @@ After declaration, data has to be:
 - used in a mesh
 - written by a participant
 - read by a participant (or read through other means, e.g., of immediate export)
-- exchanged in a coupling-scheme, if it gets written and read by different participants.
+- exchanged in a coupling-scheme if it gets written and read by different participants.
 
 All other cases get checked here (minus the ones that get handled by `precice-tools check`).
 
@@ -314,8 +302,8 @@ This does not necessarily cause the simulation to malfunction or misbehave.
 ## (12) Disjoint simulations
 
 A simulation between participants A and B and a second one between participants C and D can run simultaneously without
-using any of the coupling features of preCICE. This will however deteriorate the readability of the configuration and
-make it more prone to errors.
+using any of the coupling features of preCICE.
+This will, however, deteriorate the readability of the configuration and make it more prone to errors.
 
 ### Fully disjoint
 
@@ -332,3 +320,45 @@ data in any way), but that reference the same data names. This is not considered
 might be an oversight here and will therefore be warned about.
 
 - `severity`: `warning`
+
+## (13) A mesh must be provided by exactly one participant
+
+Any mesh defined in the configuration must be provided by exactly one participant.
+Only then can the mesh be used in mappings, exchanges et cetera.
+
+### Mesh is not provided by any participant
+
+A mesh that gets mentioned in an arbitrary tag in the config does not get provided by any participant.
+
+- `severity`: `error`
+
+### Mesh gets provided by multiple participants
+
+A mesh that gets mentioned in an arbitrary tag in the config gets provided by multiple participants.
+
+- `severity`: `error`
+
+## (14) Exchange in coupling-scheme leads to mapping or api-access
+
+If two participants define a coupling-scheme between them, then they need a mapping or api-access to exchange data.
+
+An exchange of the form `from="A" to="B" mesh="A-Mesh"` implies that `A` writes data to `A-mesh`,
+exchanges it to `B`, who either has api-access and reads directly from it or defines a read-mapping to his own mesh.
+
+Analogously, an exchange of the form `from="A" to="B" mesh="B-Mesh"` implies that `A` writes data to one of his meshes
+(or directly to `B-Mesh`with api-access), maps it to `B-Mesh`, exchanges it to `B`, who then reads from it
+
+The same applies to a multi-coupling-scheme.
+
+### Coupling-scheme is missing a mapping
+
+If `A` and `B` do not fulfill the criteria explained above, a violation will be returned.
+
+- `severity`:`error`
+
+### Coupling-scheme with api-access is missing a mapping
+
+If `A` or `B` does have api-access to the correct mesh, it might still lead to an error in the simulation.
+However, as this is a valid use-case, only in debug mode will a warning be displayed.
+
+- `severity`:`debug`

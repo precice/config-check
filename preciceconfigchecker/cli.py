@@ -8,6 +8,7 @@ from precice_config_graph import graph as g, xml_processing
 
 from preciceconfigchecker.rules_processing import check_all_rules, print_all_results
 
+
 def main():
     path: str = None
     debug: bool = False
@@ -38,6 +39,7 @@ def main():
 
     # if the user uses severity=debug, then the severity has to be passed here as an argument
     print_all_results(violations_by_rule, debug)
+
 
 if __name__ == "__main__":
     sys.exit(main())

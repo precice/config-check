@@ -3,7 +3,7 @@ from networkx import Graph
 import preciceconfigchecker.color as c
 from preciceconfigchecker.rule import Rule
 from preciceconfigchecker.rules import missing_coupling, missing_exchange, data_use_read_write, compositional_coupling, \
-    mapping, m2n_exchange, disjoint_simulations
+    mapping, m2n_exchange, disjoint_simulations, provide_mesh, coupling_scheme_mapping
 from preciceconfigchecker.severity import Severity
 from preciceconfigchecker.violation import Violation
 
@@ -15,9 +15,12 @@ rules: list[Rule] = [
     m2n_exchange.M2NExchangeRule(),
     mapping.MappingRule(),
     disjoint_simulations.DisjointSimulationsRule(),
+    provide_mesh.ProvideMeshRule(),
+    coupling_scheme_mapping.CouplingSchemeMappingRule()
 ]
 
-def has_satisfied_rules(violations_by_rule: dict[Rule, list[Violation]], debug:bool) -> bool:
+
+def has_satisfied_rules(violations_by_rule: dict[Rule, list[Violation]], debug: bool) -> bool:
     """
     Checks if at least one rule is satisfied.
     If debug mode is enabled, violations with severity level DEBUG are also considered.
@@ -34,7 +37,8 @@ def has_satisfied_rules(violations_by_rule: dict[Rule, list[Violation]], debug:b
             return True
     return False
 
-def has_unsatisfied_rules(violations_by_rule: dict[Rule, list[Violation]], debug:bool):
+
+def has_unsatisfied_rules(violations_by_rule: dict[Rule, list[Violation]], debug: bool):
     """
     Checks if at least one rule is unsatisfied.
     If debug mode is enabled, violations with severity level DEBUG are also considered.
@@ -50,6 +54,7 @@ def has_unsatisfied_rules(violations_by_rule: dict[Rule, list[Violation]], debug
         if not rule.satisfied(violations, debug):
             return True
     return False
+
 
 def check_all_rules(graph: Graph, debug: bool) -> dict[Rule, list[Violation]]:
     """
@@ -89,6 +94,7 @@ def print_all_results(violations_by_rule: dict[Rule, list[Violation]], debug: bo
     Returns:
         None
     """
+
     def total_violations_by_severity(severity: Severity) -> int:
         """
         Counts how many violations of a severity type there are.
@@ -99,7 +105,7 @@ def print_all_results(violations_by_rule: dict[Rule, list[Violation]], debug: bo
         Returns:
             int: Number of severity type.
         """
-        result:int = 0
+        result: int = 0
         for violations in violations_by_rule.values():
             for violation in violations:
                 if violation.severity == severity:
@@ -151,7 +157,7 @@ def print_result(rule: Rule, violations: list[Violation], debug: bool) -> None:
             print(f" - {c.dyeing(rule.__class__.__name__, c.purple)}")
         return
     else:
-        rule_name:str = f"({c.dyeing(rule.__class__.__name__, c.purple)}) {rule.name}" if debug else f"{rule.name}"
+        rule_name: str = f"({c.dyeing(rule.__class__.__name__, c.purple)}) {rule.name}" if debug else f"{rule.name}"
         print(rule_name)
 
         for violation in violations:
