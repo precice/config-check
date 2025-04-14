@@ -30,7 +30,7 @@ class MappingRule(Rule):
         def format_explanation(self) -> str:
             out: str = (f"The participant {self.participant.name} is specifying a {self.direction.value}-mapping "
                         f"{self.connecting_word} mesh {self.mesh.name}, which is his own mesh.")
-            out += f"The mapping is from participant {self.participant.name} to participant {self.participant.name}."
+            out += f"\nThe mapping is on {self.participant.name}'s own meshes, which is forbidden."
             return out
 
         def format_possible_solutions(self) -> list[str]:
@@ -141,7 +141,7 @@ class MappingRule(Rule):
 
         def format_possible_solutions(self) -> list[str]:
             out: list[str] = []
-            out += [f"Create a coupling-scheme between participants {self.parent.name} and {self.stranger.name} with an"
+            out += [f"Create a coupling-scheme between participants {self.parent.name} and {self.stranger.name} with an "
                     f"exchange to exchange data between them."]
             out += ["Otherwise, please remove the mapping to improve readability."]
             return out
