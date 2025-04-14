@@ -1,6 +1,6 @@
 from precice_config_graph.nodes import ParticipantNode, MeshNode, Direction, MappingConstraint, MappingMethod, DataNode
 
-from preciceconfigchecker.rules.mapping import MappingRule as m, MappingRule
+from preciceconfigchecker.rules.mapping import MappingRule as m
 from preciceconfigchecker.rules.m2n_exchange import M2NExchangeRule as mn
 from preciceconfigchecker.rules.data_use_read_write import DataUseReadWriteRule as d
 from preciceconfigchecker.rules.coupling_scheme_mapping import CouplingSchemeMappingRule as csm
@@ -76,7 +76,7 @@ def test_mapping():
         m.MissingM2NMappingViolation(p_incinerator, p_propagator, m_propagator, Direction.READ),
 
         m.MappingMissingDataProcessingViolation(p_propagator, p_generator, m_propagator, m_generator, Direction.WRITE,
-                                                MappingRule.MissingDataProcessing.READ_DATA),
+                                                m.MissingDataProcessing.READ_DATA),
 
         mn.MissingM2NEchangeViolation(p_incinerator),
 
