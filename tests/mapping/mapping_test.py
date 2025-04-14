@@ -1,16 +1,15 @@
 from precice_config_graph.nodes import ParticipantNode, MeshNode, Direction, MappingConstraint, MappingMethod, DataNode
 
-from preciceconfigchecker.rules.mapping import MappingRule as m
+from preciceconfigchecker.rules.mapping import MappingRule as m, MappingRule
 from preciceconfigchecker.rules.m2n_exchange import M2NExchangeRule as mn
 from preciceconfigchecker.rules.data_use_read_write import DataUseReadWriteRule as d
 from preciceconfigchecker.rules.coupling_scheme_mapping import CouplingSchemeMappingRule as csm
-from preciceconfigchecker.rules_processing import print_all_results, check_all_rules
 
 from tests.test_utils import assert_equal_violations, get_actual_violations, create_graph
 
 
 def test_mapping():
-    graph = create_graph("tests/mapping/precice-config.xml")
+    graph = create_graph("precice-config.xml")
 
     violations_actual = get_actual_violations(graph)
 
@@ -76,7 +75,8 @@ def test_mapping():
 
         m.MissingM2NMappingViolation(p_incinerator, p_propagator, m_propagator, Direction.READ),
 
-        m.MappingMissingDataProcessingViolation(p_propagator, p_generator, m_propagator, m_generator, Direction.WRITE),
+        m.MappingMissingDataProcessingViolation(p_propagator, p_generator, m_propagator, m_generator, Direction.WRITE,
+                                                MappingRule.MissingDataProcessing.READ_DATA),
 
         mn.MissingM2NEchangeViolation(p_incinerator),
 
@@ -86,13 +86,11 @@ def test_mapping():
 
         d.DataNotExchangedViolation(d_color, p_instigator, p_elevator),
 
-        csm.MissingMappingCouplingSchemeViolation(p_propagator,p_generator, m_propagator),
+        csm.MissingMappingCouplingSchemeViolation(p_propagator, p_generator, m_propagator),
 
         csm.MissingMappingCouplingSchemeViolation(p_incinerator, p_propagator, m_incinerator),
 
         csm.MissingMappingCouplingSchemeViolation(p_generator, p_propagator, m_generator)
     ]
-    print_all_results(check_all_rules(graph,True),True)
-
 
     assert_equal_violations("Mapping-test", violations_expected, violations_actual)
