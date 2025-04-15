@@ -4,6 +4,7 @@ from networkx import Graph
 from precice_config_graph.nodes import DataNode, MeshNode, ReadDataNode, WriteDataNode, WatchPointNode, ExportNode, \
     WatchIntegralNode, ParticipantNode, ExchangeNode, ActionNode, ReceiveMeshNode
 from preciceconfigchecker.rule import Rule
+from preciceconfigchecker.rule_utils import format_list
 from preciceconfigchecker.severity import Severity
 from preciceconfigchecker.violation import Violation
 
@@ -35,19 +36,8 @@ class DataUseReadWriteRule(Rule):
 
         def __init__(self, data_node: DataNode, meshes: list[MeshNode]):
             self.data_node = data_node
-            self.form = ""
-            if len(meshes) > 1:
-                self.form = "es"
-            meshes_s = sorted(meshes, key=lambda x: x.name)
-            self.names = meshes_s[0].name
-            if len(meshes) > 1:
-                for i in range(1, len(meshes_s) - 1):
-                    self.names += ", "
-                    self.names += meshes_s[i].name
-                # Last mesh has to be connected with "and", the others with a comma.
-                self.names += " and "
-                # Name of last mesh
-                self.names += meshes_s[-1].name
+            self.form = "es" if len(meshes) > 1 else ""
+            self.names = format_list([m.name for m in meshes])
 
         def format_explanation(self) -> str:
             # self.form ensures the correct number (multiplicity) for the word mesh (i.e., mesh or meshes)
@@ -74,16 +64,7 @@ class DataUseReadWriteRule(Rule):
             if len(writers) > 1:
                 self.form = "s"
                 self.form2 = "are"
-            writers_s = sorted(writers, key=lambda x: x.name)
-            self.names = writers_s[0].name
-            if len(writers) > 1:
-                for i in range(1, len(writers_s) - 1):
-                    self.names += ", "
-                    self.names += writers_s[i].name
-                # Last mesh has to be connected with "and", the others with a comma.
-                self.names += " and "
-                # Name of last mesh
-                self.names += writers_s[-1].name
+            self.names = format_list([w.name for w in writers])
 
         def format_explanation(self) -> str:
             return (f"Data {self.data_node.name} is used in mesh {self.mesh.name} and participant{self.form} "
@@ -110,16 +91,7 @@ class DataUseReadWriteRule(Rule):
             if len(readers) > 1:
                 self.form = "s"
                 self.form2 = "are"
-            readers_s = sorted(readers, key=lambda x: x.name)
-            self.names = readers_s[0].name
-            if len(readers) > 1:
-                for i in range(1, len(readers_s) - 1):
-                    self.names += ", "
-                    self.names += readers_s[i].name
-                # Last mesh has to be connected with "and", the others with a comma.
-                self.names += " and "
-                # Name of last mesh
-                self.names += readers_s[-1].name
+            self.names = format_list([r.name for r in readers])
 
         def format_explanation(self) -> str:
             return (f"Data {self.data_node.name} is being used in mesh {self.mesh.name} and participant{self.form} "

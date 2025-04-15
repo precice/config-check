@@ -3,6 +3,7 @@ from networkx import Graph
 from precice_config_graph.nodes import ParticipantNode, DataNode
 
 from preciceconfigchecker.rule import Rule
+from preciceconfigchecker.rule_utils import format_list
 from preciceconfigchecker.severity import Severity
 from preciceconfigchecker.violation import Violation
 
@@ -12,7 +13,7 @@ default_possible_solutions = [
 
 
 class DisjointSimulationsRule(Rule):
-    name = "Couplings must not be disjoint"
+    name = "Couplings should not be disjoint"
 
     class CommonDisjointSimulationsViolation(Violation):
         participant_sets: frozenset[frozenset[ParticipantNode]]
@@ -27,8 +28,7 @@ class DisjointSimulationsRule(Rule):
                            f"other{details}. ")
 
             def format_set(participants: frozenset[ParticipantNode]) -> str:
-                value = [participant.name for participant in participants]
-                return ", ".join(sorted(value))
+                return format_list([p.name for p in participants])
 
             if len(self.participant_sets) == 2:
                 [participants_a, participants_b] = list(self.participant_sets)

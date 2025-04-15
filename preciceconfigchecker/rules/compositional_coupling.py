@@ -2,6 +2,7 @@ import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import CouplingSchemeNode, MultiCouplingSchemeNode, ParticipantNode, CouplingSchemeType
 from preciceconfigchecker.rule import Rule
+from preciceconfigchecker.rule_utils import format_list
 from preciceconfigchecker.severity import Severity
 from preciceconfigchecker.violation import Violation
 
@@ -12,21 +13,13 @@ class CompositionalCouplingRule(Rule):
 
     class CompositionalDeadlockViolation(Violation):
         """
-            This class handels participants exchanging data through coupling schemes in a circular way, which leads
+            This class handles participants exchanging data through coupling schemes in a circular way, which leads
             to a deadlock.
         """
         severity = Severity.ERROR
 
         def __init__(self, participants: list[ParticipantNode]) -> None:
-            participants_s = sorted(participants, key=lambda participant: participant.name)
-            self.names = ""
-            for i in range(len(participants_s) - 1):
-                self.names += participants_s[i].name
-                self.names += ", "
-            # Last participant has to be connected with "and", the others with a comma.
-            self.names += "and "
-            # Name of last participant
-            self.names += participants_s[-1].name
+            self.names = format_list([p.name for p in participants])
 
         def format_explanation(self) -> str:
             return f"Participants {self.names} are involved in a circularly dependent (serial) coupling."
@@ -36,7 +29,6 @@ class CompositionalCouplingRule(Rule):
 
     def check(self, graph: Graph) -> list[Violation]:
         violations = []
-        participants = []
         coupling_edges = []
         # Only coupling schemes are important for this evaluation
         g1 = nx.subgraph_view(graph, filter_node=filter_coupling_scheme_nodes)
