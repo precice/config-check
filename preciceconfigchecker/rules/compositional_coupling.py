@@ -32,7 +32,7 @@ class CompositionalCouplingRule(Rule):
             return f"Participants {self.names} are involved in a circularly dependent (serial) coupling."
 
         def format_possible_solutions(self) -> list[str]:
-            return [f"Please change the structure of couplings between participants {self.names}."]
+            return [f"Please change the structure of couplings between {self.names}."]
 
     def check(self, graph: Graph) -> list[Violation]:
         violations = []
