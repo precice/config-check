@@ -36,3 +36,5 @@ def format_list(items: list[str], conjunction: str = "and", sort: bool = True) -
         ])
     elif len(items) == 1:
         return items[0]
+    else:
+        return ""
