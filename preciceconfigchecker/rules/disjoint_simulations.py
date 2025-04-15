@@ -12,7 +12,7 @@ default_possible_solutions = [
 
 
 class DisjointSimulationsRule(Rule):
-    name = "Couplings must not be disjoint"
+    name = "Couplings should not be disjoint"
 
     class CommonDisjointSimulationsViolation(Violation):
         participant_sets: frozenset[frozenset[ParticipantNode]]
