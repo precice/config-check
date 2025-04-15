@@ -12,7 +12,7 @@ class CompositionalCouplingRule(Rule):
 
     class CompositionalDeadlockViolation(Violation):
         """
-            This class handels participants exchanging data through coupling schemes in a circular way, which leads
+            This class handles participants exchanging data through coupling schemes in a circular way, which leads
             to a deadlock.
         """
         severity = Severity.ERROR
@@ -36,7 +36,6 @@ class CompositionalCouplingRule(Rule):
 
     def check(self, graph: Graph) -> list[Violation]:
         violations = []
-        participants = []
         coupling_edges = []
         # Only coupling schemes are important for this evaluation
         g1 = nx.subgraph_view(graph, filter_node=filter_coupling_scheme_nodes)
