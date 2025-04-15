@@ -20,10 +20,10 @@ class ProvideMeshRule(Rule):
             self.mesh = mesh
 
         def format_explanation(self) -> str:
-            return f"The mesh {self.mesh.name} does not get provided by any participant."
+            return f"Mesh {self.mesh.name} does not get provided by any participant."
 
         def format_possible_solutions(self) -> list[str]:
-            return [f"Please let any participant provide the mesh {self.mesh.name}.",
+            return [f"Please let any participant provide {self.mesh.name}.",
                     "Otherwise, please remove it to improve readability."]
 
     class RepeatedlyClaimedMeshViolation(Violation):
@@ -46,7 +46,7 @@ class ProvideMeshRule(Rule):
             self.names += participants_s[-1].name
 
         def format_explanation(self) -> str:
-            return f"The mesh {self.mesh.name} is provided by participants {self.names}."
+            return f"Mesh {self.mesh.name} is provided by participants {self.names}."
 
         def format_possible_solutions(self) -> list[str]:
             return [f"Ensure that only one participant provides {self.mesh.name}."]
