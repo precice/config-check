@@ -23,10 +23,11 @@ class DisjointSimulationsRule(Rule):
             self.participant_sets = participant_sets
 
         def assemble_from_default_explanation(self, details: str = "") -> str:
-            explanation = f"There are {len(self.participant_sets)} simulations that do not interact with each other{details}. "
+            explanation = (f"There are {len(self.participant_sets)} simulations that do not interact with each "
+                           f"other{details}. ")
 
             def format_set(participants: frozenset[ParticipantNode]) -> str:
-                value = [ participant.name for participant in participants ]
+                value = [participant.name for participant in participants]
                 return ", ".join(sorted(value))
 
             if len(self.participant_sets) == 2:
@@ -36,7 +37,8 @@ class DisjointSimulationsRule(Rule):
                 do_str = "do" if len(participants_a) > 1 else "does"
                 participants_b_label = "participants" if len(participants_b) > 1 else "participant"
 
-                explanation += f"{participants_a_label} {format_set(participants_a)} {do_str} not communicate with {participants_b_label} {format_set(participants_b)}."
+                explanation += (f"{participants_a_label} {format_set(participants_a)} {do_str} not communicate with "
+                                f"{participants_b_label} {format_set(participants_b)}.")
             else:
                 explanation += f"Disjoint groups:"
                 for component in self.participant_sets:
@@ -54,9 +56,7 @@ class DisjointSimulationsRule(Rule):
             return self.assemble_from_default_explanation()
 
         def format_possible_solutions(self) -> list[str]:
-            return default_possible_solutions + [
-                "Add some data to be exchanged between these simulations.",
-            ]
+            return default_possible_solutions + ["Add some data to be exchanged between these simulations.",]
 
     class SharedDataDisjointSimulationsViolation(CommonDisjointSimulationsViolation):
         severity = Severity.WARNING
@@ -70,9 +70,7 @@ class DisjointSimulationsRule(Rule):
             return self.assemble_from_default_explanation(f", but share data {self.shared_data.name}")
 
         def format_possible_solutions(self) -> list[str]:
-            return default_possible_solutions + [
-                "Exchange the data between these simulations.",
-            ]
+            return default_possible_solutions + ["Exchange the data between these simulations.",]
 
     def check(self, graph: Graph) -> list[Violation]:
         def is_participant(node) -> bool:
@@ -130,8 +128,8 @@ class DisjointSimulationsRule(Rule):
                 if any_node in potential_home_component:
                     home_component = potential_home_component
 
-            assert home_component is not None,\
-                "Any dataless component is always in an overall component"
+            assert home_component is not None, \
+                "Any dataless component is always in an overall component."
 
             # Now, use this home component to add this dataless component to one or more data names
             related_data = filter(is_data_node, home_component)
