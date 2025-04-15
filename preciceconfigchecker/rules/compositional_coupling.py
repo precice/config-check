@@ -2,6 +2,7 @@ import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import CouplingSchemeNode, MultiCouplingSchemeNode, ParticipantNode, CouplingSchemeType
 from preciceconfigchecker.rule import Rule
+from preciceconfigchecker.rule_utils import format_list
 from preciceconfigchecker.severity import Severity
 from preciceconfigchecker.violation import Violation
 
@@ -18,15 +19,7 @@ class CompositionalCouplingRule(Rule):
         severity = Severity.ERROR
 
         def __init__(self, participants: list[ParticipantNode]) -> None:
-            participants_s = sorted(participants, key=lambda participant: participant.name)
-            self.names = ""
-            for i in range(len(participants_s) - 1):
-                self.names += participants_s[i].name
-                self.names += ", "
-            # Last participant has to be connected with "and", the others with a comma.
-            self.names += "and "
-            # Name of last participant
-            self.names += participants_s[-1].name
+            self.names = format_list([p.name for p in participants])
 
         def format_explanation(self) -> str:
             return f"Participants {self.names} are involved in a circularly dependent (serial) coupling."

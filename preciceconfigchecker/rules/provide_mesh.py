@@ -3,6 +3,7 @@ from networkx import Graph
 from precice_config_graph.nodes import ParticipantNode, MeshNode
 
 from preciceconfigchecker.rule import Rule
+from preciceconfigchecker.rule_utils import format_list
 from preciceconfigchecker.severity import Severity
 from preciceconfigchecker.violation import Violation
 
@@ -35,15 +36,7 @@ class ProvideMeshRule(Rule):
 
         def __init__(self, participants: list[ParticipantNode], mesh: MeshNode):
             self.mesh = mesh
-            participants_s = sorted(participants, key=lambda participant: participant.name)
-            self.names = participants_s[0].name
-            for i in range(1, len(participants_s) - 1):
-                self.names += ", "
-                self.names += participants_s[i].name
-            # The last participant has to be connected with "and", the others with a comma.
-            self.names += " and "
-            # Name of last participant
-            self.names += participants_s[-1].name
+            self.names = format_list([p.name for p in participants])
 
         def format_explanation(self) -> str:
             return f"Mesh {self.mesh.name} is provided by participants {self.names}."
