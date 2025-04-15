@@ -80,9 +80,8 @@ class CouplingSchemeMappingRule(Rule):
             return out
 
         def format_possible_solutions(self) -> list[str]:
-            return [
-                f"Specifying a just-in-time {self.direction.value}-mapping at {self.mapper.name} will make the exchange "
-                f"of data more reliable."]
+            return [f"Specifying a just-in-time {self.direction.value}-mapping at {self.mapper.name} will make the "
+                    f"exchange of data more reliable."]
 
     def check(self, graph: Graph) -> list[Violation]:
         violations: list[Violation] = []
