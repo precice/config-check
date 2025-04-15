@@ -54,9 +54,9 @@ class DataUseReadWriteRule(Rule):
             return f"Data {self.data_node.name} gets used in mesh{self.form} {self.names}, but nobody is reading or writing it."
 
         def format_possible_solutions(self) -> list[str]:
-            return [f"Consider having a participant read data {self.data_node.name}.",
-                    f"Consider having a participant write data {self.data_node.name}.",
-                    "Otherwise please remove it to improve readability."]
+            return [f"Consider having a participant read {self.data_node.name}.",
+                    f"Consider having a participant write {self.data_node.name}.",
+                    "Otherwise, please remove it to improve readability."]
 
     class DataUsedNotReadWrittenViolation(Violation):
         """
@@ -86,14 +86,13 @@ class DataUseReadWriteRule(Rule):
                 self.names += writers_s[-1].name
 
         def format_explanation(self) -> str:
-            return (
-                f"Data {self.data_node.name} is used in mesh {self.mesh.name} and participant{self.form} {self.names} "
-                f"{self.form2} writing it, but nobody is reading it.")
+            return (f"Data {self.data_node.name} is used in mesh {self.mesh.name} and participant{self.form} "
+                    f"{self.names} {self.form2} writing it, but nobody is reading it.")
 
         def format_possible_solutions(self) -> list[str]:
             return [f"Consider having a participant read data {self.data_node.name}.",
-                    f"Consider exporting data {self.data_node.name} by a participant.",
-                    f"Consider using watchpoints or watch-integrals to keep track of data {self.data_node.name}.",
+                    f"Consider exporting {self.data_node.name} by a participant.",
+                    f"Consider using watchpoints or watch-integrals to keep track of {self.data_node.name}.",
                     "Otherwise please remove it to improve readability."]
 
     class DataUsedReadNotWrittenViolation(Violation):
@@ -147,8 +146,8 @@ class DataUseReadWriteRule(Rule):
                     f"but not exchanged between them.")
 
         def format_possible_solutions(self) -> list[str]:
-            return [f"Please exchange {self.data_node.name} in a coupling-scheme between participants "
-                    f"{self.writer.name} and {self.reader.name}"]
+            return [f"Please exchange {self.data_node.name} in a coupling-scheme between {self.writer.name} and "
+                    f"{self.reader.name}"]
 
     def check(self, graph: Graph) -> list[Violation]:
         violations: list[Violation] = []
@@ -172,11 +171,10 @@ class DataUseReadWriteRule(Rule):
                 for neighbor in g1.neighbors(data_node):
                     # Check if data gets used by a mesh
                     if isinstance(neighbor, MeshNode):
-                        # else: continue on not found?
                         try:
                             parent = parents_of_meshes[neighbor]
                         except KeyError:
-                            # TODO Will be handled in mesh.py
+                            # Is handled in provide_mesh.py
                             continue
                         use_data = True
                         meshes += [neighbor]

@@ -6,9 +6,9 @@ from preciceconfigchecker.violation import Violation
 
 
 class M2NExchangeRule(Rule):
-    name = "M2N Exchange Rule."
+    name = "M2N-exchange rule."
 
-    class MissingM2NEchangeViolation(Violation):
+    class MissingM2NExchangeViolation(Violation):
         """
             This class handles a participant not being part of an M2N exchange.
         """
@@ -21,9 +21,7 @@ class M2NExchangeRule(Rule):
             return f"Participant {self.participant.name} is not part of an M2N exchange."
 
         def format_possible_solutions(self) -> list[str]:
-            return [
-                f"Please create an M2N exchange between participant {self.participant.name} and another participant.",
-                f"Otherwise, please remove participant {self.participant.name} to improve readability."]
+            return [f"Please create an M2N exchange between {self.participant.name} and another participant."]
 
     class DuplicateM2NExchangeViolation(Violation):
         """
@@ -36,12 +34,12 @@ class M2NExchangeRule(Rule):
             self.participant2 = calo_nord
 
         def format_explanation(self) -> str:
-            return (f"There is more than one M2N exchange between participant {self.participant1.name} and "
-                    f"participant {self.participant2.name}.")
+            return (f"There is more than one M2N exchange between participants {self.participant1.name} and "
+                    f"{self.participant2.name}.")
 
         def format_possible_solutions(self) -> list[str]:
-            return [f"Please remove duplicate M2N exchanges between participant {self.participant1.name} and "
-                    f"participant {self.participant2.name}."]
+            return [f"Please remove duplicate M2N exchanges between {self.participant1.name} and "
+                    f"{self.participant2.name}."]
 
     def check(self, graph: Graph) -> list[Violation]:
         violations: list[Violation] = []
@@ -65,7 +63,7 @@ class M2NExchangeRule(Rule):
         # Check every participant if it gets mentioned in an M2N exchange
         for participant in participants:
             if participant not in m2n_participants:
-                violations.append(self.MissingM2NEchangeViolation(participant))
+                violations.append(self.MissingM2NExchangeViolation(participant))
 
         # Check every M2N for duplicates
         for m2n in m2ns:
