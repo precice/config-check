@@ -24,7 +24,7 @@ def format_list(items: list[str], conjunction: str = "and", sort: bool = True) -
     :return: concatenated string
     """
     if sort:
-        items.sort()
+        items = sorted(items)
 
     if len(items) > 1:
         last_item = items.pop()
