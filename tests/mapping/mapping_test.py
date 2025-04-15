@@ -77,7 +77,7 @@ def test_mapping():
 
         m.MappingMissingDataProcessingViolation(p_propagator, p_generator, m_propagator, m_generator, Direction.WRITE,
                                                 mdp.READ_DATA),
-        mn.MissingM2NEchangeViolation(p_incinerator),
+        mn.MissingM2NExchangeViolation(p_incinerator),
 
         d.DataNotExchangedViolation(d_color, p_generator, p_alligator),
 

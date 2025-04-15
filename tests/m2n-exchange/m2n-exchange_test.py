@@ -21,7 +21,7 @@ def test_m2n_exchange():
                 n_instigator = node
 
     violations_expected = [
-        e.MissingM2NEchangeViolation(n_alligator),
+        e.MissingM2NExchangeViolation(n_alligator),
         e.DuplicateM2NExchangeViolation(n_generator, n_propagator),
         d.FullyDisjointSimulationsViolation(frozenset([
             frozenset([n_generator, n_propagator, n_instigator]),
