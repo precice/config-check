@@ -38,7 +38,7 @@ class MappingRule(Rule):
                 self.connecting_word = "to"
 
         def format_explanation(self) -> str:
-            out: str = (f"The participant {self.participant.name} is specifying a {self.direction.value}-mapping "
+            out: str = (f"Participant {self.participant.name} is specifying a {self.direction.value}-mapping "
                         f"{self.connecting_word} mesh {self.mesh.name}, which is his own mesh.")
             out += f"\nThe mapping is on {self.participant.name}'s own meshes, which is forbidden."
             return out
@@ -65,27 +65,24 @@ class MappingRule(Rule):
                 self.connecting_word = "to"
 
         def format_explanation(self) -> str:
-            out: str = (f"The participant {self.parent.name} is specifying a {self.direction.value}-mapping "
+            out: str = (f"Participant {self.parent.name} is specifying a {self.direction.value}-mapping "
                         f"{self.connecting_word} participant {self.stranger.name}, but the exchange in the coupling-"
                         f"scheme between them is incorrect.")
-            out += (
-                f"\nFor a {self.direction.value}-mapping, the mesh {self.mesh.name} should be used to exchange "
-                f"data and the participant specifying the {self.connecting_word}-mesh should be the "
-                f"{self.connecting_word}-participant in the exchange.")
+            out += (f"\nFor a {self.direction.value}-mapping, {self.mesh.name} should be used to exchange "
+                    f"data and the participant specifying the {self.connecting_word}-mesh should be the "
+                    f"{self.connecting_word}-participant in the exchange.")
             return out
 
         def format_possible_solutions(self) -> list[str]:
             out: list[str] = []
             # In a 'read' mapping, the 'from' mesh is by Stranger => Stranger should be from-participant in exchange.
             if self.direction == Direction.READ:
-                out += [f"Add an exchange from participant {self.stranger.name} to participant {self.parent.name}, "
-                        f"which uses participant {self.stranger.name}'s mesh {self.mesh.name} to the coupling-scheme "
-                        f"between them."]
+                out += [f"Add an exchange from {self.stranger.name} to {self.parent.name}, which uses "
+                        f"{self.stranger.name}'s mesh {self.mesh.name} to the coupling-scheme between them."]
             # In a 'write' mapping, the 'to' mesh is by Stranger => Stranger should be to-participant in exchange.
             elif self.direction == Direction.WRITE:
-                out += [f"Add an exchange from participant {self.parent.name} to participant {self.stranger.name}, "
-                        f"which uses participant {self.stranger.name}'s mesh {self.mesh.name}, to the coupling-scheme "
-                        f"between them."]
+                out += [f"Add an exchange from {self.parent.name} to {self.stranger.name}, which uses "
+                        f"{self.stranger.name}'s mesh {self.mesh.name}, to the coupling-scheme between them."]
             return out
 
     class MissingExchangeMappingViolation(Violation):
@@ -106,10 +103,10 @@ class MappingRule(Rule):
                 self.connecting_word = "to"
 
         def format_explanation(self) -> str:
-            out: str = (f"The participant {self.parent.name} is specifying a {self.direction.value}-mapping "
+            out: str = (f"Participant {self.parent.name} is specifying a {self.direction.value}-mapping "
                         f"{self.connecting_word} participant {self.stranger.name}'s mesh {self.mesh.name}, "
                         f"but there is no exchange for it in the coupling-scheme between them.")
-            out += (f"\nFor a {self.direction.value}-mapping, the mesh {self.mesh.name} should be used to "
+            out += (f"\nFor a {self.direction.value}-mapping, {self.mesh.name} should be used to "
                     f"exchange data.")
             return out
 
@@ -117,14 +114,12 @@ class MappingRule(Rule):
             out: list[str] = []
             # In a 'read' mapping, the 'from' mesh is by Stranger => Stranger should be from-participant in exchange.
             if self.direction == Direction.READ:
-                out += [f"Add an exchange from participant {self.stranger.name} to participant {self.parent.name}, "
-                        f"which uses participant {self.stranger.name}'s mesh {self.mesh.name} to the coupling-scheme "
-                        f"between them."]
+                out = [f"Add an exchange from {self.stranger.name} to {self.parent.name}, which uses "
+                       f"{self.stranger.name}'s mesh {self.mesh.name} to the coupling-scheme between them."]
             # In a 'write' mapping, the 'to' mesh is by Stranger => Stranger should be to-participant in exchange.
             elif self.direction == Direction.WRITE:
-                out += [f"Add an exchange from participant {self.parent.name} to participant {self.stranger.name}, "
-                        f"which uses participant {self.stranger.name}'s mesh {self.mesh.name} to the coupling-scheme "
-                        f"between them."]
+                out = [f"Add an exchange from {self.parent.name} to {self.stranger.name}, which uses "
+                       f"{self.stranger.name}'s mesh {self.mesh.name} to the coupling-scheme between them."]
             return out
 
     class MissingCouplingSchemeMappingViolation(Violation):
@@ -145,15 +140,14 @@ class MappingRule(Rule):
                 self.connecting_word = "to"
 
         def format_explanation(self) -> str:
-            return (f"The participant {self.parent.name} is specifying a {self.direction.value}-mapping "
+            return (f"Participant {self.parent.name} is specifying a {self.direction.value}-mapping "
                     f"{self.connecting_word} participant {self.stranger.name}, but there does not exist a "
                     f"coupling-scheme between them.")
 
         def format_possible_solutions(self) -> list[str]:
             out: list[str] = []
-            out += [
-                f"Create a coupling-scheme between participants {self.parent.name} and {self.stranger.name} with an "
-                f"exchange to exchange data between them."]
+            out += [f"Create a coupling-scheme between {self.parent.name} and {self.stranger.name} with an "
+                    f"exchange to exchange data between them."]
             out += ["Otherwise, please remove the mapping to improve readability."]
             return out
 
@@ -181,8 +175,8 @@ class MappingRule(Rule):
 
         def format_possible_solutions(self) -> list[str]:
             out: list[str] = []
-            out += [f"Create an m2n-exchange between participants {self.parent.name} and {self.stranger.name}"
-                    f" to exchange data between them."]
+            out += [f"Create an m2n-exchange between {self.parent.name} and {self.stranger.name} to exchange data "
+                    f"between them."]
             out += ["Otherwise, please remove the mapping to improve readability."]
             return out
 
@@ -204,45 +198,39 @@ class MappingRule(Rule):
             self.constraint = constraint
 
         def format_explanation(self) -> str:
-            out: str = f"The participants {self.parent.name} and {self.stranger.name} are executing in parallel."
-            out += (
-                f"\nThe {self.direction.value}-mapping specified by participant {self.parent.name} on meshes "
-                f"{self.mesh_parent.name} and {self.mesh_stranger.name} with constraint=\"{self.constraint.value}\" "
-                f"is is invalid.")
-            out += (
-                "\nFor parallel participants, only mappings of the form read-consistent and write-conservative are "
-                "allowed.")
+            out: str = f"Participants {self.parent.name} and {self.stranger.name} are executing in parallel."
+            out += (f"\nThe {self.direction.value}-mapping specified by {self.parent.name} on meshes "
+                    f"{self.mesh_parent.name} and {self.mesh_stranger.name} with constraint=\"{self.constraint.value}\" "
+                    f"is is invalid.")
+            out += ("\nFor parallel participants, only mappings of the form read-consistent and write-conservative are "
+                    "allowed.")
             return out
 
         def format_possible_solutions(self) -> list[str]:
             out: list[str] = []
             # Mapping format is "almost" correct
             if self.direction == Direction.READ and self.constraint == MappingConstraint.CONSERVATIVE:
-                out += [
-                    f"Consider changing either the direction of the mapping between participants {self.parent.name} and "
-                    f"{self.stranger.name} to direction=\"write\" or the constraint of the mapping to constraint="
-                    f"\"consistent\"."]
+                out += [f"Consider changing either the direction of the mapping between {self.parent.name} and "
+                        f"{self.stranger.name} to direction=\"write\" or the constraint of the mapping to constraint="
+                        f"\"consistent\"."]
                 out += [f"The effect of a read-conservative mapping can be achieved by moving the mapping from "
-                        f"participant {self.parent.name} to participant {self.stranger.name} and changing its direction "
-                        f"to \"write\"."]
+                        f"{self.parent.name} to {self.stranger.name} and changing its direction to \"write\"."]
                 out += [f"When moving the mapping, remember to update the <exchange .../> tag in the participants "
                         f"coupling-scheme."]
             elif self.direction == Direction.WRITE and self.constraint == MappingConstraint.CONSISTENT:
-                out += [
-                    f"Consider changing either the direction of the mapping between participants {self.parent.name} and "
-                    f"{self.stranger.name} to direction=\"read\" or the constraint of the mapping to constraint="
-                    f"\"conservative\"."]
+                out += [f"Consider changing either the direction of the mapping between {self.parent.name} and "
+                        f"{self.stranger.name} to direction=\"read\" or the constraint of the mapping to constraint="
+                        f"\"conservative\"."]
                 out += [f"The effect of a write-consistent mapping can be achieved by moving the mapping from "
-                        f"participant {self.parent.name} to participant {self.stranger.name} and changing its direction "
-                        f"to \"read\"."]
+                        f"{self.parent.name} to {self.stranger.name} and changing its direction to \"read\"."]
                 out += [f"When moving the mapping, remember to update the <exchange .../> tag in the participants "
                         f"coupling-scheme."]
             # Generic answers for arbitrary constraints
             elif self.direction == Direction.READ:
-                out += [f"Consider changing the constraint of the mapping between participants {self.parent.name} and "
+                out += [f"Consider changing the constraint of the mapping between {self.parent.name} and "
                         f"{self.stranger.name} from \"{self.constraint.value}\" to \"consistent\"."]
             elif self.direction == Direction.WRITE:
-                out += [f"Consider changing the constraint of the mapping between participants {self.parent.name} and "
+                out += [f"Consider changing the constraint of the mapping between {self.parent.name} and "
                         f"{self.stranger.name} from \"{self.constraint.value}\" to \"conservative\"."]
             return out
 
@@ -282,11 +270,10 @@ class MappingRule(Rule):
         def format_possible_solutions(self) -> list[str]:
             sol: list[str] = []
             sol += [
-                f"Either change direction=\"{self.direction.value}\" to direction=\"{self.inverse_direction.value}\""
-                f", or swap meshes {self.mesh_parent.name} and {self.mesh_stranger.name}."]
-            sol += [f"Move the mapping from participant {self.parent.name} to participant "
-                    f"{self.stranger.name}, change its direction and remember to switch the mesh used in the "
-                    f"<exchange .../> tag in their coupling scheme."]
+                f"Either change direction=\"{self.direction.value}\" to direction=\"{self.inverse_direction.value}\", "
+                f"or swap meshes {self.mesh_parent.name} and {self.mesh_stranger.name}."]
+            sol += [f"Move the mapping from {self.parent.name} to {self.stranger.name}, change its direction and "
+                    f"remember to update the mesh used in the <exchange .../> tag in their coupling scheme."]
             sol += ["Otherwise, please remove it to improve readability."]
             return sol
 
@@ -317,7 +304,7 @@ class MappingRule(Rule):
         def format_explanation(self) -> str:
             out: str = (f"Participant {self.parent.name} is specifying a {self.direction.value}-mapping "
                         f"{self.connecting_word} participant {self.stranger.name}'s mesh {self.mesh_stranger.name} "
-                        f"{self.inverse_connector} participant {self.parent.name}'s mesh {self.mesh_parent.name}.")
+                        f"{self.inverse_connector} {self.parent.name}'s mesh {self.mesh_parent.name}.")
             if self.missing_data_processing == MissingDataProcessing.READ_DATA:
                 if self.direction == Direction.WRITE:
                     out += (f"\nHowever, it seems like {self.stranger.name} does not {self.inverse_direction.value} "
@@ -386,10 +373,10 @@ class MappingRule(Rule):
                     f"does not have access to it.")
 
         def format_possible_solutions(self) -> list[str]:
-            return [f"Let participant {self.parent.name} receive mesh {self.mesh.name} from participant "
-                    f"{self.stranger.name} with the attribute api-access=\"true\".",
-                    f"Map the values from mesh {self.mesh.name} to a mesh by participant {self.parent.name}, before"
-                    f" {self.direction.value}ing them.",
+            return [f"Let {self.parent.name} receive mesh {self.mesh.name} from {self.stranger.name} with attribute "
+                    f"api-access=\"true\".",
+                    f"Map the values from mesh {self.mesh.name} to a mesh by {self.parent.name}, before "
+                    f"{self.direction.value}ing them.",
                     "Otherwise, please remove it to improve readability."]
 
     class JustInTimeMappingFormatViolation(Violation):
@@ -414,44 +401,38 @@ class MappingRule(Rule):
             self.constraint = constraint
 
         def format_explanation(self) -> str:
-            out: str = (
-                f"The just-in-time {self.direction.value}-mapping of participant {self.parent.name} {self.connecting_word} "
-                f"participant {self.stranger.name}'s mesh {self.mesh.name} is in direction="
-                f"\"{self.direction.value}\" and has constraint=\"{self.constraint.value}\", which is invalid.")
-            out += (
-                "\nCurrently, only just-in-time mappings of the form read-consistent and write-conservative are "
-                "supported.")
+            out: str = (f"The just-in-time {self.direction.value}-mapping of participant {self.parent.name} "
+                        f"{self.connecting_word} participant {self.stranger.name}'s mesh {self.mesh.name} is in direction="
+                        f"\"{self.direction.value}\" and has constraint=\"{self.constraint.value}\", which is invalid.")
+            out += ("\nCurrently, only just-in-time mappings of the form read-consistent and write-conservative are "
+                    "supported.")
             return out
 
         def format_possible_solutions(self) -> list[str]:
             out: list[str] = []
             # Mapping format is "almost" correct
             if self.direction == Direction.READ and self.constraint == MappingConstraint.CONSERVATIVE:
-                out += [
-                    f"Consider changing either the direction of the mapping between participants {self.parent.name} and "
-                    f"{self.stranger.name} to direction=\"write\" or the constraint of the mapping to constraint="
-                    f"\"consistent\"."]
+                out += [f"Consider changing either the direction of the mapping between {self.parent.name} and "
+                        f"{self.stranger.name} to direction=\"write\" or the constraint of the mapping to constraint="
+                        f"\"consistent\"."]
                 out += [f"The effect of a read-conservative mapping can be achieved by moving the mapping from "
-                        f"participant {self.parent.name} to participant {self.stranger.name} and changing its direction "
-                        f"to \"write\"."]
-                out += [f"When moving the mapping, remember to update the <exchange .../> tag in the participants "
-                        f"coupling-scheme."]
-            elif self.direction == Direction.WRITE and self.constraint == MappingConstraint.CONSISTENT:
+                        f"{self.parent.name} to {self.stranger.name} and changing its direction to \"write\"."]
                 out += [
-                    f"Consider changing either the direction of the mapping between participants {self.parent.name} and "
-                    f"{self.stranger.name} to direction=\"read\" or the constraint of the mapping to constraint="
-                    f"\"conservative\"."]
+                    f"When moving the mapping, remember to update the <exchange .../> tag in their coupling-scheme."]
+            elif self.direction == Direction.WRITE and self.constraint == MappingConstraint.CONSISTENT:
+                out += [f"Consider changing either the direction of the mapping between {self.parent.name} and "
+                        f"{self.stranger.name} to direction=\"read\" or the constraint of the mapping to constraint="
+                        f"\"conservative\"."]
                 out += [f"The effect of a write-consistent mapping can be achieved by moving the mapping from "
-                        f"participant {self.parent.name} to participant {self.stranger.name} and changing its direction "
-                        f"to \"read\"."]
-                out += [f"When moving the mapping, remember to update the <exchange .../> tag in the participants "
-                        f"coupling-scheme."]
+                        f"{self.parent.name} to {self.stranger.name} and changing its direction to \"read\"."]
+                out += [
+                    f"When moving the mapping, remember to update the <exchange .../> tag in their coupling-scheme."]
             # Generic answers for arbitrary constraints
             elif self.direction == Direction.READ:
-                out += [f"Consider changing the constraint of the mapping between participants {self.parent.name} and "
+                out += [f"Consider changing the constraint of the mapping between {self.parent.name} and "
                         f"{self.stranger.name} from \"{self.constraint.value}\" to \"consistent\"."]
             elif self.direction == Direction.WRITE:
-                out += [f"Consider changing the constraint of the mapping between participants {self.parent.name} and "
+                out += [f"Consider changing the constraint of the mapping between {self.parent.name} and "
                         f"{self.stranger.name} from \"{self.constraint.value}\" to \"conservative\"."]
             return out
 
@@ -480,18 +461,16 @@ class MappingRule(Rule):
             out: str = (f"The just-in-time {self.direction.value}-mapping of participant {self.parent.name} "
                         f"{self.connecting_word} participant {self.stranger.name} and mesh {self.mesh.name} is in "
                         f"the wrong direction.")
-            out += (
-                f"\nIn just-in-time{self.direction.value}-mappings, the {self.connecting_word}=\"mesh\" has to "
-                f"be on a stranger participants mesh.")
+            out += (f"\nIn just-in-time{self.direction.value}-mappings, the {self.connecting_word}=\"mesh\" has to "
+                    f"be on a stranger participants mesh.")
             return out
 
         def format_possible_solutions(self) -> list[str]:
             out: list[str] = []
             out += [f"Change direction=\"{self.direction.value}\" to direction=\"{self.inverse_direction.value}\"."]
-            out += [f"Move the mapping from participant {self.parent.name} to participant "
-                    f"{self.stranger.name} and change its direction and remember to switch the mesh used in the "
-                    f"<exchange .../> tag in their coupling scheme."]
-            out += [f"Otherwise, change the {self.connecting_word}-mesh to a mesh by participant {self.stranger.name}."]
+            out += [f"Move the mapping from {self.parent.name} to {self.stranger.name}, change its direction and "
+                    f"remember to switch the mesh used in the <exchange .../> tag in their coupling scheme."]
+            out += [f"Otherwise, change the {self.connecting_word}-mesh to a mesh by {self.stranger.name}."]
             return out
 
     class JustInTimeMappingFormatDirectionViolation(Violation):
@@ -521,27 +500,24 @@ class MappingRule(Rule):
                 f"The just-in-time {self.direction.value}-mapping with constraint \"{self.constraint.value}\" between "
                 f"participant {self.parent.name} and participant {self.stranger.name}'s mesh {self.mesh.name} has an "
                 f"invalid format and is in the wrong direction.")
-            out += (
-                f"\nCurrently, only the formats \"write-conservative\" and \"read-consistent\" are implemented for "
-                f"just-in-time mappings.")
-            out += (
-                f"\nIn just-in-time {self.direction.value}-mappings, the {self.connecting_word}=\"mesh\" has to "
-                f"be on a stranger participants mesh.")
+            out += (f"\nCurrently, only the formats \"write-conservative\" and \"read-consistent\" are implemented for "
+                    f"just-in-time mappings.")
+            out += (f"\nIn just-in-time {self.direction.value}-mappings, the {self.connecting_word}=\"mesh\" has to "
+                    f"be on a stranger participants mesh.")
             return out
 
         def format_possible_solutions(self) -> list[str]:
             out: list[str] = []
             out += [f"Change direction=\"{self.direction.value}\" to direction=\"{self.inverse_direction.value}\"."]
-            out += [f"Move the mapping from participant {self.parent.name} to participant "
-                    f"{self.stranger.name}, change its direction and remember to switch the mesh used in the "
-                    f"<exchange .../> tag in their coupling scheme."]
+            out += [f"Move the mapping from {self.parent.name} to {self.stranger.name}, change its direction and "
+                    f"remember to switch the mesh used in the <exchange .../> tag in their coupling scheme."]
             if self.direction == Direction.WRITE:
-                out += [f"Please update the constraint of the mapping between participants {self.parent.name} and "
+                out += [f"Please update the constraint of the mapping between {self.parent.name} and "
                         f"{self.stranger.name} from \"{self.constraint.value}\" to \"conservative\"."]
             elif self.direction == Direction.READ:
-                out += [f"Please update the constraint of the mapping between participants {self.parent.name} and "
+                out += [f"Please update the constraint of the mapping between {self.parent.name} and "
                         f"{self.stranger.name} from \"{self.constraint.value}\" to \"consistent\"."]
-            out += [f"Otherwise, change the {self.connecting_word}-mesh to a mesh by participant {self.stranger.name}."]
+            out += [f"Otherwise, change the {self.connecting_word}-mesh to a mesh by {self.stranger.name}."]
             return out
 
     class JustInTimeMappingMethodViolation(Violation):
@@ -566,12 +542,11 @@ class MappingRule(Rule):
             self.method = method
 
         def format_explanation(self) -> str:
-            out: str = (
-                f"The just-in-time {self.direction.value}-mapping of participant {self.parent.name} {self.connecting_word} "
-                f"{self.stranger.name}'s mesh {self.mesh.name} has mapping-method \"{self.method.value}\", which is invalid.")
-            out += (
-                "\nCurrently, only just-in-time mappings with methods \"nearest-neighbor\", \"rbf-pum-direct\" and "
-                "\"rbf\" are supported.")
+            out: str = (f"The just-in-time {self.direction.value}-mapping of participant {self.parent.name} "
+                        f"{self.connecting_word} {self.stranger.name}'s mesh {self.mesh.name} has mapping-method "
+                        f"\"{self.method.value}\", which is invalid.")
+            out += (f"\nCurrently, only just-in-time mappings with methods \"nearest-neighbor\", \"rbf-pum-direct\" and"
+                    " \"rbf\" are supported.")
             return out
 
         def format_possible_solutions(self) -> list[str]:
@@ -611,10 +586,10 @@ class MappingRule(Rule):
                 elif self.direction == Direction.READ:
                     out += (f"\nHowever, it seems like {self.parent.name} does not {self.direction.value} "
                             f"{self.connecting_word} {self.mesh.name}.")
-                elif self.missing_data_processing == MissingDataProcessing.WRITE_DATA:
-                    if self.direction == Direction.WRITE:
-                        out += (f"\nHowever, it seems like {self.parent.name} does not {self.inverse_direction.value} "
-                                f"{self.inverse_connector} {self.mesh.name}.")
+            elif self.missing_data_processing == MissingDataProcessing.WRITE_DATA:
+                if self.direction == Direction.WRITE:
+                    out += (f"\nHowever, it seems like {self.parent.name} does not {self.inverse_direction.value} "
+                            f"{self.inverse_connector} {self.mesh.name}.")
                 elif self.direction == Direction.READ:
                     out += (f"\nHowever, it seems like {self.stranger.name} does not {self.direction.value} "
                             f"{self.connecting_word} {self.mesh.name}.")
