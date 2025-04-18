@@ -85,11 +85,11 @@ def test_mapping():
 
         d.DataNotExchangedViolation(d_color, p_instigator, p_elevator),
 
-        csm.MissingMappingCouplingSchemeViolation(p_propagator, p_generator, m_propagator),
+        csm.MissingMappingCouplingSchemeViolation(p_propagator, p_generator, m_propagator,d_color),
 
-        csm.MissingMappingCouplingSchemeViolation(p_incinerator, p_propagator, m_incinerator),
+        csm.MissingMappingCouplingSchemeViolation(p_incinerator, p_propagator, m_incinerator,d_color),
 
-        csm.MissingMappingCouplingSchemeViolation(p_generator, p_propagator, m_generator)
+        csm.MissingMappingCouplingSchemeViolation(p_generator, p_propagator, m_generator,d_color)
     ]
 
     assert_equal_violations("Mapping-test", violations_expected, violations_actual)
