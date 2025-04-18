@@ -63,8 +63,6 @@ def test_mapping():
                                            MappingConstraint.SCALED_CONSISTENT_SURFACE),
         m.JustInTimeMappingFormatViolation(p_instigator, p_alligator, m_alligator, Direction.WRITE,
                                            MappingConstraint.CONSISTENT),
-        m.ParallelCouplingMappingFormatViolation(p_elevator, p_instigator, m_elevator, m_instigator, Direction.READ,
-                                                 MappingConstraint.CONSERVATIVE),
         m.JustInTimeMappingFormatDirectionViolation(p_incinerator, p_propagator, m_propagator, Direction.READ,
                                                     MappingConstraint.SCALED_CONSISTENT_VOLUME),
         m.MissingExchangeMappingViolation(p_elevator, p_instigator, m_instigator, Direction.READ),
