@@ -180,60 +180,6 @@ class MappingRule(Rule):
             out += ["Otherwise, please remove the mapping to improve readability."]
             return out
 
-    class ParallelCouplingMappingFormatViolation(Violation):
-        """
-            This class handles a mapping being specified by two participants which are running in parallel,
-            i.e., they are both in the same parallel-coupling-scheme. For such participants, only the mapping
-            formats read-consistent and write-conservative are allowed.
-        """
-        severity = Severity.ERROR
-
-        def __init__(self, parent: ParticipantNode, stranger: ParticipantNode,
-                     mesh_parent: MeshNode, mesh_stranger, direction: Direction, constraint: MappingConstraint):
-            self.parent = parent
-            self.stranger = stranger
-            self.mesh_parent = mesh_parent
-            self.mesh_stranger = mesh_stranger
-            self.direction = direction
-            self.constraint = constraint
-
-        def format_explanation(self) -> str:
-            out: str = f"Participants {self.parent.name} and {self.stranger.name} are executing in parallel."
-            out += (f"\nThe {self.direction.value}-mapping specified by {self.parent.name} on meshes "
-                    f"{self.mesh_parent.name} and {self.mesh_stranger.name} with constraint=\"{self.constraint.value}\" "
-                    f"is is invalid.")
-            out += ("\nFor parallel participants, only mappings of the form read-consistent and write-conservative are "
-                    "allowed.")
-            return out
-
-        def format_possible_solutions(self) -> list[str]:
-            out: list[str] = []
-            # Mapping format is "almost" correct
-            if self.direction == Direction.READ and self.constraint == MappingConstraint.CONSERVATIVE:
-                out += [f"Consider changing either the direction of the mapping between {self.parent.name} and "
-                        f"{self.stranger.name} to direction=\"write\" or the constraint of the mapping to constraint="
-                        f"\"consistent\"."]
-                out += [f"The effect of a read-conservative mapping can be achieved by moving the mapping from "
-                        f"{self.parent.name} to {self.stranger.name} and changing its direction to \"write\"."]
-                out += [f"When moving the mapping, remember to update the <exchange .../> tag in the participants "
-                        f"coupling-scheme."]
-            elif self.direction == Direction.WRITE and self.constraint == MappingConstraint.CONSISTENT:
-                out += [f"Consider changing either the direction of the mapping between {self.parent.name} and "
-                        f"{self.stranger.name} to direction=\"read\" or the constraint of the mapping to constraint="
-                        f"\"conservative\"."]
-                out += [f"The effect of a write-consistent mapping can be achieved by moving the mapping from "
-                        f"{self.parent.name} to {self.stranger.name} and changing its direction to \"read\"."]
-                out += [f"When moving the mapping, remember to update the <exchange .../> tag in the participants "
-                        f"coupling-scheme."]
-            # Generic answers for arbitrary constraints
-            elif self.direction == Direction.READ:
-                out += [f"Consider changing the constraint of the mapping between {self.parent.name} and "
-                        f"{self.stranger.name} from \"{self.constraint.value}\" to \"consistent\"."]
-            elif self.direction == Direction.WRITE:
-                out += [f"Consider changing the constraint of the mapping between {self.parent.name} and "
-                        f"{self.stranger.name} from \"{self.constraint.value}\" to \"conservative\"."]
-            return out
-
     class MappingDirectionViolation(Violation):
         """
             This class handles a mapping being specified by two participants, but the to- and from-meshes not being
@@ -837,24 +783,6 @@ class MappingRule(Rule):
                 # Continue with the next mapping; this one cannot cause more violations
                 continue
 
-            # Regular mappings between parallel participants have to be either read-consistent or write-conservative
-            if not mapping.just_in_time:
-                # Check if the coupling-scheme between the participants is parallel
-                if coupling in parallel_couplings:
-                    # Now, check whether it has the correct format: Only read-consistent and write-conservative are
-                    #  allowed for parallel couplings
-                    if direction == Direction.READ:
-                        if not constraint == MappingConstraint.CONSISTENT:
-                            violations.append(
-                                self.ParallelCouplingMappingFormatViolation(participant_parent,
-                                                                            participant_stranger, mesh_parent,
-                                                                            mesh_stranger, direction, constraint))
-                    elif direction == Direction.WRITE:
-                        if not constraint == MappingConstraint.CONSERVATIVE:
-                            violations.append(
-                                self.ParallelCouplingMappingFormatViolation(participant_parent,
-                                                                            participant_stranger, mesh_parent,
-                                                                            mesh_stranger, direction, constraint))
             # Both JIT and regular mappings
             exchanges = get_exchange_of_participants(participant_parent, participant_stranger, coupling)
             if not exchanges:
