@@ -572,8 +572,7 @@ class MappingRule(Rule):
         violations: list[Violation] = []
 
         m2ns: list[M2NNode] = filter_m2n_nodes(graph)
-        couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode] = filter_coupling_nodes(graph)
-        parallel_couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode] = filter_parallel_coupling_nodes(graph)
+        coupling_schemes: list[CouplingSchemeNode | MultiCouplingSchemeNode] = filter_coupling_nodes(graph)
 
         mappings: list[MappingNode] = filter_mapping_nodes(graph)
         for mapping in mappings:
@@ -774,8 +773,8 @@ class MappingRule(Rule):
                                                     mesh_stranger, direction))
 
             # Check if mapping-participants also have a coupling scheme and then also an exchange
-            coupling = get_coupling_scheme_of_mapping(couplings, participant_parent, participant_stranger)
-            if not coupling:
+            couplings = get_coupling_schemes_of_mapping(coupling_schemes, participant_parent, participant_stranger)
+            if len(couplings) == 0:
                 # Participants try to map data, but there exists no coupling scheme between them
                 violations.append(
                     self.MissingCouplingSchemeMappingViolation(participant_parent, participant_stranger,
@@ -784,8 +783,8 @@ class MappingRule(Rule):
                 continue
 
             # Both JIT and regular mappings
-            exchanges = get_exchange_of_participants(participant_parent, participant_stranger, coupling)
-            if not exchanges:
+            exchanges = get_exchange_of_participants(participant_parent, participant_stranger, couplings)
+            if len(exchanges) == 0:
                 # Participants try to map data, and there exists a coupling-scheme between them, but not any exchanges
                 violations.append(
                     self.MissingExchangeMappingViolation(participant_parent, participant_stranger, mesh_stranger,
@@ -870,43 +869,45 @@ def get_participants_of_mesh(graph: Graph, mesh: MeshNode) -> list[ParticipantNo
     return participants
 
 
-def get_coupling_scheme_of_mapping(couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode],
-                                   participant_a: ParticipantNode, participant_b: ParticipantNode,
-                                   ) -> CouplingSchemeNode | MultiCouplingSchemeNode | None:
+def get_coupling_schemes_of_mapping(coupling_schemes: list[CouplingSchemeNode | MultiCouplingSchemeNode],
+                                    participant_a: ParticipantNode, participant_b: ParticipantNode,
+                                    ) -> list[CouplingSchemeNode | MultiCouplingSchemeNode]:
     """
         This method returns the coupling scheme between the given participants.
-        :param couplings: All couplings of the preCICE config.
+        :param coupling_schemes: All couplings of the preCICE config.
         :param participant_a: One of the participants for which the coupling scheme is needed.
         :param participant_b: The other participant.
         :return:The coupling scheme between the participants; None if there is no coupling-scheme between the participants.
     """
-    for coupling in couplings:
+    couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode] = []
+    for coupling in coupling_schemes:
         if isinstance(coupling, CouplingSchemeNode):
             if ((participant_a == coupling.first_participant and participant_b == coupling.second_participant) or
                     (participant_b == coupling.first_participant and participant_a == coupling.second_participant)):
-                return coupling
+                couplings += [coupling]
         elif isinstance(coupling, MultiCouplingSchemeNode):
             if participant_a in coupling.participants and participant_b in coupling.participants:
-                return coupling
-    return None
+                couplings += [coupling]
+    return couplings
 
 
 def get_exchange_of_participants(participant_a: ParticipantNode, participant_b: ParticipantNode,
-                                 coupling: CouplingSchemeNode | MultiCouplingSchemeNode) -> list[ExchangeNode] | None:
+                                 couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode]) -> list[ExchangeNode]:
     """
         This method returns the exchange nodes between the given participants in the given coupling-scheme if any exist.
         :param participant_a: One of the participants for which the exchange is needed.
         :param participant_b: The other participant.
-        :param coupling: The coupling-scheme between the participants, in which the exchange should exist.
+        :param couplings: The coupling-scheme(s) between the participants, in which the exchange should exist.
         :return: A list of exchange nodes between the two participants, if any exist, else None.
     """
     exchange_nodes: list[ExchangeNode] = []
-    # Both coupling-scheme nodes and multi-coupling-scheme-nodes have the same attribute 'exchanges'
-    for exchange in coupling.exchanges:
-        if ((participant_a == exchange.to_participant and participant_b == exchange.from_participant) or
-                (participant_b == exchange.to_participant and participant_a == exchange.from_participant)):
-            exchange_nodes.append(exchange)
-    return exchange_nodes if exchange_nodes else None
+    for coupling in couplings:
+        # Both coupling-scheme nodes and multi-coupling-scheme-nodes have the same attribute 'exchanges'
+        for exchange in coupling.exchanges:
+            if ((participant_a == exchange.to_participant and participant_b == exchange.from_participant) or
+                    (participant_b == exchange.to_participant and participant_a == exchange.from_participant)):
+                exchange_nodes.append(exchange)
+    return exchange_nodes
 
 
 def filter_mapping_nodes(graph: Graph) -> list[MappingNode]:
