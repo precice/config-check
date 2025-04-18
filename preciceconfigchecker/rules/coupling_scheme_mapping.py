@@ -98,6 +98,8 @@ class CouplingSchemeMappingRule(Rule):
             # Check for all exchanges, whether a mapping exists between first and second (in the correct direction)
             exchanges: list[ExchangeNode] = coupling.exchanges
             for exchange in exchanges:
+                print("exchange:\ndata:", exchange.data.name, "mesh", exchange.mesh.name, "from:",
+                      exchange.from_participant.name, "to:", exchange.to_participant.name)
                 # Check whose mesh gets used
                 exchange_mesh = exchange.mesh
                 from_participant = exchange.from_participant
@@ -112,6 +114,20 @@ class CouplingSchemeMappingRule(Rule):
                         mapping_fits_exchange(mapping, Direction.READ, from_participant, to_participant,
                                               exchange_mesh) for mapping in to_participant.mappings)
                     # Only add a violation if no correct mapping exists
+
+                    if exchange.data.name == "Displacement":
+                        print("\n",has_correct_mapping)
+                        for mapping in to_participant.mappings:
+                            print("mapping:\n", "parent", mapping.parent_participant.name, "from",
+                                  mapping.from_mesh.name,
+                                  "to", mapping.to_mesh.name)
+                    elif exchange.data.name == "Velocity":
+                        print("\n",has_correct_mapping)
+                        for mapping in to_participant.mappings:
+                            print("mapping:\n", "parent", mapping.parent_participant.name, "from",
+                                  mapping.from_mesh.name,
+                                  "to", mapping.to_mesh.name)
+
                     if not has_correct_mapping:
                         if has_api_access(to_participant, exchange_mesh):
                             # If the participant has api-access, add a debug-violation
@@ -176,10 +192,15 @@ def mapping_fits_exchange(mapping: MappingNode, direction: Direction, from_parti
         # For direction-write, the mesh used in the exchange needs to be by to-participant
         if exchange_mesh not in to_participant.provide_meshes:
             return False
+        if exchange_mesh != mapping.to_mesh:
+            return False
     elif direction == Direction.READ:
         # For direction-read, the mesh used in the exchange needs to be by from-participant
         if exchange_mesh not in from_participant.provide_meshes:
             return False
+        elif exchange_mesh != mapping.from_mesh:
+            return False
+
     return True
 
 
