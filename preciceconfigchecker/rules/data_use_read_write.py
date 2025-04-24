@@ -118,7 +118,7 @@ class DataUseReadWriteRule(Rule):
                     f"but not exchanged between them.")
 
         def format_possible_solutions(self) -> list[str]:
-            return [f"Please exchange {self.data_node.name} in a coupling-scheme between {self.writer.name} and "
+            return [f"Please exchange {self.data_node.name} in a coupling scheme between {self.writer.name} and "
                     f"{self.reader.name}"]
 
     def check(self, graph: Graph) -> list[Violation]:

@@ -28,17 +28,17 @@ Rules will be listed with a number (0) before them.
 In case a rule has multiple corresponding violations, each violation will be listed in a subheading and a brief
 explanation, as well as their severity.
 
-## (1) Missing coupling-scheme
+## (1) Missing coupling scheme
 
-If a preCICE config.xml is missing a coupling-scheme (or a multi-coupling-scheme), then no data gets exchanged between
+If a preCICE config.xml is missing a coupling scheme (or a multi-coupling scheme), then no data gets exchanged between
 participants.
 
-Since preCICE is a tool for running coupled simulations between multiple participants, not defining a coupling-scheme is
+Since preCICE is a tool for running coupled simulations between multiple participants, not defining a coupling scheme is
 an error.
 
 - `severity`: `error`
 
-## (2) `TODO` Participant not part of a coupling-scheme
+## (2) `TODO` Participant not part of a coupling scheme
 
 A participant needs to be part of at least one coupling scheme.
 
@@ -86,13 +86,13 @@ Similarly, if a participant writes data to a mesh, then someone should read from
 
 ## (6) Missing exchange
 
-A coupling-scheme needs to have at least one exchange element. Otherwise, it is redundant.
+A coupling scheme needs to have at least one exchange element. Otherwise, it is redundant.
 
 - `severity`: `error`
 
 ## (7) Compositional coupling deadlock
 
-Participants can be "connected" through coupling-schemes.
+Participants can be "connected" through coupling schemes.
 When using `serial` couplings, the `second` participant waits for the `first`.
 
 This means that when more than two participants get coupled in pairs of two, a circular dependency can
@@ -194,9 +194,9 @@ In order for the data-exchange to work, both participants have to exchange data 
 
 - `severity`: `error`
 
-### Participants of mapping have no coupling-scheme
+### Participants of mapping have no coupling scheme
 
-In order for the exchange to function properly, both participants have to exchange data via a coupling-scheme.
+In order for the exchange to function properly, both participants have to exchange data via a coupling scheme.
 
 - `severity`: `error`
 
@@ -225,7 +225,7 @@ Both meshes mentioned in the mapping get provided by the same participant.
 
 - `severity`: `error`
 
-## (9) `TODO` Coupling-scheme without mapping
+## (9) `TODO` Coupling scheme without mapping
 
 To ensure that exchanged data between one participant and its mesh to another participant and its mesh, a mapping has
 to be defined.
@@ -241,7 +241,7 @@ After declaration, data has to be:
 - used in a mesh
 - written by a participant
 - read by a participant (or read through other means, e.g., of immediate export)
-- exchanged in a coupling-scheme if it gets written and read by different participants.
+- exchanged in a coupling scheme if it gets written and read by different participants.
 
 All other cases get checked here (minus the ones that get handled by `precice-tools check`).
 
@@ -330,9 +330,9 @@ A mesh that gets mentioned in an arbitrary tag in the config gets provided by mu
 
 - `severity`: `error`
 
-## (14) Exchange in coupling-scheme leads to mapping or api-access
+## (14) Exchange in coupling scheme leads to mapping or api-access
 
-If two participants define a coupling-scheme between them, then they need a mapping or api-access to exchange data.
+If two participants define a coupling scheme between them, then they need a mapping or api-access to exchange data.
 
 An exchange of the form `from="A" to="B" mesh="A-Mesh"` implies that `A` writes data to `A-mesh`,
 exchanges it to `B`, who either has api-access and reads directly from it or defines a read-mapping to his own mesh.
@@ -340,15 +340,15 @@ exchanges it to `B`, who either has api-access and reads directly from it or def
 Analogously, an exchange of the form `from="A" to="B" mesh="B-Mesh"` implies that `A` writes data to one of his meshes
 (or directly to `B-Mesh`with api-access), maps it to `B-Mesh`, exchanges it to `B`, who then reads from it
 
-The same applies to a multi-coupling-scheme.
+The same applies to a multi-coupling scheme.
 
-### Coupling-scheme is missing a mapping
+### Coupling scheme is missing a mapping
 
 If `A` and `B` do not fulfill the criteria explained above, a violation will be returned.
 
 - `severity`:`error`
 
-### Coupling-scheme with api-access is missing a mapping
+### Coupling scheme with api-access is missing a mapping
 
 If `A` or `B` does have api-access to the correct mesh, it might still lead to an error in the simulation.
 However, as this is a valid use-case, only in debug mode will a warning be displayed.

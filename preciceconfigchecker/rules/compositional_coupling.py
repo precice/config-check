@@ -9,7 +9,7 @@ from preciceconfigchecker.violation import Violation
 
 class CompositionalCouplingRule(Rule):
     # A compositional coupling between participants can lead to a deadlock and will cause errors.
-    name = "Coupling-schemes cannot be circularly dependent."
+    name = "Coupling schemes cannot be circularly dependent."
 
     class CompositionalDeadlockViolation(Violation):
         """
@@ -54,12 +54,12 @@ class CompositionalCouplingRule(Rule):
 # Helper functions
 def filter_coupling_scheme_nodes(node) -> bool:
     """
-   A function filtering coupling-scheme nodes in the graph.
+   A function filtering coupling scheme nodes in the graph.
 
    Args:
        node: the node to check
 
    Returns:
-       True, if the node is a coupling-scheme node.
+       True, if the node is a coupling scheme node.
    """
     return isinstance(node, CouplingSchemeNode)
