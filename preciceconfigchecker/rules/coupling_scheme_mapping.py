@@ -8,11 +8,11 @@ from preciceconfigchecker.violation import Violation
 
 
 class CouplingSchemeMappingRule(Rule):
-    name = "Exchange in a coupling-scheme needs a mapping between involved participants."
+    name = "Exchange in a coupling scheme needs a mapping between involved participants."
 
     class MissingMappingCouplingSchemeViolation(Violation):
         """
-            A coupling-scheme with a data exchange between two participants exists, but no mapping between them.
+            A coupling scheme with a data exchange between two participants exists, but no mapping between them.
             This means they either need api-access to one-another, or they are missing a mapping.
             In case they are missing a mapping, there is this violation.
         """
@@ -40,7 +40,7 @@ class CouplingSchemeMappingRule(Rule):
                 self.to_string = f"to {self.exchange_mesh.name}"
 
         def format_explanation(self) -> str:
-            return (f"The exchange belonging to the coupling-scheme between participants "
+            return (f"The exchange belonging to the coupling scheme between participants "
                     f"{self.from_participant.name} and {self.to_participant.name} using {self.mesh_owner.name}'s "
                     f"mesh {self.exchange_mesh.name} is missing a mapping.")
 
@@ -52,7 +52,7 @@ class CouplingSchemeMappingRule(Rule):
 
     class MissingMappingAPIAccessCouplingSchemeViolation(Violation):
         """
-            A coupling-scheme with a data exchange between two participants exists, but no mapping between them.
+            A coupling scheme with a data exchange between two participants exists, but no mapping between them.
             This means they either need api-access to one-another, or they are missing a mapping.
             In case they have api-access, there is this violation, as a user can forget to specify a mapping.
         """
@@ -76,7 +76,7 @@ class CouplingSchemeMappingRule(Rule):
                 self.mesh_owner = to_participant
 
         def format_explanation(self) -> str:
-            out: str = (f"The exchange belonging to the coupling-scheme between participants "
+            out: str = (f"The exchange belonging to the coupling scheme between participants "
                         f"{self.from_participant.name} and {self.to_participant.name} using {self.mesh_owner.name}'s "
                         f"mesh {self.exchange_mesh.name} does not have a mapping.")
             out += (f"\nThis is valid, because {self.mapper.name} has api-access to {self.non_mapper.name}'s "
@@ -147,9 +147,9 @@ class CouplingSchemeMappingRule(Rule):
 
 def filter_coupling_nodes(graph: Graph) -> list[CouplingSchemeNode | MultiCouplingSchemeNode]:
     """
-        This function returns all coupling-scheme nodes of the given graph.
+        This function returns all coupling scheme nodes of the given graph.
         :param graph:The graph to check.
-        :return: All (multi-)coupling-scheme nodes of the graph.
+        :return: All (multi-)coupling scheme nodes of the graph.
     """
     couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode] = []
     for node in graph.nodes:
