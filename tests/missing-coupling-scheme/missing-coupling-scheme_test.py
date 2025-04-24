@@ -38,4 +38,4 @@ def test_missing_coupling_scheme():
     violations_expected += [
         m.MissingCouplingSchemeMappingViolation(p_propagator, p_generator, m_generator, Direction.READ)]
 
-    assert_equal_violations("Missing-coupling scheme test", violations_expected, violations_actual)
+ assert_equal_violations("Missing-coupling-scheme test", violations_expected, violations_actual)
