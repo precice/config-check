@@ -180,60 +180,6 @@ class MappingRule(Rule):
             out += ["Otherwise, please remove the mapping to improve readability."]
             return out
 
-    class ParallelCouplingMappingFormatViolation(Violation):
-        """
-            This class handles a mapping being specified by two participants which are running in parallel,
-            i.e., they are both in the same parallel-coupling scheme. For such participants, only the mapping
-            formats read-consistent and write-conservative are allowed.
-        """
-        severity = Severity.ERROR
-
-        def __init__(self, parent: ParticipantNode, stranger: ParticipantNode,
-                     mesh_parent: MeshNode, mesh_stranger, direction: Direction, constraint: MappingConstraint):
-            self.parent = parent
-            self.stranger = stranger
-            self.mesh_parent = mesh_parent
-            self.mesh_stranger = mesh_stranger
-            self.direction = direction
-            self.constraint = constraint
-
-        def format_explanation(self) -> str:
-            out: str = f"Participants {self.parent.name} and {self.stranger.name} are executing in parallel."
-            out += (f"\nThe {self.direction.value}-mapping specified by {self.parent.name} on meshes "
-                    f"{self.mesh_parent.name} and {self.mesh_stranger.name} with constraint=\"{self.constraint.value}\" "
-                    f"is is invalid.")
-            out += ("\nFor parallel participants, only mappings of the form read-consistent and write-conservative are "
-                    "allowed.")
-            return out
-
-        def format_possible_solutions(self) -> list[str]:
-            out: list[str] = []
-            # Mapping format is "almost" correct
-            if self.direction == Direction.READ and self.constraint == MappingConstraint.CONSERVATIVE:
-                out += [f"Consider changing either the direction of the mapping between {self.parent.name} and "
-                        f"{self.stranger.name} to direction=\"write\" or the constraint of the mapping to constraint="
-                        f"\"consistent\"."]
-                out += [f"The effect of a read-conservative mapping can be achieved by moving the mapping from "
-                        f"{self.parent.name} to {self.stranger.name} and changing its direction to \"write\"."]
-                out += [f"When moving the mapping, remember to update the <exchange .../> tag in the participants "
-                        f"coupling scheme."]
-            elif self.direction == Direction.WRITE and self.constraint == MappingConstraint.CONSISTENT:
-                out += [f"Consider changing either the direction of the mapping between {self.parent.name} and "
-                        f"{self.stranger.name} to direction=\"read\" or the constraint of the mapping to constraint="
-                        f"\"conservative\"."]
-                out += [f"The effect of a write-consistent mapping can be achieved by moving the mapping from "
-                        f"{self.parent.name} to {self.stranger.name} and changing its direction to \"read\"."]
-                out += [f"When moving the mapping, remember to update the <exchange .../> tag in the participants "
-                        f"coupling scheme."]
-            # Generic answers for arbitrary constraints
-            elif self.direction == Direction.READ:
-                out += [f"Consider changing the constraint of the mapping between {self.parent.name} and "
-                        f"{self.stranger.name} from \"{self.constraint.value}\" to \"consistent\"."]
-            elif self.direction == Direction.WRITE:
-                out += [f"Consider changing the constraint of the mapping between {self.parent.name} and "
-                        f"{self.stranger.name} from \"{self.constraint.value}\" to \"conservative\"."]
-            return out
-
     class MappingDirectionViolation(Violation):
         """
             This class handles a mapping being specified by two participants, but the to- and from-meshes not being
@@ -626,8 +572,7 @@ class MappingRule(Rule):
         violations: list[Violation] = []
 
         m2ns: list[M2NNode] = filter_m2n_nodes(graph)
-        couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode] = filter_coupling_nodes(graph)
-        parallel_couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode] = filter_parallel_coupling_nodes(graph)
+        coupling_schemes: list[CouplingSchemeNode | MultiCouplingSchemeNode] = filter_coupling_nodes(graph)
 
         mappings: list[MappingNode] = filter_mapping_nodes(graph)
         for mapping in mappings:
@@ -828,8 +773,8 @@ class MappingRule(Rule):
                                                     mesh_stranger, direction))
 
             # Check if mapping-participants also have a coupling scheme and then also an exchange
-            coupling = get_coupling_scheme_of_mapping(couplings, participant_parent, participant_stranger)
-            if not coupling:
+            couplings = get_coupling_schemes_of_mapping(coupling_schemes, participant_parent, participant_stranger)
+            if len(couplings) == 0:
                 # Participants try to map data, but there exists no coupling scheme between them
                 violations.append(
                     self.MissingCouplingSchemeMappingViolation(participant_parent, participant_stranger,
@@ -837,28 +782,10 @@ class MappingRule(Rule):
                 # Continue with the next mapping; this one cannot cause more violations
                 continue
 
-            # Regular mappings between parallel participants have to be either read-consistent or write-conservative
-            if not mapping.just_in_time:
-                # Check if the coupling scheme between the participants is parallel
-                if coupling in parallel_couplings:
-                    # Now, check whether it has the correct format: Only read-consistent and write-conservative are
-                    #  allowed for parallel couplings
-                    if direction == Direction.READ:
-                        if not constraint == MappingConstraint.CONSISTENT:
-                            violations.append(
-                                self.ParallelCouplingMappingFormatViolation(participant_parent,
-                                                                            participant_stranger, mesh_parent,
-                                                                            mesh_stranger, direction, constraint))
-                    elif direction == Direction.WRITE:
-                        if not constraint == MappingConstraint.CONSERVATIVE:
-                            violations.append(
-                                self.ParallelCouplingMappingFormatViolation(participant_parent,
-                                                                            participant_stranger, mesh_parent,
-                                                                            mesh_stranger, direction, constraint))
             # Both JIT and regular mappings
-            exchanges = get_exchange_of_participants(participant_parent, participant_stranger, coupling)
-            if not exchanges:
-                # Participants try to map data, and there exists a coupling scheme between them, but not any exchanges
+            exchanges = get_exchange_of_participants(participant_parent, participant_stranger, couplings)
+            if len(exchanges) == 0:
+                # Participants try to map data, and there exists a coupling-scheme between them, but not any exchanges
                 violations.append(
                     self.MissingExchangeMappingViolation(participant_parent, participant_stranger, mesh_stranger,
                                                          direction))
@@ -942,43 +869,45 @@ def get_participants_of_mesh(graph: Graph, mesh: MeshNode) -> list[ParticipantNo
     return participants
 
 
-def get_coupling_scheme_of_mapping(couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode],
-                                   participant_a: ParticipantNode, participant_b: ParticipantNode,
-                                   ) -> CouplingSchemeNode | MultiCouplingSchemeNode | None:
+def get_coupling_schemes_of_mapping(coupling_schemes: list[CouplingSchemeNode | MultiCouplingSchemeNode],
+                                    participant_a: ParticipantNode, participant_b: ParticipantNode,
+                                    ) -> list[CouplingSchemeNode | MultiCouplingSchemeNode]:
     """
         This method returns the coupling scheme between the given participants.
-        :param couplings: All couplings of the preCICE config.
+        :param coupling_schemes: All coupling schemes of the preCICE config.
         :param participant_a: One of the participants for which the coupling scheme is needed.
         :param participant_b: The other participant.
         :return:The coupling scheme between the participants; None if there is no coupling scheme between the participants.
     """
-    for coupling in couplings:
+    couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode] = []
+    for coupling in coupling_schemes:
         if isinstance(coupling, CouplingSchemeNode):
             if ((participant_a == coupling.first_participant and participant_b == coupling.second_participant) or
                     (participant_b == coupling.first_participant and participant_a == coupling.second_participant)):
-                return coupling
+                couplings += [coupling]
         elif isinstance(coupling, MultiCouplingSchemeNode):
             if participant_a in coupling.participants and participant_b in coupling.participants:
-                return coupling
-    return None
+                couplings += [coupling]
+    return couplings
 
 
 def get_exchange_of_participants(participant_a: ParticipantNode, participant_b: ParticipantNode,
-                                 coupling: CouplingSchemeNode | MultiCouplingSchemeNode) -> list[ExchangeNode] | None:
+                                 couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode]) -> list[ExchangeNode]:
     """
         This method returns the exchange nodes between the given participants in the given coupling scheme if any exist.
         :param participant_a: One of the participants for which the exchange is needed.
         :param participant_b: The other participant.
-        :param coupling: The coupling scheme between the participants, in which the exchange should exist.
+        :param couplings: The coupling scheme(s) between the participants, in which the exchange should exist.
         :return: A list of exchange nodes between the two participants, if any exist, else None.
     """
     exchange_nodes: list[ExchangeNode] = []
-    # Both coupling scheme nodes and multi-coupling-scheme-nodes have the same attribute 'exchanges'
-    for exchange in coupling.exchanges:
-        if ((participant_a == exchange.to_participant and participant_b == exchange.from_participant) or
-                (participant_b == exchange.to_participant and participant_a == exchange.from_participant)):
-            exchange_nodes.append(exchange)
-    return exchange_nodes if exchange_nodes else None
+    for coupling in couplings:
+        # Both coupling scheme nodes and multi-coupling-scheme-nodes have the same attribute 'exchanges'
+        for exchange in coupling.exchanges:
+            if ((participant_a == exchange.to_participant and participant_b == exchange.from_participant) or
+                    (participant_b == exchange.to_participant and participant_a == exchange.from_participant)):
+                exchange_nodes.append(exchange)
+    return exchange_nodes
 
 
 def filter_mapping_nodes(graph: Graph) -> list[MappingNode]:

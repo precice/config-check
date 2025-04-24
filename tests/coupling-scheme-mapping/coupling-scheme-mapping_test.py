@@ -37,11 +37,11 @@ def test_coupling_scheme_mapping():
 
     violations_expected = [
 
-        c.MissingMappingCouplingSchemeViolation(p_generator, p_propagator, m_generator),
+        c.MissingMappingCouplingSchemeViolation(p_generator, p_propagator, m_generator, d_color),
 
-        c.MissingMappingCouplingSchemeViolation(p_generator, p_propagator, m_propagator),
+        c.MissingMappingCouplingSchemeViolation(p_generator, p_propagator, m_propagator, d_color),
 
-        c.MissingMappingAPIAccessCouplingSchemeViolation(p_alligator, p_instigator, m_alligator),
+        c.MissingMappingAPIAccessCouplingSchemeViolation(p_alligator, p_instigator, m_alligator, d_color),
 
         d.SharedDataDisjointSimulationsViolation(d_color, frozenset([frozenset([p_generator, p_propagator, p_elevator]),
                                                                      frozenset([p_alligator, p_instigator])])),

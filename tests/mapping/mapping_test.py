@@ -63,8 +63,6 @@ def test_mapping():
                                            MappingConstraint.SCALED_CONSISTENT_SURFACE),
         m.JustInTimeMappingFormatViolation(p_instigator, p_alligator, m_alligator, Direction.WRITE,
                                            MappingConstraint.CONSISTENT),
-        m.ParallelCouplingMappingFormatViolation(p_elevator, p_instigator, m_elevator, m_instigator, Direction.READ,
-                                                 MappingConstraint.CONSERVATIVE),
         m.JustInTimeMappingFormatDirectionViolation(p_incinerator, p_propagator, m_propagator, Direction.READ,
                                                     MappingConstraint.SCALED_CONSISTENT_VOLUME),
         m.MissingExchangeMappingViolation(p_elevator, p_instigator, m_instigator, Direction.READ),
@@ -85,11 +83,11 @@ def test_mapping():
 
         d.DataNotExchangedViolation(d_color, p_instigator, p_elevator),
 
-        csm.MissingMappingCouplingSchemeViolation(p_propagator, p_generator, m_propagator),
+        csm.MissingMappingCouplingSchemeViolation(p_propagator, p_generator, m_propagator, d_color),
 
-        csm.MissingMappingCouplingSchemeViolation(p_incinerator, p_propagator, m_incinerator),
+        csm.MissingMappingCouplingSchemeViolation(p_incinerator, p_propagator, m_incinerator, d_color),
 
-        csm.MissingMappingCouplingSchemeViolation(p_generator, p_propagator, m_generator)
+        csm.MissingMappingCouplingSchemeViolation(p_generator, p_propagator, m_generator, d_color)
     ]
 
     assert_equal_violations("Mapping-test", violations_expected, violations_actual)

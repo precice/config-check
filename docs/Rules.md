@@ -177,14 +177,6 @@ Otherwise, the direction of the mapping is wrong.
 
 - `severity`: `error`
 
-### Mapping between parallel participants has a wrong format
-
-Participants which are coupled with a parallel coupling scheme
-(i.e., coupling schemes of types `parallel-explicit`, `parallel-implicit` and `multi`) have the same format restrictions
-as JIT mappings: Only the formats `read-consistent` and `write-conservative` are supported.
-
-- `severity`: `error`
-
 ### Mapping is missing data processing
 
 Parent declares a read-mapping, but does not read from the corresponding mesh, i.e., Parent has no `read-data` element,
