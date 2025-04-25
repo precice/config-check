@@ -2,12 +2,12 @@ from precice_config_graph.nodes import DataNode, ParticipantNode, MeshNode, Dire
 
 from preciceconfigchecker.rules.data_use_read_write import DataUseReadWriteRule as d
 from preciceconfigchecker.rules.mapping import MappingRule as m
+from preciceconfigchecker.rules.receive_mesh import ReceiveMeshRule as r
 
 from tests.test_utils import assert_equal_violations, get_actual_violations, create_graph
 
 
 def test_data_not_use_not_read_not_write():
-
     graph = create_graph("tests/data-rules/use-read-write-not_exchange/precice-config.xml")
 
     violations_actual = get_actual_violations(graph)
@@ -27,6 +27,8 @@ def test_data_not_use_not_read_not_write():
                 p_alligator = node
             elif node.name == "Instigator":
                 p_instigator = node
+            elif node.name == "Elevator":
+                p_elevator = node
         elif isinstance(node, MeshNode):
             if node.name == "Generator-Mesh":
                 m_generator = node
@@ -45,9 +47,11 @@ def test_data_not_use_not_read_not_write():
 
                             d.DataNotExchangedViolation(d_color, p_generator, p_instigator),
 
-                            m.MissingExchangeMappingViolation(p_instigator,p_generator, m_generator, Direction.READ),
+                            m.MissingExchangeMappingViolation(p_instigator, p_generator, m_generator, Direction.READ),
 
-                            m.MissingExchangeMappingViolation(p_alligator,p_generator, m_generator, Direction.READ),
+                            m.MissingExchangeMappingViolation(p_alligator, p_generator, m_generator, Direction.READ),
+
+                            r.MappedAPIAccessReceiveMesh(p_elevator, m_generator),
                             ]
 
     assert_equal_violations("Data-not-exchanged-test", violations_expected, violations_actual)

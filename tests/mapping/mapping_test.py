@@ -4,6 +4,7 @@ from preciceconfigchecker.rules.mapping import MappingRule as m, MissingDataProc
 from preciceconfigchecker.rules.m2n_exchange import M2NExchangeRule as mn
 from preciceconfigchecker.rules.data_use_read_write import DataUseReadWriteRule as d
 from preciceconfigchecker.rules.coupling_scheme_mapping import CouplingSchemeMappingRule as csm
+from preciceconfigchecker.rules.receive_mesh import ReceiveMeshRule as r
 
 from tests.test_utils import assert_equal_violations, get_actual_violations, create_graph
 
@@ -87,7 +88,9 @@ def test_mapping():
 
         csm.MissingMappingCouplingSchemeViolation(p_incinerator, p_propagator, m_incinerator, d_color),
 
-        csm.MissingMappingCouplingSchemeViolation(p_generator, p_propagator, m_generator, d_color)
+        csm.MissingMappingCouplingSchemeViolation(p_generator, p_propagator, m_generator, d_color),
+
+        r.UnusedReceiveMesh(p_generator,m_propagator),
     ]
 
     assert_equal_violations("Mapping-test", violations_expected, violations_actual)
