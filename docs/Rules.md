@@ -79,7 +79,7 @@ If neither is satisfied, the participant has no permission to read from or write
 
 ## (5) `TODO` Participant reads from/writes to mesh, but nobody writes to/reads from it
 
-If a participant reads data from a mesh, then someone should write it beforehand.<br>
+If a participant reads data from a mesh, then someone should write it beforehand.
 Similarly, if a participant writes data to a mesh, then someone should read from it later on.
 
 - `severity`: `error`
@@ -139,11 +139,11 @@ to Stranger. Analogously, this also works to achieve a `write-consistent` mappin
 
 ### JIT mapping is in the wrong direction
 
-If the direction is `read`, then the JIT mapping needs to have the tag `from="..."`. If it instead has the tag
+If the direction is `read`, then the JIT mapping requires the tag `from="..."`. If it instead has the tag
 `to="..."`,
 then direction and tag don't fit and the mapping is in the wrong direction.
 
-Similarly, a JIT `write`-mapping needs to have the tag `to="..."`, otherwise its direction is wrong.
+Similarly, a JIT `write`-mapping requires the tag `to="..."`, otherwise its direction is wrong.
 
 - `severity`: `error`
 
@@ -196,7 +196,7 @@ In order for the data-exchange to work, both participants have to exchange data 
 
 ### Participants of mapping have no coupling scheme
 
-In order for the exchange to function properly, both participants have to exchange data via a coupling scheme.
+In order for the exchange to function properly, both participants need to exchange data via a coupling scheme.
 
 - `severity`: `error`
 
@@ -221,18 +221,11 @@ otherwise, there exists no correct data-exchange between the participants.
 
 ### Mapping is between the same participant
 
-Both meshes mentioned in the mapping get provided by the same participant.
+Both meshes mentioned in the mapping is provided by the same participant.
 
 - `severity`: `error`
 
-## (9) `TODO` Coupling scheme without mapping
-
-To ensure that exchanged data between one participant and its mesh to another participant and its mesh, a mapping has
-to be defined.
-
-- `severity`: `error`
-
-## (10) Data rules
+## (9) Data rules
 
 A data element in a preCICE needs to be mentioned at many locations to finally allow it to be utilized by one or more
 participants.
@@ -243,7 +236,7 @@ After declaration, data has to be:
 - read by a participant (or read through other means, e.g., of immediate export)
 - exchanged in a coupling scheme if it gets written and read by different participants.
 
-All other cases get checked here (minus the ones that get handled by `precice-tools check`).
+All other cases are checked here (minus the ones that get handled by `precice-tools check`).
 
 Using, reading or writing data without the respective other tags is not as severe an error, as this data element is
 likely not used in the simulation yet, due to multiple tags missing.
@@ -252,26 +245,26 @@ For the exact implementation, see `rules/data_use_read_write.py`.
 
 ### Data gets used in a mesh, read and written by different participants, but not exchanged
 
-The data element does not get exchanged between the participants which are accessing the data.
+The data element is not exchanged between the participants which are accessing the data.
 
 - `severity`: `error`
 
 ### Data gets used but not written or read
 
-The data element gets used in a mesh, but no participant is reading or writing it.
+The data element is used in a mesh, but no participant is reading or writing it.
 
 - `severity`: `warning`
 
 ### Data gets used and read, but not written
 
-The data element gets used in a mesh and read by a participant (or other ways of acquiring the data), but no participant
+The data element is used in a mesh and read by a participant (or other ways of acquiring the data), but no participant
 is writing the data.
 
 - `severity`: `error`
 
 ### Data gets used and written, but not read
 
-The data element gets used in a mesh and written by a participant, but nobody is reading it (or acquiring the data
+The data element is used in a mesh and written by a participant, but nobody is reading it (or acquiring the data
 through other means).
 
 - `severity`: `warning`
@@ -282,16 +275,15 @@ The data element gets declared but not used in a mesh, read or written by any pa
 
 - `severity`: `warning`
 
-## (11) `TODO` Unused mesh
+## (10) `TODO` Unused mesh
 
-A participant can provide a mesh to another participant, who receives it but does not use it.
-This means that the mesh is not used in any coupling scheme.
+A mesh is not used if no participant writes/reads data to/from it.
 
 This does not necessarily cause the simulation to malfunction or misbehave.
 
 - `severity`: `warning`
 
-## (12) Disjoint simulations
+## (11) Disjoint simulations
 
 A simulation between participants A and B and a second one between participants C and D can run simultaneously without
 using any of the coupling features of preCICE.
@@ -313,7 +305,7 @@ might be an oversight here and will therefore be warned about.
 
 - `severity`: `warning`
 
-## (13) A mesh must be provided by exactly one participant
+## (12) A mesh must be provided by exactly one participant
 
 Any mesh defined in the configuration must be provided by exactly one participant.
 Only then can the mesh be used in mappings, exchanges et cetera.
@@ -330,7 +322,7 @@ A mesh that gets mentioned in an arbitrary tag in the config gets provided by mu
 
 - `severity`: `error`
 
-## (14) Exchange in coupling scheme leads to mapping or api-access
+## (13) Exchange in coupling scheme leads to mapping or api-access
 
 If two participants define a coupling scheme between them, then they need a mapping or api-access to exchange data.
 
@@ -352,5 +344,24 @@ If `A` and `B` do not fulfill the criteria explained above, a violation will be 
 
 If `A` or `B` does have api-access to the correct mesh, it might still lead to an error in the simulation.
 However, as this is a valid use-case, only in debug mode will a warning be displayed.
+
+- `severity`:`debug`
+
+## (14) Received mesh must be used
+
+If participants receive a mesh, then they should use it.
+
+### Unused receive mesh
+
+If a participant receives a mesh without api-access, then they need to specify a mapping to use it.
+If they receive it with api-access, then they can write/read directly to/from it.
+
+- `severity`:`warning`
+
+### API-access with mapping
+
+If a participant receives a mesh _with_ api-access, then they do not have to specify a mapping to use it,
+as they can operate directly on it.
+However, if they still map to their own meshes, then this is not an error per se, but might not be wanted.
 
 - `severity`:`debug`
