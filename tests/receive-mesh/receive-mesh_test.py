@@ -18,9 +18,13 @@ def test_receive_mesh():
         elif isinstance(node, MeshNode):
             if node.name == "Wedding-Gift-Mesh":
                 m_wedding_gift = node
+            elif node.name == "Generator-Mesh":
+                m_generator = node
 
     violations_expected = [
-        r.UnusedReceiveMesh(p_propagator, m_wedding_gift)
+        r.UnusedReceiveMesh(p_propagator, m_wedding_gift),
+
+        r.MappedAPIAccessReceiveMesh(p_propagator,m_generator),
     ]
 
     assert_equal_violations("Receive-mesh test", violations_expected, violations_actual)
