@@ -4,8 +4,7 @@ from tests.test_utils import assert_equal_violations, get_actual_violations, cre
 from preciceconfigchecker.rules.provide_mesh import ProvideMeshRule as pm
 
 
-def test_simple_good():
-    # tests/provide-mesh/
+def test_provide_mesh():
     graph = create_graph("tests/provide-mesh/precice-config.xml")
 
     violations_actual = get_actual_violations(graph)
