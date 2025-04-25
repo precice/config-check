@@ -1,0 +1,122 @@
+import networkx as nx
+from networkx import Graph
+from precice_config_graph.nodes import ParticipantNode, MeshNode, ReceiveMeshNode, Direction
+
+from preciceconfigchecker.rule import Rule
+from preciceconfigchecker.rule_utils import format_list
+from preciceconfigchecker.severity import Severity
+from preciceconfigchecker.violation import Violation
+
+
+class ReceiveMeshRule(Rule):
+    name = "Receive mesh."
+
+    class UnusedReceiveMesh(Violation):
+        """
+            This class handles a participant receiving a mesh, without using it.
+        """
+        severity = Severity.WARNING
+
+        def __init__(self, participant: ParticipantNode, mesh: MeshNode):
+            self.participant = participant
+            self.mesh = mesh
+
+        def format_explanation(self) -> str:
+            return f"Participant {self.participant.name} is receiving mesh {self.mesh.name}, without using it."
+
+        def format_possible_solutions(self) -> list[str]:
+            return [f"Please let {self.participant.name} use {self.mesh.name}, by mapping it to a mesh provided by "
+                    f"{self.participant.name} or operating on it with api-access.",
+                    "Otherwise, please remove it to improve readability."]
+
+    class MappedAPIAccessReceiveMesh(Violation):
+        """
+            This class handles a participant receiving a mesh with api-access, but specifying a mapping on it.
+            As this is unusual, a violation will be shown in debug mode.
+        """
+        severity = Severity.DEBUG
+
+        def __init__(self, participant: ParticipantNode, mesh: MeshNode):
+            self.participant = participant
+            self.mesh = mesh
+
+        def format_explanation(self) -> str:
+            return (f"Participant {self.participant.name} is receiving mesh {self.mesh.name}, with api-access, "
+                    f"but is specifying a mapping on it."
+                    f"\nThis is valid, but unusual.")
+
+        def format_possible_solutions(self) -> list[str]:
+            return [f"With api-access, {self.participant.name} can directly operate on {self.mesh.name}."]
+
+    def check(self, graph: Graph) -> list[Violation]:
+        violations: list[Violation] = []
+        participants: list[ParticipantNode] = get_participants(graph)
+        # Check all participants for their receive-meshes
+        for participant in participants:
+            receive_meshes: list[ReceiveMeshNode] = participant.receive_meshes
+            # Check all meshes they receive
+            for receive_mesh in receive_meshes:
+                used: bool = False
+                mesh: MeshNode = receive_mesh.mesh
+                # Check if they use the receive-mesh:
+                # A receive-mesh can be used by reading data from it, writing data to it, exporting it,
+                # using an action on it, tracking it with a watchpoint/-integral
+                if len(participant.exports) > 0:
+                    used = True
+                # These are only valid if they have api-access:
+                if receive_mesh.api_access:
+                    for read_data in participant.read_data:
+                        if read_data.mesh == mesh:
+                            used = True
+                    for write_data in participant.write_data:
+                        if write_data.mesh == mesh:
+                            used = True
+                    for action in participant.actions:
+                        if action.mesh == mesh:
+                            used = True
+                    for watchpoint in participant.watchpoints:
+                        if watchpoint.mesh == mesh:
+                            used = True
+                    for watch_integral in participant.watch_integrals:
+                        if watch_integral.mesh == mesh:
+                            used = True
+                    # Even with api-access, participants can still have a regular mapping
+                    for mapping in participant.mappings:
+                        if not mapping.just_in_time:
+                            if mapping.to_mesh == mesh or mapping.from_mesh == mesh:
+                                used = True
+                                violations.append(self.MappedAPIAccessReceiveMesh(participant, mesh))
+                        # if mapping.direction == Direction.READ:
+                        #     # In a regular mapping, the to-mesh must not be None
+                        #     # If it is None, then the mapping is a just-in-time mapping
+                        #     if mapping.from_mesh == mesh and mapping.to_mesh is not None:
+                        #         used = True
+                        #         violations.append(self.MappedAPIAccessReceiveMesh(participant, mesh))
+                        # elif mapping.direction == Direction.WRITE:
+                        #     if mapping.to_mesh == mesh and mapping.from_mesh is not None:
+                        #         used = True
+                        #         violations.append(self.MappedAPIAccessReceiveMesh(participant, mesh))
+
+                # If they don't have api-access, they need a mapping first
+                else:
+                    for mapping in participant.mappings:
+                        if mapping.to_mesh == mesh or mapping.from_mesh == mesh:
+                            used = True
+
+                if not used:
+                    violations.append(self.UnusedReceiveMesh(participant, mesh))
+
+        return violations
+
+
+def get_participants(graph: Graph) -> list[ParticipantNode]:
+    """
+        This method returns all participant nodes of the given graph.
+        :param graph: The graph to get the participants from.
+        :return: All participant nodes of the given graph.
+    """
+    participants: list[ParticipantNode] = []
+    for node in graph.nodes():
+        if isinstance(node, ParticipantNode):
+            participants.append(node)
+    return participants
