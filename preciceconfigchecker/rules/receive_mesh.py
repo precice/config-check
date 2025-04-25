@@ -74,8 +74,9 @@ class ReceiveMeshRule(Rule):
                         if not mapping.just_in_time and receive_mesh.api_access:
                             violations.append(self.MappedAPIAccessReceiveMesh(participant, mesh))
 
+                # No need to check if mesh has been used already
                 # These are only valid if the participant has api-access:
-                if receive_mesh.api_access:
+                if receive_mesh.api_access and not used:
                     for read_data in participant.read_data:
                         if read_data.mesh == mesh:
                             used = True
