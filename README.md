@@ -14,13 +14,13 @@ configuration for logical errors.
 - Python 3.10
 - Pip
 - Git for cloning the repository
-- [precice-config-graph Library](https://github.com/precice-forschungsprojekt/config-graph). This will be installed during the Installation step below.
+- [precice-config-graph Library](https://github.com/precice/config-graph). This will be installed during the Installation step below.
 
 ## Installation
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/precice-forschungsprojekt/config-checker
+git clone https://github.com/precice/config-check
 cd config-checker
 ```
 2. Create a new Python Virtual Environment (optional, but recommended):
@@ -88,9 +88,9 @@ python -m preciceconfigchecker.cli "path/to/precice-config.xml" --debug
 
 We are always open to suggestions for new rules.
 When encountering a logical error that does not already get reviewed by our checker,
-please create a new issue on our [GitHub repository](https://github.com/precice-forschungsprojekt/config-checker) and:
+please create a new issue on our [GitHub repository](https://github.com/precice/config-check) and:
 
-- Check that the problem is not already under development (marked with `TODO` in [docs/Rules.md](https://github.com/precice-forschungsprojekt/config-checker/blob/main/docs/Rules.md))
+- Check that the problem is not already under development (marked with `TODO` in [docs/Rules.md](https://github.com/precice/config-check/blob/main/docs/Rules.md))
 - Explain the problem:
     - What exactly is the problem?
     - Why is it a problem?
