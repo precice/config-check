@@ -36,7 +36,10 @@ def runCheck(path: pathlib.Path, debug: bool):
     # if the user uses severity=debug, then the severity has to be passed here as an argument
     print_all_results(violations_by_rule, debug)
 
-    return 2 if violations_by_rule else 0
+    if all(map(lambda vals: len(vals) == 0, violations_by_rule.values())):
+        return 0
+    else:
+        return 2
 
 
 def main():
