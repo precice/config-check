@@ -20,7 +20,7 @@ Issues = "https://github.com/precice-forschungsprojekt/config-checker/issues"
 precice-config-check = "preciceconfigchecker.cli:main"
 
 [tool.setuptools]
-packages = ["preciceconfigchecker"]
+packages = ["preciceconfigchecker", "preciceconfigchecker.rules"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
