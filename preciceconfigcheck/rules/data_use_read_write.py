@@ -244,7 +244,7 @@ class DataUseReadWriteRule(Rule):
                                     elif isinstance(potential_reader_neighbor, WatchIntegralNode):
                                         readers_per_writer[writer].append(potential_reader)
                                     elif isinstance(potential_reader_neighbor, ActionNode):
-                                        # Actions can have many source datas; check for current data_node
+                                        # Actions can have many source data; check for current data_node
                                         for source in potential_reader_neighbor.source_data:
                                             if source == data_node:
                                                 readers_per_writer[writer].append(potential_reader)
