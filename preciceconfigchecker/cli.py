@@ -1,5 +1,6 @@
 import argparse
 import sys
+import pathlib
 
 from preciceconfigchecker.severity import Severity
 import preciceconfigchecker.color as c
@@ -9,23 +10,15 @@ from precice_config_graph import graph as g, xml_processing
 from preciceconfigchecker.rules_processing import check_all_rules, print_all_results
 
 
-def main():
-    path: str = None
-    debug: bool = False
-    parser = argparse.ArgumentParser(usage='%(prog)s',
-                                     description='Checks a preCICE config.xml file for logical errors.')
-    parser.add_argument('src', type=argparse.FileType('r'), help='Path of the config.xml source file.')
-    parser.add_argument('-d', '--debug', action='store_true', help='Enables debug mode')
-    args = parser.parse_args()
-
-    if args.debug:
-        debug = args.debug
+def runCheck(path: pathlib.Path, debug: bool):
+    if debug:
         print(f"[{Severity.DEBUG.value}]: Debug mode enabled")
-    if args.src.name.endswith('.xml'):
-        path = args.src.name
-        print(f"Checking file at '{c.dyeing(path, c.cyan)}'")
+
+    if path.name.endswith('.xml'):
+        print(f"Checking file at '{c.dyeing(str(path), c.cyan)}'")
     else:
-        sys.exit(f"[{Severity.ERROR.value}]: '{c.dyeing(args.src.name, c.cyan)}' is not an xml file")
+        print(f"[{Severity.ERROR.value}]: '{c.dyeing(str(path), c.cyan)}' is not an xml file", file=sys.stderr)
+        return 1
 
     # Step 1: Use preCICE itself to check for basic errors
     # TODO: Participant.check(...)
@@ -39,6 +32,18 @@ def main():
 
     # if the user uses severity=debug, then the severity has to be passed here as an argument
     print_all_results(violations_by_rule, debug)
+
+    return 2 if violations_by_rule else 0
+
+
+def main():
+    parser = argparse.ArgumentParser(usage='%(prog)s',
+                                     description='Checks a preCICE config.xml file for logical errors.')
+    parser.add_argument('src', type=pathlib.Path, help='Path of the config.xml source file.')
+    parser.add_argument('-d', '--debug', action='store_true', help='Enables debug mode')
+    args = parser.parse_args()
+
+    return runCheck(path=args.src, debug=args.debug)
 
 
 if __name__ == "__main__":
