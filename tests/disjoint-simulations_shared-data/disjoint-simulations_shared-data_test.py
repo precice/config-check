@@ -1,7 +1,11 @@
 from precice_config_graph.nodes import ParticipantNode, DataNode
 from preciceconfigcheck.rules.disjoint_simulations import DisjointSimulationsRule as r
 
-from tests.test_utils import assert_equal_violations, get_actual_violations, create_graph
+from tests.test_utils import (
+    assert_equal_violations,
+    get_actual_violations,
+    create_graph,
+)
 
 
 def test_partly_disjoint_simulations():
@@ -23,11 +27,20 @@ def test_partly_disjoint_simulations():
             if node.name == "Color":
                 d_color = node
 
-    violations_expected = [r.SharedDataDisjointSimulationsViolation(
-        d_color,
-        frozenset([
-            frozenset([p_generator_a, p_propagator_a]), frozenset([p_generator_b, p_propagator_b])
-        ])
-    )]
+    violations_expected = [
+        r.SharedDataDisjointSimulationsViolation(
+            d_color,
+            frozenset(
+                [
+                    frozenset([p_generator_a, p_propagator_a]),
+                    frozenset([p_generator_b, p_propagator_b]),
+                ]
+            ),
+        )
+    ]
 
-    assert_equal_violations("Disjoint-simulations with shared data test", violations_expected, violations_actual)
+    assert_equal_violations(
+        "Disjoint-simulations with shared data test",
+        violations_expected,
+        violations_actual,
+    )

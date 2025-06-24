@@ -16,7 +16,7 @@ class MissingCouplingSchemeRule(Rule):
         # No nodes have to be passed: A coupling scheme is missing and does not depend on anything else
         # from the config file
         severity = Severity.ERROR
-        
+
         def __init__(self) -> None:
             pass
 
@@ -24,13 +24,19 @@ class MissingCouplingSchemeRule(Rule):
             return "It seems like your configuration is missing a coupling scheme."
 
         def format_possible_solutions(self) -> list[str]:
-            return ["Please add a coupling scheme to your configuration to exchange data between participants."]
+            return [
+                "Please add a coupling scheme to your configuration to exchange data between participants."
+            ]
 
     def check(self, graph: Graph) -> list[MissingCouplingSchemeViolation]:
         # Filter all coupling-nodes: Only coupling scheme nodes remain
-        coupling_nodes = nx.subgraph_view(graph, filter_node=filter_coupling_scheme_nodes)
+        coupling_nodes = nx.subgraph_view(
+            graph, filter_node=filter_coupling_scheme_nodes
+        )
         # Filter all multi-coupling-nodes: Only multi-coupling scheme nodes remain
-        multi_coupling_nodes = nx.subgraph_view(graph, filter_node=filter_multi_coupling_scheme_nodes)
+        multi_coupling_nodes = nx.subgraph_view(
+            graph, filter_node=filter_multi_coupling_scheme_nodes
+        )
 
         # If both subgraphs contain no nodes, no coupling nodes exist
         if not coupling_nodes.nodes and not multi_coupling_nodes.nodes:

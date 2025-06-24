@@ -1,6 +1,14 @@
 from networkx import Graph
-from precice_config_graph.nodes import CouplingSchemeNode, MultiCouplingSchemeNode, ParticipantNode, ExchangeNode, \
-    MeshNode, MappingNode, Direction, DataNode
+from precice_config_graph.nodes import (
+    CouplingSchemeNode,
+    MultiCouplingSchemeNode,
+    ParticipantNode,
+    ExchangeNode,
+    MeshNode,
+    MappingNode,
+    Direction,
+    DataNode,
+)
 
 from preciceconfigcheck.rule import Rule
 from preciceconfigcheck.severity import Severity
@@ -8,18 +16,26 @@ from preciceconfigcheck.violation import Violation
 
 
 class CouplingSchemeMappingRule(Rule):
-    name = "Exchange in a coupling scheme needs a mapping between involved participants."
+    name = (
+        "Exchange in a coupling scheme needs a mapping between involved participants."
+    )
 
     class MissingMappingCouplingSchemeViolation(Violation):
         """
-            A coupling scheme with a data exchange between two participants exists, but no mapping between them.
-            This means they either need api-access to one-another, or they are missing a mapping.
-            In case they are missing a mapping, there is this violation.
+        A coupling scheme with a data exchange between two participants exists, but no mapping between them.
+        This means they either need api-access to one-another, or they are missing a mapping.
+        In case they are missing a mapping, there is this violation.
         """
+
         severity = Severity.ERROR
 
-        def __init__(self, from_participant: ParticipantNode, to_participant: ParticipantNode, exchange_mesh: MeshNode,
-                     data: DataNode):
+        def __init__(
+            self,
+            from_participant: ParticipantNode,
+            to_participant: ParticipantNode,
+            exchange_mesh: MeshNode,
+            data: DataNode,
+        ):
             self.from_participant = from_participant
             self.to_participant = to_participant
             self.exchange_mesh = exchange_mesh
@@ -42,26 +58,36 @@ class CouplingSchemeMappingRule(Rule):
             self.data = data
 
         def format_explanation(self) -> str:
-            return (f"The exchange of data {self.data.name} belonging to the coupling scheme between participants "
-                    f"{self.from_participant.name} and {self.to_participant.name} using {self.mesh_owner.name}'s "
-                    f"mesh {self.exchange_mesh.name} is missing a mapping.")
+            return (
+                f"The exchange of data {self.data.name} belonging to the coupling scheme between participants "
+                f"{self.from_participant.name} and {self.to_participant.name} using {self.mesh_owner.name}'s "
+                f"mesh {self.exchange_mesh.name} is missing a mapping."
+            )
 
         def format_possible_solutions(self) -> list[str]:
-            return [f"For this exchange, {self.mapper.name} has to define a {self.direction.value}-mapping "
-                    f"{self.from_string} {self.to_string}.",
-                    "Otherwise, change the mesh used in the exchange and make sure that there exists a corresponding "
-                    "mapping for it."]
+            return [
+                f"For this exchange, {self.mapper.name} has to define a {self.direction.value}-mapping "
+                f"{self.from_string} {self.to_string}.",
+                "Otherwise, change the mesh used in the exchange and make sure that there exists a corresponding "
+                "mapping for it.",
+            ]
 
     class MissingMappingAPIAccessCouplingSchemeViolation(Violation):
         """
-            A coupling scheme with a data exchange between two participants exists, but no mapping between them.
-            This means they either need api-access to one-another, or they are missing a mapping.
-            In case they have api-access, there is this violation, as a user can forget to specify a mapping.
+        A coupling scheme with a data exchange between two participants exists, but no mapping between them.
+        This means they either need api-access to one-another, or they are missing a mapping.
+        In case they have api-access, there is this violation, as a user can forget to specify a mapping.
         """
+
         severity = Severity.DEBUG
 
-        def __init__(self, from_participant: ParticipantNode, to_participant: ParticipantNode, exchange_mesh: MeshNode,
-                     data: DataNode):
+        def __init__(
+            self,
+            from_participant: ParticipantNode,
+            to_participant: ParticipantNode,
+            exchange_mesh: MeshNode,
+            data: DataNode,
+        ):
             self.from_participant = from_participant
             self.to_participant = to_participant
             self.exchange_mesh = exchange_mesh
@@ -80,21 +106,29 @@ class CouplingSchemeMappingRule(Rule):
             self.data = data
 
         def format_explanation(self) -> str:
-            out: str = (f"The exchange of data {self.data.name} belonging to the coupling scheme between participants "
-                        f"{self.from_participant.name} and {self.to_participant.name} using {self.mesh_owner.name}'s "
-                        f"mesh {self.exchange_mesh.name} does not have a mapping.")
-            out += (f"\nThis is valid, because {self.mapper.name} has api-access to {self.non_mapper.name}'s "
-                    f"{self.exchange_mesh.name}, but is more prone to errors.")
+            out: str = (
+                f"The exchange of data {self.data.name} belonging to the coupling scheme between participants "
+                f"{self.from_participant.name} and {self.to_participant.name} using {self.mesh_owner.name}'s "
+                f"mesh {self.exchange_mesh.name} does not have a mapping."
+            )
+            out += (
+                f"\nThis is valid, because {self.mapper.name} has api-access to {self.non_mapper.name}'s "
+                f"{self.exchange_mesh.name}, but is more prone to errors."
+            )
             return out
 
         def format_possible_solutions(self) -> list[str]:
-            return [f"Specifying a just-in-time {self.direction.value}-mapping at {self.mapper.name} will make the "
-                    f"exchange of data more reliable."]
+            return [
+                f"Specifying a just-in-time {self.direction.value}-mapping at {self.mapper.name} will make the "
+                f"exchange of data more reliable."
+            ]
 
     def check(self, graph: Graph) -> list[Violation]:
         violations: list[Violation] = []
 
-        couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode] = filter_coupling_nodes(graph)
+        couplings: list[
+            CouplingSchemeNode | MultiCouplingSchemeNode
+        ] = filter_coupling_nodes(graph)
 
         for coupling in couplings:
             # Unknown participants in from=/to= are handled by precice-tools check
@@ -114,57 +148,98 @@ class CouplingSchemeMappingRule(Rule):
                 # mesh and then reads from it => READ-mapping by to-participant required, or api-access to from-mesh
                 if exchange_mesh in from_meshes:
                     has_correct_mapping: bool = any(
-                        mapping_fits_exchange(mapping, Direction.READ, from_participant, to_participant,
-                                              exchange_mesh) for mapping in to_participant.mappings)
+                        mapping_fits_exchange(
+                            mapping,
+                            Direction.READ,
+                            from_participant,
+                            to_participant,
+                            exchange_mesh,
+                        )
+                        for mapping in to_participant.mappings
+                    )
                     # Only add a violation if no correct mapping exists
                     if not has_correct_mapping:
                         if has_api_access(to_participant, exchange_mesh):
                             # If the participant has api-access, add a debug-violation
                             violations.append(
-                                self.MissingMappingAPIAccessCouplingSchemeViolation(from_participant,
-                                                                                    to_participant,
-                                                                                    exchange_mesh, data))
+                                self.MissingMappingAPIAccessCouplingSchemeViolation(
+                                    from_participant,
+                                    to_participant,
+                                    exchange_mesh,
+                                    data,
+                                )
+                            )
                         else:
                             violations.append(
-                                self.MissingMappingCouplingSchemeViolation(from_participant, to_participant,
-                                                                           exchange_mesh, data))
+                                self.MissingMappingCouplingSchemeViolation(
+                                    from_participant,
+                                    to_participant,
+                                    exchange_mesh,
+                                    data,
+                                )
+                            )
                 # from-participant writes data to own mesh, maps it to to-mesh, exchanges it to to-participant, who
                 # reads from it => WRITE-mapping by from-participant required, or api-access to to-mesh
                 elif exchange_mesh in to_meshes:
                     has_correct_mapping: bool = any(
-                        mapping_fits_exchange(mapping, Direction.WRITE, from_participant, to_participant,
-                                              exchange_mesh) for mapping in from_participant.mappings)
+                        mapping_fits_exchange(
+                            mapping,
+                            Direction.WRITE,
+                            from_participant,
+                            to_participant,
+                            exchange_mesh,
+                        )
+                        for mapping in from_participant.mappings
+                    )
                     # Only add a violation if no correct mapping exists
                     if not has_correct_mapping:
                         if has_api_access(from_participant, exchange_mesh):
                             # If the participant has api-access, add a debug-violation
                             violations.append(
-                                self.MissingMappingAPIAccessCouplingSchemeViolation(from_participant,
-                                                                                    to_participant,
-                                                                                    exchange_mesh, data))
+                                self.MissingMappingAPIAccessCouplingSchemeViolation(
+                                    from_participant,
+                                    to_participant,
+                                    exchange_mesh,
+                                    data,
+                                )
+                            )
                         else:
                             violations.append(
-                                self.MissingMappingCouplingSchemeViolation(from_participant, to_participant,
-                                                                           exchange_mesh, data))
+                                self.MissingMappingCouplingSchemeViolation(
+                                    from_participant,
+                                    to_participant,
+                                    exchange_mesh,
+                                    data,
+                                )
+                            )
 
         return violations
 
 
-def filter_coupling_nodes(graph: Graph) -> list[CouplingSchemeNode | MultiCouplingSchemeNode]:
+def filter_coupling_nodes(
+    graph: Graph,
+) -> list[CouplingSchemeNode | MultiCouplingSchemeNode]:
     """
-        This function returns all coupling scheme nodes of the given graph.
-        :param graph:The graph to check.
-        :return: All (multi-)coupling scheme nodes of the graph.
+    This function returns all coupling scheme nodes of the given graph.
+    :param graph:The graph to check.
+    :return: All (multi-)coupling scheme nodes of the graph.
     """
     couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode] = []
     for node in graph.nodes:
-        if isinstance(node, CouplingSchemeNode) or isinstance(node, MultiCouplingSchemeNode):
+        if isinstance(node, CouplingSchemeNode) or isinstance(
+            node, MultiCouplingSchemeNode
+        ):
             couplings.append(node)
     return couplings
 
 
-def mapping_fits_exchange(mapping: MappingNode, direction: Direction, from_participant: ParticipantNode,
-                          to_participant: ParticipantNode, exchange_mesh: MeshNode) -> bool:
+def mapping_fits_exchange(
+    mapping: MappingNode,
+    direction: Direction,
+    from_participant: ParticipantNode,
+    to_participant: ParticipantNode,
+    exchange_mesh: MeshNode,
+) -> bool:
     """
         This function checks, whether the given mapping fits an exchange indicated by the given direction,
         first and second participant and mesh used in the exchange.
@@ -195,10 +270,10 @@ def mapping_fits_exchange(mapping: MappingNode, direction: Direction, from_parti
 
 def has_api_access(participant: ParticipantNode, mesh: MeshNode) -> bool:
     """
-        This function checks, whether the given participant has API access to the given mesh.
-        :param participant: The participant to check.
-        :param mesh: The mesh to check.
-        :return: True, if the participant receives the mesh with api-access=true
+    This function checks, whether the given participant has API access to the given mesh.
+    :param participant: The participant to check.
+    :param mesh: The mesh to check.
+    :return: True, if the participant receives the mesh with api-access=true
     """
     for receive_mesh in participant.receive_meshes:
         if receive_mesh.mesh == mesh and receive_mesh.api_access:

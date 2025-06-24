@@ -1,6 +1,10 @@
 import networkx as nx
 from networkx import Graph
-from precice_config_graph.nodes import ExchangeNode, CouplingSchemeNode, MultiCouplingSchemeNode
+from precice_config_graph.nodes import (
+    ExchangeNode,
+    CouplingSchemeNode,
+    MultiCouplingSchemeNode,
+)
 from preciceconfigcheck.rule import Rule
 from preciceconfigcheck.severity import Severity
 from preciceconfigcheck.violation import Violation
@@ -14,22 +18,31 @@ class MissingExchangeRule(Rule):
         """
         This class handles coupling schemes missing data-exchanges.
         """
+
         severity = Severity.ERROR
 
-        def __init__(self, coupling_scheme: CouplingSchemeNode | MultiCouplingSchemeNode) -> None:
+        def __init__(
+            self, coupling_scheme: CouplingSchemeNode | MultiCouplingSchemeNode
+        ) -> None:
             self.coupling_scheme = coupling_scheme
 
         def format_explanation(self) -> str:
             if isinstance(self.coupling_scheme, CouplingSchemeNode):
-                return (f"The coupling scheme between participants {self.coupling_scheme.first_participant.name} and "
-                        f"{self.coupling_scheme.second_participant.name} is missing an exchange.")
+                return (
+                    f"The coupling scheme between participants {self.coupling_scheme.first_participant.name} and "
+                    f"{self.coupling_scheme.second_participant.name} is missing an exchange."
+                )
             else:
-                return (f"The multi-coupling scheme of control-participant "
-                        f"{self.coupling_scheme.control_participant.name} is missing an exchange.")
+                return (
+                    f"The multi-coupling scheme of control-participant "
+                    f"{self.coupling_scheme.control_participant.name} is missing an exchange."
+                )
 
         def format_possible_solutions(self) -> list[str]:
-            return ["Please add an exchange to the coupling scheme.",
-                    "Otherwise, please remove it to improve readability."]
+            return [
+                "Please add an exchange to the coupling scheme.",
+                "Otherwise, please remove it to improve readability.",
+            ]
 
     def check(self, graph: Graph) -> list[Violation]:
         violations = []
@@ -57,5 +70,8 @@ def filter_exchange_coupling_scheme_nodes(node) -> bool:
     Returns:
         True, if the node is an exchange or (multi-)coupling scheme node.
     """
-    return (isinstance(node, CouplingSchemeNode) or isinstance(node, MultiCouplingSchemeNode) or
-            isinstance(node, ExchangeNode))
+    return (
+        isinstance(node, CouplingSchemeNode)
+        or isinstance(node, MultiCouplingSchemeNode)
+        or isinstance(node, ExchangeNode)
+    )

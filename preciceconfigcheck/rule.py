@@ -37,7 +37,7 @@ class Rule(ABC):
         """
         pass
 
-    def satisfied(self, violations:list[Violation], debug:bool) -> bool:
+    def satisfied(self, violations: list[Violation], debug: bool) -> bool:
         """
         Checks if a rule is satisfied.
         If debug mode is enabled, violations with severity level DEBUG are also considered.
@@ -49,7 +49,7 @@ class Rule(ABC):
         Returns:
             bool: True, if a rule is satisfied.
         """
-        if debug and len(violations)>0:
+        if debug and len(violations) > 0:
             return False
         for violation in violations:
             if violation.severity != Severity.DEBUG:

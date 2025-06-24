@@ -1,11 +1,20 @@
 from precice_config_graph.nodes import ParticipantNode, MeshNode, DataNode, Direction
 
 from preciceconfigcheck.rules.disjoint_simulations import DisjointSimulationsRule as d
-from preciceconfigcheck.rules.coupling_scheme_mapping import CouplingSchemeMappingRule as c
-from preciceconfigcheck.rules.mapping import MappingRule as m, MissingDataProcessing as mdp
+from preciceconfigcheck.rules.coupling_scheme_mapping import (
+    CouplingSchemeMappingRule as c,
+)
+from preciceconfigcheck.rules.mapping import (
+    MappingRule as m,
+    MissingDataProcessing as mdp,
+)
 from preciceconfigcheck.rules.receive_mesh import ReceiveMeshRule as r
 
-from tests.test_utils import assert_equal_violations, create_graph, get_actual_violations
+from tests.test_utils import (
+    assert_equal_violations,
+    create_graph,
+    get_actual_violations,
+)
 
 
 def test_coupling_scheme_mapping():
@@ -39,20 +48,31 @@ def test_coupling_scheme_mapping():
                 m_instigator = node
 
     violations_expected = [
-
-        c.MissingMappingCouplingSchemeViolation(p_generator, p_propagator, m_generator, d_color),
-
-        c.MissingMappingCouplingSchemeViolation(p_generator, p_propagator, m_propagator, d_color),
-
-        c.MissingMappingAPIAccessCouplingSchemeViolation(p_alligator, p_instigator, m_alligator, d_color),
-
-        d.SharedDataDisjointSimulationsViolation(d_color, frozenset([frozenset([p_generator, p_propagator, p_elevator]),
-                                                                     frozenset([p_alligator, p_instigator])])),
-        m.JustInTimeMappingMissingDataProcessingViolation(p_alligator, p_instigator, m_instigator, Direction.WRITE,
-                                                          mdp.READ_DATA),
+        c.MissingMappingCouplingSchemeViolation(
+            p_generator, p_propagator, m_generator, d_color
+        ),
+        c.MissingMappingCouplingSchemeViolation(
+            p_generator, p_propagator, m_propagator, d_color
+        ),
+        c.MissingMappingAPIAccessCouplingSchemeViolation(
+            p_alligator, p_instigator, m_alligator, d_color
+        ),
+        d.SharedDataDisjointSimulationsViolation(
+            d_color,
+            frozenset(
+                [
+                    frozenset([p_generator, p_propagator, p_elevator]),
+                    frozenset([p_alligator, p_instigator]),
+                ]
+            ),
+        ),
+        m.JustInTimeMappingMissingDataProcessingViolation(
+            p_alligator, p_instigator, m_instigator, Direction.WRITE, mdp.READ_DATA
+        ),
         r.UnusedReceiveMesh(p_generator, m_propagator),
-
         r.UnusedReceiveMesh(p_propagator, m_generator),
     ]
 
-    assert_equal_violations("Coupling-scheme-mapping-test", violations_expected, violations_actual)
+    assert_equal_violations(
+        "Coupling-scheme-mapping-test", violations_expected, violations_actual
+    )

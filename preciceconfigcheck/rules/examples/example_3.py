@@ -19,5 +19,5 @@ class Rule_3(Rule):
     name = "3rd Example Rule"
 
     def check(self, graph) -> list[Violation]:
-        #Find violations in the graph and return them.
-        return [ self.MyViolation("Node-M") ]
+        # Find violations in the graph and return them.
+        return [self.MyViolation("Node-M")]

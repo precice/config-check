@@ -1,6 +1,11 @@
 import networkx as nx
 from networkx import Graph
-from precice_config_graph.nodes import CouplingSchemeNode, MultiCouplingSchemeNode, ParticipantNode, CouplingSchemeType
+from precice_config_graph.nodes import (
+    CouplingSchemeNode,
+    MultiCouplingSchemeNode,
+    ParticipantNode,
+    CouplingSchemeType,
+)
 from preciceconfigcheck.rule import Rule
 from preciceconfigcheck.rule_utils import format_list
 from preciceconfigcheck.severity import Severity
@@ -13,9 +18,10 @@ class CompositionalCouplingRule(Rule):
 
     class CompositionalDeadlockViolation(Violation):
         """
-            This class handles participants exchanging data through coupling schemes in a circular way, which leads
-            to a deadlock.
+        This class handles participants exchanging data through coupling schemes in a circular way, which leads
+        to a deadlock.
         """
+
         severity = Severity.ERROR
 
         def __init__(self, participants: list[ParticipantNode]) -> None:
@@ -33,9 +39,14 @@ class CompositionalCouplingRule(Rule):
         # Only coupling schemes are important for this evaluation
         g1 = nx.subgraph_view(graph, filter_node=filter_coupling_scheme_nodes)
         for coupling in g1.nodes():
-            if coupling.type == CouplingSchemeType.SERIAL_EXPLICIT or coupling.type == CouplingSchemeType.SERIAL_IMPLICIT:
+            if (
+                coupling.type == CouplingSchemeType.SERIAL_EXPLICIT
+                or coupling.type == CouplingSchemeType.SERIAL_IMPLICIT
+            ):
                 # Directed edge between first and second participant
-                coupling_edges += [(coupling.first_participant, coupling.second_participant)]
+                coupling_edges += [
+                    (coupling.first_participant, coupling.second_participant)
+                ]
 
         # Create a new graph from edges connecting participants
         coupling_graph = nx.DiGraph()
@@ -54,12 +65,12 @@ class CompositionalCouplingRule(Rule):
 # Helper functions
 def filter_coupling_scheme_nodes(node) -> bool:
     """
-   A function filtering coupling scheme nodes in the graph.
+    A function filtering coupling scheme nodes in the graph.
 
-   Args:
-       node: the node to check
+    Args:
+        node: the node to check
 
-   Returns:
-       True, if the node is a coupling scheme node.
-   """
+    Returns:
+        True, if the node is a coupling scheme node.
+    """
     return isinstance(node, CouplingSchemeNode)

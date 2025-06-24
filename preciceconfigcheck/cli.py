@@ -14,10 +14,13 @@ def runCheck(path: pathlib.Path, debug: bool):
     if debug:
         print(f"[{Severity.DEBUG.value}]: Debug mode enabled")
 
-    if path.name.endswith('.xml'):
+    if path.name.endswith(".xml"):
         print(f"Checking file at '{c.dyeing(str(path), c.cyan)}'")
     else:
-        print(f"[{Severity.ERROR.value}]: '{c.dyeing(str(path), c.cyan)}' is not an xml file", file=sys.stderr)
+        print(
+            f"[{Severity.ERROR.value}]: '{c.dyeing(str(path), c.cyan)}' is not an xml file",
+            file=sys.stderr,
+        )
         return 1
 
     # Step 1: Use preCICE itself to check for basic errors
@@ -37,10 +40,14 @@ def runCheck(path: pathlib.Path, debug: bool):
 
 
 def main():
-    parser = argparse.ArgumentParser(usage='%(prog)s',
-                                     description='Checks a preCICE config.xml file for logical errors.')
-    parser.add_argument('src', type=pathlib.Path, help='Path of the config.xml source file.')
-    parser.add_argument('-d', '--debug', action='store_true', help='Enables debug mode')
+    parser = argparse.ArgumentParser(
+        usage="%(prog)s",
+        description="Checks a preCICE config.xml file for logical errors.",
+    )
+    parser.add_argument(
+        "src", type=pathlib.Path, help="Path of the config.xml source file."
+    )
+    parser.add_argument("-d", "--debug", action="store_true", help="Enables debug mode")
     args = parser.parse_args()
 
     return runCheck(path=args.src, debug=args.debug)

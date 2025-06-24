@@ -16,16 +16,17 @@ class Rule_2(Rule):
             return f"Something went wrong between {self.node_a}, {self.node_b} and {self.node_c}"
 
         def format_possible_solutions(self) -> list[str]:
-            return [f"Delete {self.node_a}",
-                    f"Delete {self.node_b}",
-                    f"Delete {self.node_c}",
-                    f"Connect {self.node_a} and {self.node_b}",
-                    f"Connect {self.node_a} and {self.node_c}",
-                    f"Connect {self.node_a} and {self.node_b} and {self.node_a} and {self.node_c}"
-                    ]
+            return [
+                f"Delete {self.node_a}",
+                f"Delete {self.node_b}",
+                f"Delete {self.node_c}",
+                f"Connect {self.node_a} and {self.node_b}",
+                f"Connect {self.node_a} and {self.node_c}",
+                f"Connect {self.node_a} and {self.node_b} and {self.node_a} and {self.node_c}",
+            ]
 
     name = "2nd Example Rule"
 
     def check(self, graph) -> list[Violation]:
-        #Find violations in the graph and return them.
-        return [ self.MyViolation("Node-G", "Node-H", "Node-I") ]
+        # Find violations in the graph and return them.
+        return [self.MyViolation("Node-G", "Node-H", "Node-I")]

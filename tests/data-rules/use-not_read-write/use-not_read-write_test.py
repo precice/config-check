@@ -2,7 +2,11 @@ from precice_config_graph.nodes import DataNode, MeshNode, ParticipantNode
 
 from preciceconfigcheck.rules.data_use_read_write import DataUseReadWriteRule as d
 
-from tests.test_utils import assert_equal_violations, get_actual_violations, create_graph
+from tests.test_utils import (
+    assert_equal_violations,
+    get_actual_violations,
+    create_graph,
+)
 
 
 def test_data_not_use_not_read_not_write():
@@ -23,6 +27,10 @@ def test_data_not_use_not_read_not_write():
 
     violations_expected = []
     # ErrorColor gets used in Generator-Mesh, does not get read, gets written by participant Generator
-    violations_expected += [d.DataUsedNotReadWrittenViolation(n_error_color, n_mesh, [n_generator])]
+    violations_expected += [
+        d.DataUsedNotReadWrittenViolation(n_error_color, n_mesh, [n_generator])
+    ]
 
-    assert_equal_violations("Data used, not read, written-test", violations_actual, violations_expected)
+    assert_equal_violations(
+        "Data used, not read, written-test", violations_actual, violations_expected
+    )

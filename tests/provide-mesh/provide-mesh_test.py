@@ -1,6 +1,10 @@
 from precice_config_graph.nodes import ParticipantNode, MeshNode
 
-from tests.test_utils import assert_equal_violations, get_actual_violations, create_graph
+from tests.test_utils import (
+    assert_equal_violations,
+    get_actual_violations,
+    create_graph,
+)
 from preciceconfigcheck.rules.provide_mesh import ProvideMeshRule as pm
 
 
@@ -22,11 +26,8 @@ def test_provide_mesh():
                 m_popular = node
 
     violations_expected = [
-
         pm.UnclaimedMeshViolation(m_forsaken),
-
-        pm.RepeatedlyClaimedMeshViolation([p_generator, p_propagator], m_popular)
-
+        pm.RepeatedlyClaimedMeshViolation([p_generator, p_propagator], m_popular),
     ]
 
     assert_equal_violations("Provide-mesh test", violations_expected, violations_actual)

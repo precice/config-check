@@ -1,8 +1,14 @@
 from precice_config_graph.nodes import ParticipantNode
 
-from preciceconfigcheck.rules.compositional_coupling import CompositionalCouplingRule as c
+from preciceconfigcheck.rules.compositional_coupling import (
+    CompositionalCouplingRule as c,
+)
 
-from tests.test_utils import assert_equal_violations, get_actual_violations, create_graph
+from tests.test_utils import (
+    assert_equal_violations,
+    get_actual_violations,
+    create_graph,
+)
 
 
 def test_missing_coupling_scheme():
@@ -21,6 +27,10 @@ def test_missing_coupling_scheme():
                 n_alligator = node
 
     violations_expected = []
-    violations_expected += [c.CompositionalDeadlockViolation([n_generator, n_propagator, n_alligator])]
+    violations_expected += [
+        c.CompositionalDeadlockViolation([n_generator, n_propagator, n_alligator])
+    ]
 
-    assert_equal_violations("Compositional-coupling test", violations_expected, violations_actual)
+    assert_equal_violations(
+        "Compositional-coupling test", violations_expected, violations_actual
+    )

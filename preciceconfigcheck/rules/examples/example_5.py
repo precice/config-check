@@ -2,6 +2,7 @@ from preciceconfigcheck.rule import Rule
 from preciceconfigcheck.severity import Severity
 from preciceconfigcheck.violation import Violation
 
+
 class Rule_5(Rule):
     class MyViolation1(Violation):
         severity = Severity.DEBUG
@@ -11,31 +12,25 @@ class Rule_5(Rule):
 
         def format_explanation(self) -> str:
             return "Testing Debug"
-        
+
         def format_possible_solutions(self) -> list[str]:
-            return ["The",
-                    "Test"
-            ]
-        
+            return ["The", "Test"]
+
     class MyViolation2(Violation):
         severity = Severity.DEBUG
-        
-        def __init__(self, test:str, line: int) -> None:
+
+        def __init__(self, test: str, line: int) -> None:
             self.test = test
             super().__init__(line)
 
         def format_explanation(self) -> str:
             return f"{self.test} Debug"
-        
+
         def format_possible_solutions(self) -> list[str]:
-            return ["The",
-                    "Test"
-            ]
+            return ["The", "Test"]
 
     name = "5th Example Rule"
 
     def check(self, graph) -> list[Violation]:
-        #Find violations in the graph and return them.
-        return [ self.MyViolation1(42),
-                 self.MyViolation2('Testing', 69) 
-                 ]
+        # Find violations in the graph and return them.
+        return [self.MyViolation1(42), self.MyViolation2("Testing", 69)]

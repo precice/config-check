@@ -10,23 +10,29 @@ class M2NExchangeRule(Rule):
 
     class MissingM2NExchangeViolation(Violation):
         """
-            This class handles a participant not being part of an M2N exchange.
+        This class handles a participant not being part of an M2N exchange.
         """
+
         severity = Severity.ERROR
 
         def __init__(self, participant: ParticipantNode):
             self.participant = participant
 
         def format_explanation(self) -> str:
-            return f"Participant {self.participant.name} is not part of an M2N exchange."
+            return (
+                f"Participant {self.participant.name} is not part of an M2N exchange."
+            )
 
         def format_possible_solutions(self) -> list[str]:
-            return [f"Please create an M2N exchange between {self.participant.name} and another participant."]
+            return [
+                f"Please create an M2N exchange between {self.participant.name} and another participant."
+            ]
 
     class DuplicateM2NExchangeViolation(Violation):
         """
-            This class handles two participants having more than one M2N exchange between them.
+        This class handles two participants having more than one M2N exchange between them.
         """
+
         severity = Severity.ERROR
 
         def __init__(self, davik_kang: ParticipantNode, calo_nord: ParticipantNode):
@@ -34,12 +40,16 @@ class M2NExchangeRule(Rule):
             self.participant2 = calo_nord
 
         def format_explanation(self) -> str:
-            return (f"There is more than one M2N exchange between participants {self.participant1.name} and "
-                    f"{self.participant2.name}.")
+            return (
+                f"There is more than one M2N exchange between participants {self.participant1.name} and "
+                f"{self.participant2.name}."
+            )
 
         def format_possible_solutions(self) -> list[str]:
-            return [f"Please remove duplicate M2N exchanges between {self.participant1.name} and "
-                    f"{self.participant2.name}."]
+            return [
+                f"Please remove duplicate M2N exchanges between {self.participant1.name} and "
+                f"{self.participant2.name}."
+            ]
 
     def check(self, graph: Graph) -> list[Violation]:
         violations: list[Violation] = []
@@ -74,32 +84,60 @@ class M2NExchangeRule(Rule):
                     k2l_acceptor: ParticipantNode = k2l.acceptor
                     k2l_connector: ParticipantNode = k2l.connector
                     # Duplicates with same connector and same acceptor participants
-                    if (m2n_acceptor == k2l_acceptor and m2n_connector == k2l_connector
-                            and not self.contains_violation(violations, m2n_acceptor, m2n_connector)):
-                        violations.append(self.DuplicateM2NExchangeViolation(m2n_acceptor, m2n_connector))
+                    if (
+                        m2n_acceptor == k2l_acceptor
+                        and m2n_connector == k2l_connector
+                        and not self.contains_violation(
+                            violations, m2n_acceptor, m2n_connector
+                        )
+                    ):
+                        violations.append(
+                            self.DuplicateM2NExchangeViolation(
+                                m2n_acceptor, m2n_connector
+                            )
+                        )
                     # Check for duplicates "in the other direction":
                     # This can be removed if acceptor / connector roles do matter in the future.
-                    elif (m2n_acceptor == k2l_connector and m2n_connector == k2l_acceptor
-                          and not self.contains_violation(violations, m2n_acceptor, m2n_connector)):
-                        violations.append(self.DuplicateM2NExchangeViolation(m2n_acceptor, m2n_connector))
+                    elif (
+                        m2n_acceptor == k2l_connector
+                        and m2n_connector == k2l_acceptor
+                        and not self.contains_violation(
+                            violations, m2n_acceptor, m2n_connector
+                        )
+                    ):
+                        violations.append(
+                            self.DuplicateM2NExchangeViolation(
+                                m2n_acceptor, m2n_connector
+                            )
+                        )
 
         return violations
 
     # Helper functions
-    def contains_violation(self, violations: list[Violation], participant1: ParticipantNode,
-                           participant2: ParticipantNode) -> bool:
+    def contains_violation(
+        self,
+        violations: list[Violation],
+        participant1: ParticipantNode,
+        participant2: ParticipantNode,
+    ) -> bool:
         """
-            This function tests whether there already exists a DuplicateM2NExchangeViolation between two participants.
-            :param violations: The list of violations.
-            :param participant1: The first participant.
-            :param participant2: The second participant.
-            :return: True, if there already exists a DuplicateM2NExchangeViolation between the two participants.
+        This function tests whether there already exists a DuplicateM2NExchangeViolation between two participants.
+        :param violations: The list of violations.
+        :param participant1: The first participant.
+        :param participant2: The second participant.
+        :return: True, if there already exists a DuplicateM2NExchangeViolation between the two participants.
         """
         for violation in violations:
             if isinstance(violation, self.DuplicateM2NExchangeViolation):
                 # Check if any DuplicateM2NExchangeViolation contains these two participants
-                if violation.participant1 == participant1 and violation.participant2 == participant2:
+                if (
+                    violation.participant1 == participant1
+                    and violation.participant2 == participant2
+                ):
                     return True
-                elif violation.participant1 == participant2 and violation.participant2 == participant1:
+                elif (
+                    violation.participant1 == participant2
+                    and violation.participant2 == participant1
+                ):
                     return True
         return False

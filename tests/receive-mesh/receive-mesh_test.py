@@ -1,6 +1,10 @@
 from precice_config_graph.nodes import ParticipantNode, MeshNode
 
-from tests.test_utils import assert_equal_violations, get_actual_violations, create_graph
+from tests.test_utils import (
+    assert_equal_violations,
+    get_actual_violations,
+    create_graph,
+)
 from preciceconfigcheck.rules.receive_mesh import ReceiveMeshRule as r
 
 
@@ -23,8 +27,7 @@ def test_receive_mesh():
 
     violations_expected = [
         r.UnusedReceiveMesh(p_propagator, m_wedding_gift),
-
-        r.MappedAPIAccessReceiveMesh(p_propagator,m_generator),
+        r.MappedAPIAccessReceiveMesh(p_propagator, m_generator),
     ]
 
     assert_equal_violations("Receive-mesh test", violations_expected, violations_actual)

@@ -4,11 +4,17 @@ from preciceconfigcheck.rules.data_use_read_write import DataUseReadWriteRule as
 from preciceconfigcheck.rules.mapping import MappingRule as m
 from preciceconfigcheck.rules.receive_mesh import ReceiveMeshRule as r
 
-from tests.test_utils import assert_equal_violations, get_actual_violations, create_graph
+from tests.test_utils import (
+    assert_equal_violations,
+    get_actual_violations,
+    create_graph,
+)
 
 
 def test_data_not_use_not_read_not_write():
-    graph = create_graph("tests/data-rules/use-read-write-not_exchange/precice-config.xml")
+    graph = create_graph(
+        "tests/data-rules/use-read-write-not_exchange/precice-config.xml"
+    )
 
     violations_actual = get_actual_violations(graph)
 
@@ -41,17 +47,19 @@ def test_data_not_use_not_read_not_write():
 
     violations_expected = []
     # ErrorColor gets written by participant Generator and read by Propagator, but not exchanged between them
-    violations_expected += [d.DataNotExchangedViolation(d_error_color, p_generator, p_propagator),
+    violations_expected += [
+        d.DataNotExchangedViolation(d_error_color, p_generator, p_propagator),
+        d.DataNotExchangedViolation(d_color, p_generator, p_alligator),
+        d.DataNotExchangedViolation(d_color, p_generator, p_instigator),
+        m.MissingExchangeMappingViolation(
+            p_instigator, p_generator, m_generator, Direction.READ
+        ),
+        m.MissingExchangeMappingViolation(
+            p_alligator, p_generator, m_generator, Direction.READ
+        ),
+        r.MappedAPIAccessReceiveMesh(p_elevator, m_generator),
+    ]
 
-                            d.DataNotExchangedViolation(d_color, p_generator, p_alligator),
-
-                            d.DataNotExchangedViolation(d_color, p_generator, p_instigator),
-
-                            m.MissingExchangeMappingViolation(p_instigator, p_generator, m_generator, Direction.READ),
-
-                            m.MissingExchangeMappingViolation(p_alligator, p_generator, m_generator, Direction.READ),
-
-                            r.MappedAPIAccessReceiveMesh(p_elevator, m_generator),
-                            ]
-
-    assert_equal_violations("Data-not-exchanged-test", violations_expected, violations_actual)
+    assert_equal_violations(
+        "Data-not-exchanged-test", violations_expected, violations_actual
+    )

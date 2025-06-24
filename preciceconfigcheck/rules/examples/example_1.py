@@ -16,11 +16,12 @@ class Rule_1(Rule):
             return f"Something went wrong between {self.node_a} and {self.node_b}"
 
         def format_possible_solutions(self) -> list[str]:
-            return [f"Delete {self.node_a}",
-                    f"Delete {self.node_b}",
-                    f"Connect {self.node_a} and {self.node_b}"
-                    ]
-        
+            return [
+                f"Delete {self.node_a}",
+                f"Delete {self.node_b}",
+                f"Connect {self.node_a} and {self.node_b}",
+            ]
+
     class MyViolation2(Violation):
         severity = Severity.DEBUG
 
@@ -33,17 +34,13 @@ class Rule_1(Rule):
             return f"Something went wrong between {self.node_a} and {self.node_b}"
 
         def format_possible_solutions(self) -> list[str]:
-            return [f"Connect {self.node_a} and {self.node_b}"
-                    ]
-        
+            return [f"Connect {self.node_a} and {self.node_b}"]
 
     name = "1st Example Rule"
 
     def check(self, graph) -> list[Violation]:
-        #Find violations in the graph and return them.
-        violations = [
-            self.MyViolation1("Node-A", "Node-B", 1)
-        ]
+        # Find violations in the graph and return them.
+        violations = [self.MyViolation1("Node-A", "Node-B", 1)]
         # ...
         violations.append(self.MyViolation1("Node-C", "Node-D", 2))
         # ...

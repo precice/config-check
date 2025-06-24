@@ -3,7 +3,11 @@ from precice_config_graph.nodes import DataNode, ParticipantNode, MeshNode, Dire
 from preciceconfigcheck.rules.missing_coupling import MissingCouplingSchemeRule as c
 from preciceconfigcheck.rules.mapping import MappingRule as m
 from preciceconfigcheck.rules.data_use_read_write import DataUseReadWriteRule as d
-from tests.test_utils import assert_equal_violations, get_actual_violations, create_graph
+from tests.test_utils import (
+    assert_equal_violations,
+    get_actual_violations,
+    create_graph,
+)
 
 
 def test_missing_coupling_scheme():
@@ -32,10 +36,17 @@ def test_missing_coupling_scheme():
     v_missing_coupling_scheme = c.MissingCouplingSchemeViolation()
     violations_expected += [v_missing_coupling_scheme]
 
-    v_data_not_exchanged = d.DataNotExchangedViolation(n_color, p_generator, p_propagator)
+    v_data_not_exchanged = d.DataNotExchangedViolation(
+        n_color, p_generator, p_propagator
+    )
     violations_expected += [v_data_not_exchanged]
 
     violations_expected += [
-        m.MissingCouplingSchemeMappingViolation(p_propagator, p_generator, m_generator, Direction.READ)]
+        m.MissingCouplingSchemeMappingViolation(
+            p_propagator, p_generator, m_generator, Direction.READ
+        )
+    ]
 
-    assert_equal_violations("Missing-coupling-scheme test", violations_expected, violations_actual)
+    assert_equal_violations(
+        "Missing-coupling-scheme test", violations_expected, violations_actual
+    )

@@ -1,7 +1,11 @@
 from precice_config_graph.nodes import ParticipantNode
 from preciceconfigcheck.rules.disjoint_simulations import DisjointSimulationsRule as r
 
-from tests.test_utils import assert_equal_violations, get_actual_violations, create_graph
+from tests.test_utils import (
+    assert_equal_violations,
+    get_actual_violations,
+    create_graph,
+)
 
 
 def test_fully_disjoint_simulations():
@@ -20,8 +24,17 @@ def test_fully_disjoint_simulations():
             elif node.name == "PropagatorB":
                 p_propagator_b = node
 
-    violations_expected = [r.FullyDisjointSimulationsViolation(frozenset([
-        frozenset([p_generator_a, p_propagator_a]), frozenset([p_generator_b, p_propagator_b])
-    ]))]
+    violations_expected = [
+        r.FullyDisjointSimulationsViolation(
+            frozenset(
+                [
+                    frozenset([p_generator_a, p_propagator_a]),
+                    frozenset([p_generator_b, p_propagator_b]),
+                ]
+            )
+        )
+    ]
 
-    assert_equal_violations("Fully Disjoint-simulations test", violations_expected, violations_actual)
+    assert_equal_violations(
+        "Fully Disjoint-simulations test", violations_expected, violations_actual
+    )

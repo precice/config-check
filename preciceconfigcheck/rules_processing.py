@@ -2,8 +2,18 @@ from networkx import Graph
 
 import preciceconfigcheck.color as c
 from preciceconfigcheck.rule import Rule
-from preciceconfigcheck.rules import missing_coupling, missing_exchange, data_use_read_write, compositional_coupling, \
-    mapping, m2n_exchange, disjoint_simulations, provide_mesh, coupling_scheme_mapping, receive_mesh
+from preciceconfigcheck.rules import (
+    missing_coupling,
+    missing_exchange,
+    data_use_read_write,
+    compositional_coupling,
+    mapping,
+    m2n_exchange,
+    disjoint_simulations,
+    provide_mesh,
+    coupling_scheme_mapping,
+    receive_mesh,
+)
 from preciceconfigcheck.severity import Severity
 from preciceconfigcheck.violation import Violation
 
@@ -21,7 +31,9 @@ rules: list[Rule] = [
 ]
 
 
-def has_satisfied_rules(violations_by_rule: dict[Rule, list[Violation]], debug: bool) -> bool:
+def has_satisfied_rules(
+    violations_by_rule: dict[Rule, list[Violation]], debug: bool
+) -> bool:
     """
     Checks if at least one rule is satisfied.
     If debug mode is enabled, violations with severity level DEBUG are also considered.
@@ -83,7 +95,9 @@ def check_all_rules(graph: Graph, debug: bool) -> dict[Rule, list[Violation]]:
     return violations_by_rule
 
 
-def print_all_results(violations_by_rule: dict[Rule, list[Violation]], debug: bool) -> None:
+def print_all_results(
+    violations_by_rule: dict[Rule, list[Violation]], debug: bool
+) -> None:
     """
     Prints all existing violations of all rules.
     If debug mode is enabled, violations with severity level DEBUG are also considered.
@@ -132,9 +146,13 @@ def print_all_results(violations_by_rule: dict[Rule, list[Violation]], debug: bo
         total_num_errors = total_violations_by_severity(Severity.ERROR)
         total_num_warnings = total_violations_by_severity(Severity.WARNING)
         error_str: str = Severity.ERROR.value + ("s" if total_num_errors != 1 else "")
-        warning_str: str = Severity.WARNING.value + ("s" if total_num_warnings != 1 else "")
-        print(f"Your configuration file raised {total_num_errors} {error_str} "
-              f"and {total_num_warnings} {warning_str}.")
+        warning_str: str = Severity.WARNING.value + (
+            "s" if total_num_warnings != 1 else ""
+        )
+        print(
+            f"Your configuration file raised {total_num_errors} {error_str} "
+            f"and {total_num_warnings} {warning_str}."
+        )
         print("Please review your configuration file before continuing.")
     else:
         print("You are all set to start you simulation!")
@@ -158,7 +176,11 @@ def print_result(rule: Rule, violations: list[Violation], debug: bool) -> None:
             print(f" - {c.dyeing(rule.__class__.__name__, c.purple)}")
         return
     else:
-        rule_name: str = f"({c.dyeing(rule.__class__.__name__, c.purple)}) {rule.name}" if debug else f"{rule.name}"
+        rule_name: str = (
+            f"({c.dyeing(rule.__class__.__name__, c.purple)}) {rule.name}"
+            if debug
+            else f"{rule.name}"
+        )
         print(rule_name)
 
         for violation in violations:

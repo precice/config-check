@@ -50,12 +50,12 @@ class Violation(ABC):
 
         Returns:
             list[str]: of formatted possible solutions
-        
+
         Hint: Use the attributes defined in '__init__()'.
         """
         pass
 
-    def format(self, debug:bool) -> str | None:
+    def format(self, debug: bool) -> str | None:
         """
         Formats the 'Violation' for its attributes.
         If debug mode is enabled, violations with DEBUG severity are also formatted.
@@ -69,14 +69,22 @@ class Violation(ABC):
         if not debug and (self.severity == Severity.DEBUG):
             return None
 
-        severity_info:str = f"[{self.severity.value}]: "
-        class_name:str = f"({c.dyeing(self.__class__.__name__, c.purple)}) " if debug else ""
+        severity_info: str = f"[{self.severity.value}]: "
+        class_name: str = (
+            f"({c.dyeing(self.__class__.__name__, c.purple)}) " if debug else ""
+        )
         existing_line: str = f"(Line {self.line}) " if self.line else ""
         # indent additional lines of the explanation to be aligned with first row after ">>> " is added
         explanation: str = self.format_explanation().replace("\n", "\n     ")
         possible_solutions: list[str] = self.format_possible_solutions()
 
-        out: str = c.dyeing(" >>> ", c.cyan) + severity_info + class_name + existing_line + explanation
+        out: str = (
+            c.dyeing(" >>> ", c.cyan)
+            + severity_info
+            + class_name
+            + existing_line
+            + explanation
+        )
         for possible_solution in possible_solutions:
             out += c.dyeing("\n     ==> ", c.cyan) + possible_solution
         return out
