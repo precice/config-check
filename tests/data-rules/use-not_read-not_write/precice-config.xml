@@ -21,7 +21,7 @@
 
   <participant name="Generator">
     <provide-mesh name="Generator-Mesh" />
-    <write-data name="Color" mesh="Generator-Mesh" />  
+    <write-data name="Color" mesh="Generator-Mesh" />
   </participant>
 
   <participant name="Propagator">

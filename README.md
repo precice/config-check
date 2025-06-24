@@ -49,10 +49,10 @@ config-check
 ├── preciceconfigcheck         # Main library files
 │   ├── rules                  # All rules that are checked by this utility
 │   │   ├── ...
-│   │   └── examples           # Exemplary implementations of rules to test output format 
+│   │   └── examples           # Exemplary implementations of rules to test output format
 │   │       └── ...
 │   │
-│   ├── tests                  # Configuration files to test rules 
+│   ├── tests                  # Configuration files to test rules
 │   │   └── ...
 │   │
 │   ├── cli.py                 # Main entrypoint for this checker
