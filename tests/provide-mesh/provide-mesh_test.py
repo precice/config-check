@@ -1,7 +1,7 @@
 from precice_config_graph.nodes import ParticipantNode, MeshNode
 
 from tests.test_utils import assert_equal_violations, get_actual_violations, create_graph
-from preciceconfigchecker.rules.provide_mesh import ProvideMeshRule as pm
+from preciceconfigcheck.rules.provide_mesh import ProvideMeshRule as pm
 
 
 def test_provide_mesh():

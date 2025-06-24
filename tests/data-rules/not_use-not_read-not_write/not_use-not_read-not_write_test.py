@@ -1,6 +1,6 @@
 from precice_config_graph.nodes import DataNode
 
-from preciceconfigchecker.rules.data_use_read_write import DataUseReadWriteRule as d
+from preciceconfigcheck.rules.data_use_read_write import DataUseReadWriteRule as d
 
 from tests.test_utils import assert_equal_violations, get_actual_violations, create_graph
 

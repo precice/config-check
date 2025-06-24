@@ -1,6 +1,6 @@
 from precice_config_graph.nodes import ParticipantNode
 
-from preciceconfigchecker.rules.compositional_coupling import CompositionalCouplingRule as c
+from preciceconfigcheck.rules.compositional_coupling import CompositionalCouplingRule as c
 
 from tests.test_utils import assert_equal_violations, get_actual_violations, create_graph
 

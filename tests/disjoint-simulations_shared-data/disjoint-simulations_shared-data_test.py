@@ -1,5 +1,5 @@
 from precice_config_graph.nodes import ParticipantNode, DataNode
-from preciceconfigchecker.rules.disjoint_simulations import DisjointSimulationsRule as r
+from preciceconfigcheck.rules.disjoint_simulations import DisjointSimulationsRule as r
 
 from tests.test_utils import assert_equal_violations, get_actual_violations, create_graph
 

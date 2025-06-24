@@ -1,5 +1,5 @@
 [project]
-name = "preciceconfigchecker"
+name = "precice-config-check"
 version = "0.0.1"
 
 readme = "README.md"
@@ -13,14 +13,14 @@ dependencies = [
 ]
 
 [project.urls]
-Repository = "https://github.com/precice-forschungsprojekt/config-checker.git"
-Issues = "https://github.com/precice-forschungsprojekt/config-checker/issues"
+Repository = "https://github.com/precice-forschungsprojekt/config-check.git"
+Issues = "https://github.com/precice-forschungsprojekt/config-check/issues"
 
 [project.scripts]
-precice-config-check = "preciceconfigchecker.cli:main"
+precice-config-check = "preciceconfigcheck.cli:main"
 
 [tool.setuptools]
-packages = ["preciceconfigchecker", "preciceconfigchecker.rules"]
+packages = ["preciceconfigcheck", "preciceconfigcheck.rules"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

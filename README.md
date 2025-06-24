@@ -21,7 +21,7 @@ configuration for logical errors.
 1. Clone this repository:
 ```bash
 git clone https://github.com/precice/config-check
-cd config-checker
+cd config-check
 ```
 2. Create a new Python Virtual Environment (optional, but recommended):
 ```bash
@@ -40,13 +40,13 @@ pip install --ignore-installed .
 ## Project Structure
 
 ```
-config-checker
+config-check
 ├── .github, .idea, etc…
 │
 ├── docs                       # Documentation on rules and the inner workings of this checker
 │   └── ...
 │
-├── preciceconfigchecker       # Main library files
+├── preciceconfigcheck         # Main library files
 │   ├── rules                  # All rules that are checked by this utility
 │   │   ├── ...
 │   │   └── examples           # Exemplary implementations of rules to test output format 
@@ -75,13 +75,13 @@ config-checker
 To check a preCICE configuration file for logical errors, run the following within the root of this repository:
 
 ```bash
-python -m preciceconfigchecker.cli "path/to/precice-config.xml"
+python -m preciceconfigcheck.cli "path/to/precice-config.xml"
 ```
 
 If you want more information about the checks that were performed and their results, use
 
 ```bash
-python -m preciceconfigchecker.cli "path/to/precice-config.xml" --debug
+python -m preciceconfigcheck.cli "path/to/precice-config.xml" --debug
 ```
 
 ## Suggesting new Rules

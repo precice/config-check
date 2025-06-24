@@ -1,6 +1,6 @@
 from precice_config_graph.nodes import ParticipantNode
-from preciceconfigchecker.rules.m2n_exchange import M2NExchangeRule as e
-from preciceconfigchecker.rules.disjoint_simulations import DisjointSimulationsRule as d
+from preciceconfigcheck.rules.m2n_exchange import M2NExchangeRule as e
+from preciceconfigcheck.rules.disjoint_simulations import DisjointSimulationsRule as d
 from tests.test_utils import assert_equal_violations, create_graph, get_actual_violations
 
 

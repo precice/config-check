@@ -1,9 +1,9 @@
 from precice_config_graph.nodes import ParticipantNode, MeshNode, DataNode, Direction
 
-from preciceconfigchecker.rules.disjoint_simulations import DisjointSimulationsRule as d
-from preciceconfigchecker.rules.coupling_scheme_mapping import CouplingSchemeMappingRule as c
-from preciceconfigchecker.rules.mapping import MappingRule as m, MissingDataProcessing as mdp
-from preciceconfigchecker.rules.receive_mesh import ReceiveMeshRule as r
+from preciceconfigcheck.rules.disjoint_simulations import DisjointSimulationsRule as d
+from preciceconfigcheck.rules.coupling_scheme_mapping import CouplingSchemeMappingRule as c
+from preciceconfigcheck.rules.mapping import MappingRule as m, MissingDataProcessing as mdp
+from preciceconfigcheck.rules.receive_mesh import ReceiveMeshRule as r
 
 from tests.test_utils import assert_equal_violations, create_graph, get_actual_violations
 

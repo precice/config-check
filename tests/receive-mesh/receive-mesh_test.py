@@ -1,7 +1,7 @@
 from precice_config_graph.nodes import ParticipantNode, MeshNode
 
 from tests.test_utils import assert_equal_violations, get_actual_violations, create_graph
-from preciceconfigchecker.rules.receive_mesh import ReceiveMeshRule as r
+from preciceconfigcheck.rules.receive_mesh import ReceiveMeshRule as r
 
 
 def test_receive_mesh():

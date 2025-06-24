@@ -1,5 +1,5 @@
 import sys
-import preciceconfigchecker.color as c
+import preciceconfigcheck.color as c
 
 def rule_error_message(error: str) -> None:
     """

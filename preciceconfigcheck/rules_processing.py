@@ -1,11 +1,11 @@
 from networkx import Graph
 
-import preciceconfigchecker.color as c
-from preciceconfigchecker.rule import Rule
-from preciceconfigchecker.rules import missing_coupling, missing_exchange, data_use_read_write, compositional_coupling, \
+import preciceconfigcheck.color as c
+from preciceconfigcheck.rule import Rule
+from preciceconfigcheck.rules import missing_coupling, missing_exchange, data_use_read_write, compositional_coupling, \
     mapping, m2n_exchange, disjoint_simulations, provide_mesh, coupling_scheme_mapping, receive_mesh
-from preciceconfigchecker.severity import Severity
-from preciceconfigchecker.violation import Violation
+from preciceconfigcheck.severity import Severity
+from preciceconfigcheck.violation import Violation
 
 rules: list[Rule] = [
     missing_coupling.MissingCouplingSchemeRule(),

@@ -4,9 +4,9 @@ import io
 from networkx import Graph
 from precice_config_graph import xml_processing, graph as g
 
-from preciceconfigchecker.rules_processing import rules, check_all_rules
-from preciceconfigchecker.violation import Violation
-from preciceconfigchecker import color
+from preciceconfigcheck.rules_processing import rules, check_all_rules
+from preciceconfigcheck.violation import Violation
+from preciceconfigcheck import color
 
 
 # Helper functions for test files

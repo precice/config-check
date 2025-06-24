@@ -3,10 +3,10 @@ from enum import Enum
 from precice_config_graph.nodes import ParticipantNode, MeshNode, MappingNode, Direction, MappingConstraint, \
     MappingMethod, CouplingSchemeNode, MultiCouplingSchemeNode, CouplingSchemeType, ExchangeNode, M2NNode, \
     WriteDataNode, ReadDataNode, ActionNode, ExportNode, WatchPointNode, WatchIntegralNode
-from preciceconfigchecker.rule_utils import rule_error_message
-from preciceconfigchecker.rule import Rule
-from preciceconfigchecker.severity import Severity
-from preciceconfigchecker.violation import Violation
+from preciceconfigcheck.rule_utils import rule_error_message
+from preciceconfigcheck.rule import Rule
+from preciceconfigcheck.severity import Severity
+from preciceconfigcheck.violation import Violation
 
 
 class MissingDataProcessing(Enum):

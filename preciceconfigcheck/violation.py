@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
-from preciceconfigchecker.severity import Severity
-import preciceconfigchecker.color as c
+from preciceconfigcheck.severity import Severity
+import preciceconfigcheck.color as c
 
 
 class Violation(ABC):

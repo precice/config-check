@@ -3,10 +3,10 @@ import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import DataNode, MeshNode, ReadDataNode, WriteDataNode, WatchPointNode, ExportNode, \
     WatchIntegralNode, ParticipantNode, ExchangeNode, ActionNode, ReceiveMeshNode
-from preciceconfigchecker.rule import Rule
-from preciceconfigchecker.rule_utils import format_list
-from preciceconfigchecker.severity import Severity
-from preciceconfigchecker.violation import Violation
+from preciceconfigcheck.rule import Rule
+from preciceconfigcheck.rule_utils import format_list
+from preciceconfigcheck.severity import Severity
+from preciceconfigcheck.violation import Violation
 
 
 class DataUseReadWriteRule(Rule):

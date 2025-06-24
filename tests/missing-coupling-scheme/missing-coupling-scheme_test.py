@@ -1,8 +1,8 @@
 from precice_config_graph.nodes import DataNode, ParticipantNode, MeshNode, Direction
 
-from preciceconfigchecker.rules.missing_coupling import MissingCouplingSchemeRule as c
-from preciceconfigchecker.rules.mapping import MappingRule as m
-from preciceconfigchecker.rules.data_use_read_write import DataUseReadWriteRule as d
+from preciceconfigcheck.rules.missing_coupling import MissingCouplingSchemeRule as c
+from preciceconfigcheck.rules.mapping import MappingRule as m
+from preciceconfigcheck.rules.data_use_read_write import DataUseReadWriteRule as d
 from tests.test_utils import assert_equal_violations, get_actual_violations, create_graph
 
 

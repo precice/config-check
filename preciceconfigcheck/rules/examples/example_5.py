@@ -1,6 +1,6 @@
-from preciceconfigchecker.rule import Rule
-from preciceconfigchecker.severity import Severity
-from preciceconfigchecker.violation import Violation
+from preciceconfigcheck.rule import Rule
+from preciceconfigcheck.severity import Severity
+from preciceconfigcheck.violation import Violation
 
 class Rule_5(Rule):
     class MyViolation1(Violation):

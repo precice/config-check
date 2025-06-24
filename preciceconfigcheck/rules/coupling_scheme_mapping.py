@@ -2,9 +2,9 @@ from networkx import Graph
 from precice_config_graph.nodes import CouplingSchemeNode, MultiCouplingSchemeNode, ParticipantNode, ExchangeNode, \
     MeshNode, MappingNode, Direction, DataNode
 
-from preciceconfigchecker.rule import Rule
-from preciceconfigchecker.severity import Severity
-from preciceconfigchecker.violation import Violation
+from preciceconfigcheck.rule import Rule
+from preciceconfigcheck.severity import Severity
+from preciceconfigcheck.violation import Violation
 
 
 class CouplingSchemeMappingRule(Rule):

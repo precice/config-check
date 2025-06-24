@@ -2,12 +2,12 @@ import argparse
 import sys
 import pathlib
 
-from preciceconfigchecker.severity import Severity
-import preciceconfigchecker.color as c
+from preciceconfigcheck.severity import Severity
+import preciceconfigcheck.color as c
 
 from precice_config_graph import graph as g, xml_processing
 
-from preciceconfigchecker.rules_processing import check_all_rules, print_all_results
+from preciceconfigcheck.rules_processing import check_all_rules, print_all_results
 
 
 def runCheck(path: pathlib.Path, debug: bool):
