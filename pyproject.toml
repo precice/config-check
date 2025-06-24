@@ -15,6 +15,9 @@ dependencies = [
 Repository = "https://github.com/precice-forschungsprojekt/config-checker.git"
 Issues = "https://github.com/precice-forschungsprojekt/config-checker/issues"
 
+[project.scripts]
+precice-config-check = "preciceconfigchecker.cli:main"
+
 [tool.setuptools]
 packages = ["preciceconfigchecker"]
 
