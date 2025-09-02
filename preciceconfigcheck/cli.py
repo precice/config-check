@@ -15,7 +15,7 @@ def runCheck(path: pathlib.Path, debug: bool):
         print(f"[{Severity.DEBUG.value}]: Debug mode enabled")
 
     if path.name.endswith(".xml"):
-        print(f"Checking file at '{c.dyeing(str(path), c.cyan)}'")
+        print(f"Checking '{c.dyeing(str(path), c.cyan)}' for logical issues...")
     else:
         print(
             f"[{Severity.ERROR.value}]: '{c.dyeing(str(path), c.cyan)}' is not an xml file",
