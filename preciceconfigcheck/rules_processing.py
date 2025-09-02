@@ -154,8 +154,6 @@ def print_all_results(
             f"and {total_num_warnings} {warning_str}."
         )
         print("Please review your configuration file before continuing.")
-    else:
-        print("You are all set to start you simulation!")
 
 
 def print_result(rule: Rule, violations: list[Violation], debug: bool) -> None:
