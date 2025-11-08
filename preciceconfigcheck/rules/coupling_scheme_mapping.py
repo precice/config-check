@@ -6,9 +6,9 @@ from precice_config_graph.nodes import (
     ExchangeNode,
     MeshNode,
     MappingNode,
-    Direction,
     DataNode,
 )
+import precice_config_graph.enums as e
 
 from preciceconfigcheck.rule import Rule
 from preciceconfigcheck.severity import Severity
@@ -41,7 +41,7 @@ class CouplingSchemeMappingRule(Rule):
             self.exchange_mesh = exchange_mesh
             if exchange_mesh in from_participant.provide_meshes:
                 # from_participant writes to own mesh, sends it to to_participant, who maps it to his own mesh, and reads from it
-                self.direction = Direction.READ
+                self.direction = e.Direction.READ
                 self.mapper = to_participant
                 self.non_mapper = from_participant
                 self.mesh_owner = from_participant
@@ -49,7 +49,7 @@ class CouplingSchemeMappingRule(Rule):
                 self.to_string = f"to a mesh provided by {to_participant.name}"
             else:
                 # from_participant writes to own mesh, maps it to to_participants mesh, sends it to to_participant, who reads from it
-                self.direction = Direction.WRITE
+                self.direction = e.Direction.WRITE
                 self.mapper = from_participant
                 self.non_mapper = to_participant
                 self.mesh_owner = to_participant
@@ -93,13 +93,13 @@ class CouplingSchemeMappingRule(Rule):
             self.exchange_mesh = exchange_mesh
             if exchange_mesh in from_participant.provide_meshes:
                 # from_participant writes to own mesh, sends it to to_participant, who maps it to his own mesh, and reads from it
-                self.direction = Direction.READ
+                self.direction = e.Direction.READ
                 self.mapper = to_participant
                 self.non_mapper = from_participant
                 self.mesh_owner = from_participant
             else:
                 # from_participant writes to own mesh, maps it to to_participants mesh, sends it to to_participant, who reads from it
-                self.direction = Direction.WRITE
+                self.direction = e.Direction.WRITE
                 self.mapper = from_participant
                 self.non_mapper = to_participant
                 self.mesh_owner = to_participant
@@ -150,7 +150,7 @@ class CouplingSchemeMappingRule(Rule):
                     has_correct_mapping: bool = any(
                         mapping_fits_exchange(
                             mapping,
-                            Direction.READ,
+                            e.Direction.READ,
                             from_participant,
                             to_participant,
                             exchange_mesh,
@@ -184,7 +184,7 @@ class CouplingSchemeMappingRule(Rule):
                     has_correct_mapping: bool = any(
                         mapping_fits_exchange(
                             mapping,
-                            Direction.WRITE,
+                            e.Direction.WRITE,
                             from_participant,
                             to_participant,
                             exchange_mesh,
@@ -235,7 +235,7 @@ def filter_coupling_nodes(
 
 def mapping_fits_exchange(
     mapping: MappingNode,
-    direction: Direction,
+    direction: e.Direction,
     from_participant: ParticipantNode,
     to_participant: ParticipantNode,
     exchange_mesh: MeshNode,
@@ -252,13 +252,13 @@ def mapping_fits_exchange(
     """
     if mapping.direction != direction:
         return False
-    if direction == Direction.WRITE:
+    if direction == e.Direction.WRITE:
         # For direction-write, the mesh used in the exchange needs to be by to-participant
         if exchange_mesh not in to_participant.provide_meshes:
             return False
         if exchange_mesh != mapping.to_mesh:
             return False
-    elif direction == Direction.READ:
+    elif direction == e.Direction.READ:
         # For direction-read, the mesh used in the exchange needs to be by from-participant
         if exchange_mesh not in from_participant.provide_meshes:
             return False

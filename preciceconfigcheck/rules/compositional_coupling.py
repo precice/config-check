@@ -2,10 +2,9 @@ import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import (
     CouplingSchemeNode,
-    MultiCouplingSchemeNode,
     ParticipantNode,
-    CouplingSchemeType,
 )
+import precice_config_graph.enums as e
 from preciceconfigcheck.rule import Rule
 from preciceconfigcheck.rule_utils import format_list
 from preciceconfigcheck.severity import Severity
@@ -40,8 +39,8 @@ class CompositionalCouplingRule(Rule):
         g1 = nx.subgraph_view(graph, filter_node=filter_coupling_scheme_nodes)
         for coupling in g1.nodes():
             if (
-                coupling.type == CouplingSchemeType.SERIAL_EXPLICIT
-                or coupling.type == CouplingSchemeType.SERIAL_IMPLICIT
+                coupling.type == e.CouplingSchemeType.SERIAL_EXPLICIT
+                or coupling.type == e.CouplingSchemeType.SERIAL_IMPLICIT
             ):
                 # Directed edge between first and second participant
                 coupling_edges += [

@@ -73,7 +73,7 @@ class DataUseReadWriteRule(Rule):
         severity = Severity.WARNING
 
         def __init__(
-            self, data_node: DataNode, mesh: MeshNode, writers: list[ParticipantNode]
+                self, data_node: DataNode, mesh: MeshNode, writers: list[ParticipantNode]
         ):
             self.data_node = data_node
             self.mesh = mesh
@@ -108,7 +108,7 @@ class DataUseReadWriteRule(Rule):
         severity = Severity.ERROR
 
         def __init__(
-            self, data_node: DataNode, mesh: MeshNode, readers: list[ParticipantNode]
+                self, data_node: DataNode, mesh: MeshNode, readers: list[ParticipantNode]
         ):
             self.data_node = data_node
             self.mesh = mesh
@@ -141,7 +141,7 @@ class DataUseReadWriteRule(Rule):
         severity = Severity.ERROR
 
         def __init__(
-            self, data_node: DataNode, writer: ParticipantNode, reader: ParticipantNode
+                self, data_node: DataNode, writer: ParticipantNode, reader: ParticipantNode
         ):
             self.data_node = data_node
             self.writer = writer
@@ -175,7 +175,7 @@ class DataUseReadWriteRule(Rule):
                 meshes: list[MeshNode] = []
                 writers: list[ParticipantNode] = []
                 readers: list[ParticipantNode] = []
-                readers_per_writer: dict[ParticipantNode : list[ParticipantNode]] = {}
+                readers_per_writer: dict[ParticipantNode: list[ParticipantNode]] = {}
                 readers_per_mesh: dict[MeshNode, list[ParticipantNode]] = {}
                 writers_per_mesh: dict[MeshNode, list[ParticipantNode]] = {}
 
@@ -275,8 +275,8 @@ class DataUseReadWriteRule(Rule):
                         for provide_mesh_neighbor in graph.neighbors(provide_mesh):
                             # Only use read-data if it reads current data_node
                             if (
-                                isinstance(provide_mesh_neighbor, ReadDataNode)
-                                and provide_mesh_neighbor.data == data_node
+                                    isinstance(provide_mesh_neighbor, ReadDataNode)
+                                    and provide_mesh_neighbor.data == data_node
                             ):
                                 readers_per_writer[writer].append(
                                     provide_mesh_neighbor.participant
@@ -307,36 +307,36 @@ class DataUseReadWriteRule(Rule):
                                 if len(potential_reader.exports) > 0:
                                     readers_per_writer[writer].append(potential_reader)
                                 for potential_reader_neighbor in graph.neighbors(
-                                    potential_reader
+                                        potential_reader
                                 ):
                                     if (
-                                        isinstance(
-                                            potential_reader_neighbor, ReadDataNode
-                                        )
-                                        and potential_reader_neighbor.data == data_node
+                                            isinstance(
+                                                potential_reader_neighbor, ReadDataNode
+                                            )
+                                            and potential_reader_neighbor.data == data_node
                                     ):
                                         readers_per_writer[writer].append(
                                             potential_reader
                                         )
                                     # Watchpoint, Watch-integral and export do not specify data
                                     elif isinstance(
-                                        potential_reader_neighbor, WatchPointNode
+                                            potential_reader_neighbor, WatchPointNode
                                     ):
                                         readers_per_writer[writer].append(
                                             potential_reader
                                         )
                                     elif isinstance(
-                                        potential_reader_neighbor, WatchIntegralNode
+                                            potential_reader_neighbor, WatchIntegralNode
                                     ):
                                         readers_per_writer[writer].append(
                                             potential_reader
                                         )
                                     elif isinstance(
-                                        potential_reader_neighbor, ActionNode
+                                            potential_reader_neighbor, ActionNode
                                     ):
                                         # Actions can have many source data; check for current data_node
                                         for (
-                                            source
+                                                source
                                         ) in potential_reader_neighbor.source_data:
                                             if source == data_node:
                                                 readers_per_writer[writer].append(
@@ -373,8 +373,8 @@ class DataUseReadWriteRule(Rule):
                             # Otherwise, there needs to be an exchange of data between them.
                             else:
                                 if (
-                                    writer not in data_flow_graph.nodes
-                                    or reader not in data_flow_graph.nodes
+                                        writer not in data_flow_graph.nodes
+                                        or reader not in data_flow_graph.nodes
                                 ):
                                     # One of writer/reader is not connected through an exchange involving data_node
                                     violations.append(
@@ -432,7 +432,7 @@ class DataUseReadWriteRule(Rule):
 
 
 def get_provide_meshes_for_data(
-    participant: ParticipantNode, data: DataNode
+        participant: ParticipantNode, data: DataNode
 ) -> list[MeshNode]:
     """
     This method returns all meshes provided by the given participant that use the given data.
@@ -464,14 +464,14 @@ def filter_use_read_write_data(node) -> bool:
         True, if the node is a data-, read-/write-, action- or mesh node.
     """
     return (
-        isinstance(node, DataNode)
-        or isinstance(node, MeshNode)
-        or isinstance(node, ReadDataNode)
-        or isinstance(node, ExportNode)
-        or isinstance(node, WatchPointNode)
-        or isinstance(node, WatchIntegralNode)
-        or isinstance(node, WriteDataNode)
-        or isinstance(node, ActionNode)
+            isinstance(node, DataNode)
+            or isinstance(node, MeshNode)
+            or isinstance(node, ReadDataNode)
+            or isinstance(node, ExportNode)
+            or isinstance(node, WatchPointNode)
+            or isinstance(node, WatchIntegralNode)
+            or isinstance(node, WriteDataNode)
+            or isinstance(node, ActionNode)
     )
 
 
@@ -485,7 +485,7 @@ def filter_data_exchange(node) -> bool:
 
 
 def append_participant_to_map(
-    dictionary: dict[MeshNode : list[ParticipantNode]], mesh, participant
+        dictionary: dict[MeshNode: list[ParticipantNode]], mesh, participant
 ):
     """
     This method appends the given participant to the given map for an entry 'mesh'.
