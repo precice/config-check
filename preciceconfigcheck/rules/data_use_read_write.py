@@ -1,4 +1,3 @@
-from collections import defaultdict
 import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import (

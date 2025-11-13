@@ -39,8 +39,8 @@ class CompositionalCouplingRule(Rule):
         g1 = nx.subgraph_view(graph, filter_node=filter_coupling_scheme_nodes)
         for coupling in g1.nodes():
             if (
-                coupling.type == e.CouplingSchemeType.SERIAL_EXPLICIT
-                or coupling.type == e.CouplingSchemeType.SERIAL_IMPLICIT
+                    coupling.type == e.CouplingSchemeType.SERIAL_EXPLICIT
+                    or coupling.type == e.CouplingSchemeType.SERIAL_IMPLICIT
             ):
                 # Directed edge between first and second participant
                 coupling_edges += [
