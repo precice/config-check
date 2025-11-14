@@ -1,4 +1,6 @@
-from precice_config_graph.nodes import DataNode, ParticipantNode, MeshNode, Direction
+from precice_config_graph.nodes import DataNode, ParticipantNode, MeshNode
+
+import precice_config_graph.enums as e
 
 from preciceconfigcheck.rules.data_use_read_write import DataUseReadWriteRule as d
 from preciceconfigcheck.rules.mapping import MappingRule as m
@@ -52,10 +54,10 @@ def test_data_not_use_not_read_not_write():
         d.DataNotExchangedViolation(d_color, p_generator, p_alligator),
         d.DataNotExchangedViolation(d_color, p_generator, p_instigator),
         m.MissingExchangeMappingViolation(
-            p_instigator, p_generator, m_generator, Direction.READ
+            p_instigator, p_generator, m_generator, e.Direction.READ
         ),
         m.MissingExchangeMappingViolation(
-            p_alligator, p_generator, m_generator, Direction.READ
+            p_alligator, p_generator, m_generator, e.Direction.READ
         ),
         r.MappedAPIAccessReceiveMesh(p_elevator, m_generator),
     ]

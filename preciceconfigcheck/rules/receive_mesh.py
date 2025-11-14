@@ -1,14 +1,11 @@
-import networkx as nx
 from networkx import Graph
 from precice_config_graph.nodes import (
     ParticipantNode,
     MeshNode,
     ReceiveMeshNode,
-    Direction,
 )
 
 from preciceconfigcheck.rule import Rule
-from preciceconfigcheck.rule_utils import format_list
 from preciceconfigcheck.severity import Severity
 from preciceconfigcheck.violation import Violation
 

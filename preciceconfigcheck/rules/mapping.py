@@ -4,12 +4,8 @@ from precice_config_graph.nodes import (
     ParticipantNode,
     MeshNode,
     MappingNode,
-    Direction,
-    MappingConstraint,
-    MappingMethod,
     CouplingSchemeNode,
     MultiCouplingSchemeNode,
-    CouplingSchemeType,
     ExchangeNode,
     M2NNode,
     WriteDataNode,
@@ -19,6 +15,7 @@ from precice_config_graph.nodes import (
     WatchPointNode,
     WatchIntegralNode,
 )
+import precice_config_graph.enums as e
 from preciceconfigcheck.rule_utils import rule_error_message
 from preciceconfigcheck.rule import Rule
 from preciceconfigcheck.severity import Severity
@@ -47,14 +44,14 @@ class MappingRule(Rule):
         severity = Severity.ERROR
 
         def __init__(
-            self, participant: ParticipantNode, mesh: MeshNode, direction: Direction
+                self, participant: ParticipantNode, mesh: MeshNode, direction: e.Direction
         ):
             self.participant = participant
             self.mesh = mesh
             self.direction = direction
-            if self.direction == Direction.READ:
+            if self.direction == e.Direction.READ:
                 self.connecting_word = "from"
-            elif self.direction == Direction.WRITE:
+            elif self.direction == e.Direction.WRITE:
                 self.connecting_word = "to"
 
         def format_explanation(self) -> str:
@@ -80,19 +77,19 @@ class MappingRule(Rule):
         severity = Severity.ERROR
 
         def __init__(
-            self,
-            parent: ParticipantNode,
-            stranger: ParticipantNode,
-            mesh: MeshNode,
-            direction: Direction,
+                self,
+                parent: ParticipantNode,
+                stranger: ParticipantNode,
+                mesh: MeshNode,
+                direction: e.Direction,
         ):
             self.parent = parent
             self.stranger = stranger
             self.mesh = mesh
             self.direction = direction
-            if self.direction == Direction.READ:
+            if self.direction == e.Direction.READ:
                 self.connecting_word = "from"
-            elif self.direction == Direction.WRITE:
+            elif self.direction == e.Direction.WRITE:
                 self.connecting_word = "to"
 
         def format_explanation(self) -> str:
@@ -111,13 +108,13 @@ class MappingRule(Rule):
         def format_possible_solutions(self) -> list[str]:
             out: list[str] = []
             # In a 'read' mapping, the 'from' mesh is by Stranger => Stranger should be from-participant in exchange.
-            if self.direction == Direction.READ:
+            if self.direction == e.Direction.READ:
                 out += [
                     f"Add an exchange from {self.stranger.name} to {self.parent.name}, which uses "
                     f"{self.stranger.name}'s mesh {self.mesh.name} to the coupling scheme between them."
                 ]
             # In a 'write' mapping, the 'to' mesh is by Stranger => Stranger should be to-participant in exchange.
-            elif self.direction == Direction.WRITE:
+            elif self.direction == e.Direction.WRITE:
                 out += [
                     f"Add an exchange from {self.parent.name} to {self.stranger.name}, which uses "
                     f"{self.stranger.name}'s mesh {self.mesh.name}, to the coupling scheme between them."
@@ -133,19 +130,19 @@ class MappingRule(Rule):
         severity = Severity.ERROR
 
         def __init__(
-            self,
-            parent: ParticipantNode,
-            stranger: ParticipantNode,
-            mesh: MeshNode,
-            direction: Direction,
+                self,
+                parent: ParticipantNode,
+                stranger: ParticipantNode,
+                mesh: MeshNode,
+                direction: e.Direction,
         ):
             self.parent = parent
             self.stranger = stranger
             self.mesh = mesh
             self.direction = direction
-            if self.direction == Direction.READ:
+            if self.direction == e.Direction.READ:
                 self.connecting_word = "from"
-            elif self.direction == Direction.WRITE:
+            elif self.direction == e.Direction.WRITE:
                 self.connecting_word = "to"
 
         def format_explanation(self) -> str:
@@ -163,13 +160,13 @@ class MappingRule(Rule):
         def format_possible_solutions(self) -> list[str]:
             out: list[str] = []
             # In a 'read' mapping, the 'from' mesh is by Stranger => Stranger should be from-participant in exchange.
-            if self.direction == Direction.READ:
+            if self.direction == e.Direction.READ:
                 out = [
                     f"Add an exchange from {self.stranger.name} to {self.parent.name}, which uses "
                     f"{self.stranger.name}'s mesh {self.mesh.name} to the coupling scheme between them."
                 ]
             # In a 'write' mapping, the 'to' mesh is by Stranger => Stranger should be to-participant in exchange.
-            elif self.direction == Direction.WRITE:
+            elif self.direction == e.Direction.WRITE:
                 out = [
                     f"Add an exchange from {self.parent.name} to {self.stranger.name}, which uses "
                     f"{self.stranger.name}'s mesh {self.mesh.name} to the coupling scheme between them."
@@ -185,19 +182,19 @@ class MappingRule(Rule):
         severity = Severity.ERROR
 
         def __init__(
-            self,
-            parent: ParticipantNode,
-            stranger: ParticipantNode,
-            mesh: MeshNode,
-            direction: Direction,
+                self,
+                parent: ParticipantNode,
+                stranger: ParticipantNode,
+                mesh: MeshNode,
+                direction: e.Direction,
         ):
             self.parent = parent
             self.stranger = stranger
             self.mesh = mesh
             self.direction = direction
-            if self.direction == Direction.READ:
+            if self.direction == e.Direction.READ:
                 self.connecting_word = "from"
-            elif self.direction == Direction.WRITE:
+            elif self.direction == e.Direction.WRITE:
                 self.connecting_word = "to"
 
         def format_explanation(self) -> str:
@@ -225,19 +222,19 @@ class MappingRule(Rule):
         severity = Severity.ERROR
 
         def __init__(
-            self,
-            parent: ParticipantNode,
-            stranger: ParticipantNode,
-            mesh: MeshNode,
-            direction: Direction,
+                self,
+                parent: ParticipantNode,
+                stranger: ParticipantNode,
+                mesh: MeshNode,
+                direction: e.Direction,
         ):
             self.parent = parent
             self.stranger = stranger
             self.mesh = mesh
             self.direction = direction
-            if self.direction == Direction.READ:
+            if self.direction == e.Direction.READ:
                 self.connecting_word = "from"
-            elif self.direction == Direction.WRITE:
+            elif self.direction == e.Direction.WRITE:
                 self.connecting_word = "to"
 
         def format_explanation(self) -> str:
@@ -265,28 +262,28 @@ class MappingRule(Rule):
         severity = Severity.ERROR
 
         def __init__(
-            self,
-            parent: ParticipantNode,
-            stranger: ParticipantNode,
-            mesh_parent: MeshNode,
-            mesh_stranger: MeshNode,
-            direction: Direction,
+                self,
+                parent: ParticipantNode,
+                stranger: ParticipantNode,
+                mesh_parent: MeshNode,
+                mesh_stranger: MeshNode,
+                direction: e.Direction,
         ):
             self.parent = parent
             self.stranger = stranger
             self.mesh_parent = mesh_parent
             self.mesh_stranger = mesh_stranger
             self.direction = direction
-            if self.direction == Direction.READ:
+            if self.direction == e.Direction.READ:
                 # X reads "from" Y
                 self.connecting_word = "from"
                 self.inverse_connector = "to"
-                self.inverse_direction = Direction.WRITE
-            elif self.direction == Direction.WRITE:
+                self.inverse_direction = e.Direction.WRITE
+            elif self.direction == e.Direction.WRITE:
                 # X writes "to" Y
                 self.connecting_word = "to"
                 self.inverse_connector = "from"
-                self.inverse_direction = Direction.READ
+                self.inverse_direction = e.Direction.READ
 
         def format_explanation(self) -> str:
             out: str = (
@@ -322,27 +319,27 @@ class MappingRule(Rule):
         severity = Severity.ERROR
 
         def __init__(
-            self,
-            parent: ParticipantNode,
-            stranger: ParticipantNode,
-            mesh_parent: MeshNode,
-            mesh_stranger: MeshNode,
-            direction: Direction,
-            missing_data_processing: MissingDataProcessing,
+                self,
+                parent: ParticipantNode,
+                stranger: ParticipantNode,
+                mesh_parent: MeshNode,
+                mesh_stranger: MeshNode,
+                direction: e.Direction,
+                missing_data_processing: MissingDataProcessing,
         ):
             self.parent = parent
             self.stranger = stranger
             self.mesh_parent = mesh_parent
             self.mesh_stranger = mesh_stranger
             self.direction = direction
-            if self.direction == Direction.READ:
+            if self.direction == e.Direction.READ:
                 self.connecting_word = "from"
                 self.inverse_connector = "to"
-                self.inverse_direction = Direction.WRITE
-            elif self.direction == Direction.WRITE:
+                self.inverse_direction = e.Direction.WRITE
+            elif self.direction == e.Direction.WRITE:
                 self.connecting_word = "to"
                 self.inverse_connector = "from"
-                self.inverse_direction = Direction.READ
+                self.inverse_direction = e.Direction.READ
             self.missing_data_processing = missing_data_processing
 
         def format_explanation(self) -> str:
@@ -352,30 +349,30 @@ class MappingRule(Rule):
                 f"{self.inverse_connector} {self.parent.name}'s mesh {self.mesh_parent.name}."
             )
             if self.missing_data_processing == MissingDataProcessing.READ_DATA:
-                if self.direction == Direction.WRITE:
+                if self.direction == e.Direction.WRITE:
                     out += (
                         f"\nHowever, it seems like {self.stranger.name} does not {self.inverse_direction.value} "
                         f"{self.inverse_connector} {self.mesh_stranger.name}."
                     )
-                elif self.direction == Direction.READ:
+                elif self.direction == e.Direction.READ:
                     out += (
                         f"\nHowever, it seems like {self.parent.name} does not {self.direction.value} "
                         f"{self.connecting_word} {self.mesh_parent.name}. "
                     )
             elif self.missing_data_processing == MissingDataProcessing.WRITE_DATA:
-                if self.direction == Direction.WRITE:
+                if self.direction == e.Direction.WRITE:
                     out += (
                         f"\nHowever, it seems like {self.parent.name} does not {self.direction.value} "
                         f"{self.connecting_word} {self.mesh_parent.name}."
                     )
-                elif self.direction == Direction.READ:
+                elif self.direction == e.Direction.READ:
                     out += (
                         f"\nHowever, it seems like {self.stranger.name} does not {self.inverse_direction.value} "
                         f"{self.inverse_connector} {self.mesh_stranger.name}."
                     )
             elif (
-                self.missing_data_processing
-                == MissingDataProcessing.READ_DATA_AND_WRITE_DATA
+                    self.missing_data_processing
+                    == MissingDataProcessing.READ_DATA_AND_WRITE_DATA
             ):
                 out += (
                     f"\n However, it seems like {self.parent.name} does not {self.direction.value} "
@@ -387,30 +384,30 @@ class MappingRule(Rule):
         def format_possible_solutions(self) -> list[str]:
             out: list[str] = []
             if self.missing_data_processing == MissingDataProcessing.READ_DATA:
-                if self.direction == Direction.WRITE:
+                if self.direction == e.Direction.WRITE:
                     out = [
                         f"Please ensure that {self.stranger.name} {self.inverse_direction.value}s "
                         f"{self.inverse_connector} {self.mesh_stranger.name}."
                     ]
-                elif self.direction == Direction.READ:
+                elif self.direction == e.Direction.READ:
                     out = [
                         f"Please ensure that {self.parent.name} {self.direction.value}s {self.connecting_word} "
                         f"{self.mesh_parent.name}."
                     ]
             elif self.missing_data_processing == MissingDataProcessing.WRITE_DATA:
-                if self.direction == Direction.WRITE:
+                if self.direction == e.Direction.WRITE:
                     out = [
                         f"Please ensure that {self.parent.name} {self.direction.value}s {self.connecting_word} "
                         f"{self.mesh_parent.name}."
                     ]
-                elif self.direction == Direction.READ:
+                elif self.direction == e.Direction.READ:
                     out = [
                         f"Please ensure that {self.stranger.name} {self.inverse_direction.value}s "
                         f"{self.inverse_connector} {self.mesh_stranger.name}."
                     ]
             elif (
-                self.missing_data_processing
-                == MissingDataProcessing.READ_DATA_AND_WRITE_DATA
+                    self.missing_data_processing
+                    == MissingDataProcessing.READ_DATA_AND_WRITE_DATA
             ):
                 out = [
                     f"Please ensure that {self.parent.name} {self.direction.value}s {self.connecting_word} "
@@ -430,20 +427,20 @@ class MappingRule(Rule):
         severity = Severity.ERROR
 
         def __init__(
-            self,
-            parent: ParticipantNode,
-            stranger: ParticipantNode,
-            mesh: MeshNode,
-            direction: Direction,
+                self,
+                parent: ParticipantNode,
+                stranger: ParticipantNode,
+                mesh: MeshNode,
+                direction: e.Direction,
         ):
             self.parent = parent
             self.stranger = stranger
             self.mesh = mesh
             self.direction = direction
             self.connecting_word: str = ""
-            if self.direction == Direction.READ:
+            if self.direction == e.Direction.READ:
                 self.connecting_word = "from"
-            elif self.direction == Direction.WRITE:
+            elif self.direction == e.Direction.WRITE:
                 self.connecting_word = "to"
 
         def format_explanation(self) -> str:
@@ -471,21 +468,21 @@ class MappingRule(Rule):
         severity = Severity.ERROR
 
         def __init__(
-            self,
-            parent: ParticipantNode,
-            stranger: ParticipantNode,
-            mesh: MeshNode,
-            direction: Direction,
-            constraint: MappingConstraint,
+                self,
+                parent: ParticipantNode,
+                stranger: ParticipantNode,
+                mesh: MeshNode,
+                direction: e.Direction,
+                constraint: e.MappingConstraint,
         ):
             self.parent = parent
             self.stranger = stranger
             self.mesh = mesh
             self.direction = direction
             self.connecting_word: str = ""
-            if self.direction == Direction.READ:
+            if self.direction == e.Direction.READ:
                 self.connecting_word = "from"
-            elif self.direction == Direction.WRITE:
+            elif self.direction == e.Direction.WRITE:
                 self.connecting_word = "to"
             self.constraint = constraint
 
@@ -505,8 +502,8 @@ class MappingRule(Rule):
             out: list[str] = []
             # Mapping format is "almost" correct
             if (
-                self.direction == Direction.READ
-                and self.constraint == MappingConstraint.CONSERVATIVE
+                    self.direction == e.Direction.READ
+                    and self.constraint == e.MappingConstraint.CONSERVATIVE
             ):
                 out += [
                     f"Consider changing either the direction of the mapping between {self.parent.name} and "
@@ -521,8 +518,8 @@ class MappingRule(Rule):
                     f"When moving the mapping, remember to update the <exchange .../> tag in their coupling scheme."
                 ]
             elif (
-                self.direction == Direction.WRITE
-                and self.constraint == MappingConstraint.CONSISTENT
+                    self.direction == e.Direction.WRITE
+                    and self.constraint == e.MappingConstraint.CONSISTENT
             ):
                 out += [
                     f"Consider changing either the direction of the mapping between {self.parent.name} and "
@@ -537,12 +534,12 @@ class MappingRule(Rule):
                     f"When moving the mapping, remember to update the <exchange .../> tag in their coupling scheme."
                 ]
             # Generic answers for arbitrary constraints
-            elif self.direction == Direction.READ:
+            elif self.direction == e.Direction.READ:
                 out += [
                     f"Consider changing the constraint of the mapping between {self.parent.name} and "
                     f'{self.stranger.name} from "{self.constraint.value}" to "consistent".'
                 ]
-            elif self.direction == Direction.WRITE:
+            elif self.direction == e.Direction.WRITE:
                 out += [
                     f"Consider changing the constraint of the mapping between {self.parent.name} and "
                     f'{self.stranger.name} from "{self.constraint.value}" to "conservative".'
@@ -558,24 +555,24 @@ class MappingRule(Rule):
         severity = Severity.ERROR
 
         def __init__(
-            self,
-            parent: ParticipantNode,
-            stranger: ParticipantNode,
-            mesh: MeshNode,
-            direction: Direction,
+                self,
+                parent: ParticipantNode,
+                stranger: ParticipantNode,
+                mesh: MeshNode,
+                direction: e.Direction,
         ):
             self.parent = parent
             self.stranger = stranger
             self.mesh = mesh
             self.direction = direction
-            if self.direction == Direction.READ:
+            if self.direction == e.Direction.READ:
                 # X reads "from" Y
                 self.connecting_word = "from"
-                self.inverse_direction = Direction.WRITE
-            elif self.direction == Direction.WRITE:
+                self.inverse_direction = e.Direction.WRITE
+            elif self.direction == e.Direction.WRITE:
                 # X writes "to" Y
                 self.connecting_word = "to"
-                self.inverse_direction = Direction.READ
+                self.inverse_direction = e.Direction.READ
 
         def format_explanation(self) -> str:
             out: str = (
@@ -613,23 +610,23 @@ class MappingRule(Rule):
         severity = Severity.ERROR
 
         def __init__(
-            self,
-            parent: ParticipantNode,
-            stranger: ParticipantNode,
-            mesh: MeshNode,
-            direction: Direction,
-            constraint: MappingConstraint,
+                self,
+                parent: ParticipantNode,
+                stranger: ParticipantNode,
+                mesh: MeshNode,
+                direction: e.Direction,
+                constraint: e.MappingConstraint,
         ):
             self.parent = parent
             self.stranger = stranger
             self.mesh = mesh
             self.direction = direction
-            if self.direction == Direction.READ:
+            if self.direction == e.Direction.READ:
                 self.connecting_word = "from"
-                self.inverse_direction = Direction.WRITE
-            elif self.direction == Direction.WRITE:
+                self.inverse_direction = e.Direction.WRITE
+            elif self.direction == e.Direction.WRITE:
                 self.connecting_word = "to"
-                self.inverse_direction = Direction.READ
+                self.inverse_direction = e.Direction.READ
             self.constraint = constraint
 
         def format_explanation(self) -> str:
@@ -657,12 +654,12 @@ class MappingRule(Rule):
                 f"Move the mapping from {self.parent.name} to {self.stranger.name}, change its direction and "
                 f"remember to switch the mesh used in the <exchange .../> tag in their coupling scheme."
             ]
-            if self.direction == Direction.WRITE:
+            if self.direction == e.Direction.WRITE:
                 out += [
                     f"Please update the constraint of the mapping between {self.parent.name} and "
                     f'{self.stranger.name} from "{self.constraint.value}" to "conservative".'
                 ]
-            elif self.direction == Direction.READ:
+            elif self.direction == e.Direction.READ:
                 out += [
                     f"Please update the constraint of the mapping between {self.parent.name} and "
                     f'{self.stranger.name} from "{self.constraint.value}" to "consistent".'
@@ -683,20 +680,20 @@ class MappingRule(Rule):
         severity = Severity.ERROR
 
         def __init__(
-            self,
-            parent: ParticipantNode,
-            stranger: ParticipantNode,
-            mesh: MeshNode,
-            direction: Direction,
-            method: MappingMethod,
+                self,
+                parent: ParticipantNode,
+                stranger: ParticipantNode,
+                mesh: MeshNode,
+                direction: e.Direction,
+                method: e.MappingMethod,
         ):
             self.parent = parent
             self.stranger = stranger
             self.mesh = mesh
             self.direction = direction
-            if self.direction == Direction.READ:
+            if self.direction == e.Direction.READ:
                 self.connecting_word = "from"
-            elif self.direction == Direction.WRITE:
+            elif self.direction == e.Direction.WRITE:
                 self.connecting_word = "to"
             self.method = method
 
@@ -727,25 +724,25 @@ class MappingRule(Rule):
         severity = Severity.ERROR
 
         def __init__(
-            self,
-            parent: ParticipantNode,
-            stranger: ParticipantNode,
-            mesh: MeshNode,
-            direction: Direction,
-            missing_data_processing: MissingDataProcessing,
+                self,
+                parent: ParticipantNode,
+                stranger: ParticipantNode,
+                mesh: MeshNode,
+                direction: e.Direction,
+                missing_data_processing: MissingDataProcessing,
         ):
             self.parent = parent
             self.stranger = stranger
             self.mesh = mesh
             self.direction = direction
-            if self.direction == Direction.READ:
+            if self.direction == e.Direction.READ:
                 self.connecting_word = "from"
                 self.inverse_connector = "to"
-                self.inverse_direction = Direction.WRITE
-            elif self.direction == Direction.WRITE:
+                self.inverse_direction = e.Direction.WRITE
+            elif self.direction == e.Direction.WRITE:
                 self.connecting_word = "to"
                 self.inverse_connector = "from"
-                self.inverse_direction = Direction.READ
+                self.inverse_direction = e.Direction.READ
             self.missing_data_processing = missing_data_processing
 
         def format_explanation(self) -> str:
@@ -754,30 +751,30 @@ class MappingRule(Rule):
                 f"{self.connecting_word} participant {self.stranger.name}'s mesh {self.mesh.name}. "
             )
             if self.missing_data_processing == MissingDataProcessing.READ_DATA:
-                if self.direction == Direction.WRITE:
+                if self.direction == e.Direction.WRITE:
                     out += (
                         f"\nHowever, it seems like {self.stranger.name} does not {self.inverse_direction.value} "
                         f"{self.inverse_connector} {self.mesh.name}."
                     )
-                elif self.direction == Direction.READ:
+                elif self.direction == e.Direction.READ:
                     out += (
                         f"\nHowever, it seems like {self.parent.name} does not {self.direction.value} "
                         f"{self.connecting_word} {self.mesh.name}."
                     )
             elif self.missing_data_processing == MissingDataProcessing.WRITE_DATA:
-                if self.direction == Direction.WRITE:
+                if self.direction == e.Direction.WRITE:
                     out += (
                         f"\nHowever, it seems like {self.parent.name} does not {self.inverse_direction.value} "
                         f"{self.inverse_connector} {self.mesh.name}."
                     )
-                elif self.direction == Direction.READ:
+                elif self.direction == e.Direction.READ:
                     out += (
                         f"\nHowever, it seems like {self.stranger.name} does not {self.direction.value} "
                         f"{self.connecting_word} {self.mesh.name}."
                     )
             elif (
-                self.missing_data_processing
-                == MissingDataProcessing.READ_DATA_AND_WRITE_DATA
+                    self.missing_data_processing
+                    == MissingDataProcessing.READ_DATA_AND_WRITE_DATA
             ):
                 out += (
                     f"\nHowever, it seems like {self.parent.name} does not {self.direction.value} "
@@ -789,30 +786,30 @@ class MappingRule(Rule):
         def format_possible_solutions(self) -> list[str]:
             out: list[str] = []
             if self.missing_data_processing == MissingDataProcessing.READ_DATA:
-                if self.direction == Direction.WRITE:
+                if self.direction == e.Direction.WRITE:
                     out = [
                         f"Please ensure that {self.stranger.name} {self.inverse_direction.value}s "
                         f"{self.inverse_connector} {self.mesh.name}."
                     ]
-                elif self.direction == Direction.READ:
+                elif self.direction == e.Direction.READ:
                     out = [
                         f"Please ensure that {self.parent.name} {self.direction.value}s "
                         f"{self.connecting_word} {self.mesh.name}."
                     ]
             elif self.missing_data_processing == MissingDataProcessing.WRITE_DATA:
-                if self.direction == Direction.WRITE:
+                if self.direction == e.Direction.WRITE:
                     out = [
                         f"Please ensure that {self.parent.name} {self.inverse_direction.value}s "
                         f"{self.inverse_connector} {self.mesh.name}."
                     ]
-                elif self.direction == Direction.READ:
+                elif self.direction == e.Direction.READ:
                     out = [
                         f"Please ensure that {self.stranger.name} {self.direction.value}s "
                         f"{self.connecting_word} {self.mesh.name}."
                     ]
             elif (
-                self.missing_data_processing
-                == MissingDataProcessing.READ_DATA_AND_WRITE_DATA
+                    self.missing_data_processing
+                    == MissingDataProcessing.READ_DATA_AND_WRITE_DATA
             ):
                 out = [
                     f"Please ensure that {self.parent.name} {self.direction.value}s {self.connecting_word} "
@@ -828,13 +825,13 @@ class MappingRule(Rule):
         m2ns: list[M2NNode] = filter_m2n_nodes(graph)
         coupling_schemes: list[
             CouplingSchemeNode | MultiCouplingSchemeNode
-        ] = filter_coupling_nodes(graph)
+            ] = filter_coupling_nodes(graph)
 
         mappings: list[MappingNode] = filter_mapping_nodes(graph)
         for mapping in mappings:
-            method: MappingMethod = mapping.method
-            direction: Direction = mapping.direction
-            constraint: MappingConstraint = mapping.constraint
+            method: e.MappingMethod = mapping.method
+            direction: e.Direction = mapping.direction
+            constraint: e.MappingConstraint = mapping.constraint
             participant_parent: ParticipantNode = mapping.parent_participant
             # Initialize to avoid keeping value for multiple iterations (mappings)
             mesh_parent: MeshNode = None
@@ -895,9 +892,9 @@ class MappingRule(Rule):
             if mapping.just_in_time:
                 # Only the methods nearest-neighbor, rbf-pum-direct and rbf are supported
                 supported_methods = [
-                    MappingMethod.NEAREST_NEIGHBOR,
-                    MappingMethod.RBF_PUM_DIRECT,
-                    MappingMethod.RBF,
+                    e.MappingMethod.NEAREST_NEIGHBOR,
+                    e.MappingMethod.RBF_PUM_DIRECT,
+                    e.MappingMethod.RBF,
                 ]
                 if method not in supported_methods:
                     violations.append(
@@ -911,12 +908,12 @@ class MappingRule(Rule):
                     )
 
                 # Only read-consistent and write-conservative are supported
-                if direction == Direction.READ:
+                if direction == e.Direction.READ:
                     # For a read-mapping, the 'from' mesh needs to be defined
                     if mapping.from_mesh:
                         # Correct direction
                         # For a JIT-read-mapping, the constraint has to be consistent
-                        if constraint != MappingConstraint.CONSISTENT:
+                        if constraint != e.MappingConstraint.CONSISTENT:
                             # Correct direction, but wrong constraint
                             violations.append(
                                 self.JustInTimeMappingFormatViolation(
@@ -929,10 +926,10 @@ class MappingRule(Rule):
                             )
                     else:
                         # Wrong direction
-                        if constraint == MappingConstraint.CONSISTENT:
+                        if constraint == e.MappingConstraint.CONSISTENT:
                             # Correct format
                             violations.append(
-                                self.JustInTimeMappingDirectionViolation(
+                                self.JustInTimeMappinge.DirectionViolation(
                                     participant_parent,
                                     participant_stranger,
                                     mesh_stranger,
@@ -950,12 +947,12 @@ class MappingRule(Rule):
                                     constraint,
                                 )
                             )
-                elif direction == Direction.WRITE:
+                elif direction == e.Direction.WRITE:
                     # For a write-mapping, the 'to' mesh needs to be defined
                     if mapping.to_mesh:
                         # Correct direction
                         # For a JIT-write-mapping, the constraint has to be conservative
-                        if constraint != MappingConstraint.CONSERVATIVE:
+                        if constraint != e.MappingConstraint.CONSERVATIVE:
                             # Correct direction, but wrong constraint
                             violations.append(
                                 self.JustInTimeMappingFormatViolation(
@@ -968,10 +965,10 @@ class MappingRule(Rule):
                             )
                     else:
                         # Wrong direction
-                        if constraint == MappingConstraint.CONSERVATIVE:
+                        if constraint == e.MappingConstraint.CONSERVATIVE:
                             # Correct format
                             violations.append(
-                                self.JustInTimeMappingDirectionViolation(
+                                self.JustInTimeMappinge.DirectionViolation(
                                     participant_parent,
                                     participant_stranger,
                                     mesh_stranger,
@@ -981,7 +978,7 @@ class MappingRule(Rule):
                         else:
                             # Wrong format and wrong direction
                             violations.append(
-                                self.JustInTimeMappingFormatDirectionViolation(
+                                self.JustInTimeMappingFormate.DirectionViolation(
                                     participant_parent,
                                     participant_stranger,
                                     mesh_stranger,
@@ -1007,14 +1004,14 @@ class MappingRule(Rule):
                 write_datas = []
                 read_datas = []
                 # Check if there are corresponding read-/write-data elements for the mapping
-                if direction == Direction.WRITE:
+                if direction == e.Direction.WRITE:
                     write_datas = get_write_datas_of_mesh(
                         mesh_stranger, participant_parent
                     )
                     read_datas = get_read_datas_of_mesh(
                         mesh_stranger, participant_stranger
                     )
-                elif direction == Direction.READ:
+                elif direction == e.Direction.READ:
                     read_datas = get_read_datas_of_mesh(
                         mesh_stranger, participant_parent
                     )
@@ -1055,11 +1052,11 @@ class MappingRule(Rule):
                     )
             # Only regular mappings here
             else:
-                if direction == Direction.READ:
+                if direction == e.Direction.READ:
                     # In a read-mapping, the 'to'-mesh has to be by the parent, the 'from'-mesh by Stranger
                     if not mesh_parent == mapping.to_mesh:
                         violations.append(
-                            self.MappingDirectionViolation(
+                            self.Mappinge.DirectionViolation(
                                 participant_parent,
                                 participant_stranger,
                                 mesh_parent,
@@ -1067,7 +1064,7 @@ class MappingRule(Rule):
                                 direction,
                             )
                         )
-                elif direction == Direction.WRITE:
+                elif direction == e.Direction.WRITE:
                     # In a write-mapping, the 'from'-mesh has to be by the parent, the 'to'-mesh by stranger
                     if not mesh_parent == mapping.from_mesh:
                         violations.append(
@@ -1082,7 +1079,7 @@ class MappingRule(Rule):
                 write_datas = []
                 read_datas = []
                 # Check if there are corresponding read-/write-data elements for the mapping
-                if direction == Direction.WRITE:
+                if direction == e.Direction.WRITE:
                     # In a write-mapping, Parent should write to their own mesh; Stranger should read from their own mesh
                     write_datas = get_write_datas_of_mesh(
                         mesh_parent, participant_parent
@@ -1090,7 +1087,7 @@ class MappingRule(Rule):
                     read_datas = get_read_datas_of_mesh(
                         mesh_stranger, participant_stranger
                     )
-                elif direction == Direction.READ:
+                elif direction == e.Direction.READ:
                     # In a read-mapping, Parent should read from their own mesh; Stranger should write to their own
                     write_datas = get_write_datas_of_mesh(
                         mesh_stranger, participant_stranger
@@ -1180,10 +1177,10 @@ class MappingRule(Rule):
                 continue
             # Check if any exchange of the participants coupling scheme is “correct”, i.e., on the strangers mesh
             if not any(
-                exchange_belongs_to_mapping(
-                    exchange, direction, participant_stranger, mesh_stranger
-                )
-                for exchange in exchanges
+                    exchange_belongs_to_mapping(
+                        exchange, direction, participant_stranger, mesh_stranger
+                    )
+                    for exchange in exchanges
             ):
                 # No correct exchange, i.e., using correct mesh
                 violations.append(
@@ -1200,7 +1197,7 @@ class MappingRule(Rule):
 
 # Helper functions
 def get_m2n_of_participants(
-    m2ns: list[M2NNode], participant_a: ParticipantNode, participant_b: ParticipantNode
+        m2ns: list[M2NNode], participant_a: ParticipantNode, participant_b: ParticipantNode
 ) -> M2NNode | None:
     """
     This function returns the m2n-node connecting two participants if one exists.
@@ -1218,10 +1215,10 @@ def get_m2n_of_participants(
 
 
 def exchange_belongs_to_mapping(
-    exchange: ExchangeNode,
-    direction: Direction,
-    participant_stranger: ParticipantNode,
-    mesh_stranger: MeshNode,
+        exchange: ExchangeNode,
+        direction: e.Direction,
+        participant_stranger: ParticipantNode,
+        mesh_stranger: MeshNode,
 ) -> bool:
     """
     Evaluates whether the given exchange is correct for mapping corresponding to the given (stranger) participant,
@@ -1237,12 +1234,12 @@ def exchange_belongs_to_mapping(
     """
     ex_dir: bool = False
     ex_mesh: bool = False
-    if direction == Direction.READ:
+    if direction == e.Direction.READ:
         # In a read-mapping, Stranger should correspond to the exchange's from-participant
         if participant_stranger == exchange.from_participant:
             ex_dir = True
             # Otherwise, the direction is false
-    elif direction == Direction.WRITE:
+    elif direction == e.Direction.WRITE:
         # In a write-mapping, Stranger should correspond to the exchange's to-participant
         if participant_stranger == exchange.to_participant:
             ex_dir = True
@@ -1271,9 +1268,9 @@ def get_participants_of_mesh(graph: Graph, mesh: MeshNode) -> list[ParticipantNo
 
 
 def get_coupling_schemes_of_mapping(
-    coupling_schemes: list[CouplingSchemeNode | MultiCouplingSchemeNode],
-    participant_a: ParticipantNode,
-    participant_b: ParticipantNode,
+        coupling_schemes: list[CouplingSchemeNode | MultiCouplingSchemeNode],
+        participant_a: ParticipantNode,
+        participant_b: ParticipantNode,
 ) -> list[CouplingSchemeNode | MultiCouplingSchemeNode]:
     """
     This method returns the coupling scheme between the given participants.
@@ -1286,26 +1283,26 @@ def get_coupling_schemes_of_mapping(
     for coupling in coupling_schemes:
         if isinstance(coupling, CouplingSchemeNode):
             if (
-                participant_a == coupling.first_participant
-                and participant_b == coupling.second_participant
+                    participant_a == coupling.first_participant
+                    and participant_b == coupling.second_participant
             ) or (
-                participant_b == coupling.first_participant
-                and participant_a == coupling.second_participant
+                    participant_b == coupling.first_participant
+                    and participant_a == coupling.second_participant
             ):
                 couplings += [coupling]
         elif isinstance(coupling, MultiCouplingSchemeNode):
             if (
-                participant_a in coupling.participants
-                and participant_b in coupling.participants
+                    participant_a in coupling.participants
+                    and participant_b in coupling.participants
             ):
                 couplings += [coupling]
     return couplings
 
 
 def get_exchange_of_participants(
-    participant_a: ParticipantNode,
-    participant_b: ParticipantNode,
-    couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode],
+        participant_a: ParticipantNode,
+        participant_b: ParticipantNode,
+        couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode],
 ) -> list[ExchangeNode]:
     """
     This method returns the exchange nodes between the given participants in the given coupling scheme if any exist.
@@ -1319,11 +1316,11 @@ def get_exchange_of_participants(
         # Both coupling scheme nodes and multi-coupling-scheme-nodes have the same attribute 'exchanges'
         for exchange in coupling.exchanges:
             if (
-                participant_a == exchange.to_participant
-                and participant_b == exchange.from_participant
+                    participant_a == exchange.to_participant
+                    and participant_b == exchange.from_participant
             ) or (
-                participant_b == exchange.to_participant
-                and participant_a == exchange.from_participant
+                    participant_b == exchange.to_participant
+                    and participant_a == exchange.from_participant
             ):
                 exchange_nodes.append(exchange)
     return exchange_nodes
@@ -1343,7 +1340,7 @@ def filter_mapping_nodes(graph: Graph) -> list[MappingNode]:
 
 
 def filter_coupling_nodes(
-    graph: Graph,
+        graph: Graph,
 ) -> list[CouplingSchemeNode | MultiCouplingSchemeNode]:
     """
     This function returns all coupling scheme nodes of the given graph.
@@ -1353,14 +1350,14 @@ def filter_coupling_nodes(
     couplings: list[CouplingSchemeNode | MultiCouplingSchemeNode] = []
     for node in graph.nodes:
         if isinstance(node, CouplingSchemeNode) or isinstance(
-            node, MultiCouplingSchemeNode
+                node, MultiCouplingSchemeNode
         ):
             couplings.append(node)
     return couplings
 
 
 def filter_parallel_coupling_nodes(
-    graph: Graph,
+        graph: Graph,
 ) -> list[CouplingSchemeNode | MultiCouplingSchemeNode]:
     """
     This function returns all parallel coupling scheme nodes of the given graph.
@@ -1371,8 +1368,8 @@ def filter_parallel_coupling_nodes(
     for node in graph.nodes:
         if isinstance(node, CouplingSchemeNode):
             if node.type in [
-                CouplingSchemeType.PARALLEL_EXPLICIT,
-                CouplingSchemeType.PARALLEL_IMPLICIT,
+                e.CouplingSchemeType.PARALLEL_EXPLICIT,
+                e.CouplingSchemeType.PARALLEL_IMPLICIT,
             ]:
                 couplings.append(node)
         elif isinstance(node, MultiCouplingSchemeNode):
@@ -1394,7 +1391,7 @@ def filter_m2n_nodes(graph: Graph) -> list[M2NNode]:
 
 
 def get_write_datas_of_mesh(
-    mesh: MeshNode, parent: ParticipantNode
+        mesh: MeshNode, parent: ParticipantNode
 ) -> list[WriteDataNode | ActionNode]:
     """
     Get all writers of the given mesh, which gets provided by parent.
@@ -1414,7 +1411,7 @@ def get_write_datas_of_mesh(
 
 
 def get_read_datas_of_mesh(
-    mesh: MeshNode, parent: ParticipantNode
+        mesh: MeshNode, parent: ParticipantNode
 ) -> list[ReadDataNode | ExportNode | ActionNode | WatchPointNode | WatchIntegralNode]:
     """
     Get all readers of the given mesh, which gets provided by parent.
@@ -1425,7 +1422,7 @@ def get_read_datas_of_mesh(
     """
     readers: list[
         ReadDataNode | ExportNode | ActionNode | WatchPointNode | WatchIntegralNode
-    ] = []
+        ] = []
     # Export “reads” all meshes
     for export in parent.exports:
         readers.append(export)

@@ -1,11 +1,9 @@
 from precice_config_graph.nodes import (
     ParticipantNode,
     MeshNode,
-    Direction,
-    MappingConstraint,
-    MappingMethod,
     DataNode,
 )
+import precice_config_graph.enums as e
 
 from preciceconfigcheck.rules.mapping import (
     MappingRule as m,
@@ -66,61 +64,61 @@ def test_mapping():
 
     violations_expected = [
         m.MappingDirectionViolation(
-            p_propagator, p_generator, m_propagator, m_generator, Direction.WRITE
+            p_propagator, p_generator, m_propagator, m_generator, e.Direction.WRITE
         ),
         m.IncorrectExchangeMappingViolation(
-            p_propagator, p_generator, m_generator, Direction.WRITE
+            p_propagator, p_generator, m_generator, e.Direction.WRITE
         ),
         m.JustInTimeMappingApiAccessViolation(
-            p_alligator, p_generator, m_generator, Direction.READ
+            p_alligator, p_generator, m_generator, e.Direction.READ
         ),
         m.MissingCouplingSchemeMappingViolation(
-            p_alligator, p_generator, m_generator, Direction.READ
+            p_alligator, p_generator, m_generator, e.Direction.READ
         ),
         m.JustInTimeMappingMethodViolation(
             p_instigator,
             p_alligator,
             m_alligator,
-            Direction.READ,
-            MappingMethod.RADIAL_GEOMETRIC_MULTISCALE,
+            e.Direction.READ,
+            e.MappingMethod.RADIAL_GEOMETRIC_MULTISCALE,
         ),
         m.JustInTimeMappingFormatViolation(
             p_instigator,
             p_alligator,
             m_alligator,
-            Direction.READ,
-            MappingConstraint.SCALED_CONSISTENT_SURFACE,
+            e.Direction.READ,
+            e.MappingConstraint.SCALED_CONSISTENT_SURFACE,
         ),
         m.JustInTimeMappingFormatViolation(
             p_instigator,
             p_alligator,
             m_alligator,
-            Direction.WRITE,
-            MappingConstraint.CONSISTENT,
+            e.Direction.WRITE,
+            e.MappingConstraint.CONSISTENT,
         ),
         m.JustInTimeMappingFormatDirectionViolation(
             p_incinerator,
             p_propagator,
             m_propagator,
-            Direction.READ,
-            MappingConstraint.SCALED_CONSISTENT_VOLUME,
+            e.Direction.READ,
+            e.MappingConstraint.SCALED_CONSISTENT_VOLUME,
         ),
         m.MissingExchangeMappingViolation(
-            p_elevator, p_instigator, m_instigator, Direction.READ
+            p_elevator, p_instigator, m_instigator, e.Direction.READ
         ),
         m.IncorrectExchangeMappingViolation(
-            p_incinerator, p_propagator, m_propagator, Direction.READ
+            p_incinerator, p_propagator, m_propagator, e.Direction.READ
         ),
-        m.SameParticipantMappingViolation(p_incinerator, m_incinerator, Direction.READ),
+        m.SameParticipantMappingViolation(p_incinerator, m_incinerator, e.Direction.READ),
         m.MissingM2NMappingViolation(
-            p_incinerator, p_propagator, m_propagator, Direction.READ
+            p_incinerator, p_propagator, m_propagator, e.Direction.READ
         ),
         m.MappingMissingDataProcessingViolation(
             p_propagator,
             p_generator,
             m_propagator,
             m_generator,
-            Direction.WRITE,
+            e.Direction.WRITE,
             mdp.READ_DATA,
         ),
         mn.MissingM2NExchangeViolation(p_incinerator),

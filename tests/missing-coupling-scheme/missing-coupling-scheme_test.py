@@ -1,5 +1,6 @@
-from precice_config_graph.nodes import DataNode, ParticipantNode, MeshNode, Direction
+from precice_config_graph.nodes import DataNode, ParticipantNode, MeshNode
 
+import precice_config_graph.enums as e
 from preciceconfigcheck.rules.missing_coupling import MissingCouplingSchemeRule as c
 from preciceconfigcheck.rules.mapping import MappingRule as m
 from preciceconfigcheck.rules.data_use_read_write import DataUseReadWriteRule as d
@@ -43,7 +44,7 @@ def test_missing_coupling_scheme():
 
     violations_expected += [
         m.MissingCouplingSchemeMappingViolation(
-            p_propagator, p_generator, m_generator, Direction.READ
+            p_propagator, p_generator, m_generator, e.Direction.READ
         )
     ]
 

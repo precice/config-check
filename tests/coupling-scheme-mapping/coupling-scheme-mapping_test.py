@@ -1,4 +1,5 @@
-from precice_config_graph.nodes import ParticipantNode, MeshNode, DataNode, Direction
+from precice_config_graph.nodes import ParticipantNode, MeshNode, DataNode
+import precice_config_graph.enums as e
 
 from preciceconfigcheck.rules.disjoint_simulations import DisjointSimulationsRule as d
 from preciceconfigcheck.rules.coupling_scheme_mapping import (
@@ -67,7 +68,7 @@ def test_coupling_scheme_mapping():
             ),
         ),
         m.JustInTimeMappingMissingDataProcessingViolation(
-            p_alligator, p_instigator, m_instigator, Direction.WRITE, mdp.READ_DATA
+            p_alligator, p_instigator, m_instigator, e.Direction.WRITE, mdp.READ_DATA
         ),
         r.UnusedReceiveMesh(p_generator, m_propagator),
         r.UnusedReceiveMesh(p_propagator, m_generator),
