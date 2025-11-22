@@ -85,11 +85,11 @@ class M2NExchangeRule(Rule):
                     k2l_connector: ParticipantNode = k2l.connector
                     # Duplicates with same connector and same acceptor participants
                     if (
-                        m2n_acceptor == k2l_acceptor
-                        and m2n_connector == k2l_connector
-                        and not self.contains_violation(
-                            violations, m2n_acceptor, m2n_connector
-                        )
+                            m2n_acceptor == k2l_acceptor
+                            and m2n_connector == k2l_connector
+                            and not self.contains_violation(
+                        violations, m2n_acceptor, m2n_connector
+                    )
                     ):
                         violations.append(
                             self.DuplicateM2NExchangeViolation(
@@ -99,11 +99,11 @@ class M2NExchangeRule(Rule):
                     # Check for duplicates "in the other direction":
                     # This can be removed if acceptor / connector roles do matter in the future.
                     elif (
-                        m2n_acceptor == k2l_connector
-                        and m2n_connector == k2l_acceptor
-                        and not self.contains_violation(
-                            violations, m2n_acceptor, m2n_connector
-                        )
+                            m2n_acceptor == k2l_connector
+                            and m2n_connector == k2l_acceptor
+                            and not self.contains_violation(
+                        violations, m2n_acceptor, m2n_connector
+                    )
                     ):
                         violations.append(
                             self.DuplicateM2NExchangeViolation(
@@ -115,10 +115,10 @@ class M2NExchangeRule(Rule):
 
     # Helper functions
     def contains_violation(
-        self,
-        violations: list[Violation],
-        participant1: ParticipantNode,
-        participant2: ParticipantNode,
+            self,
+            violations: list[Violation],
+            participant1: ParticipantNode,
+            participant2: ParticipantNode,
     ) -> bool:
         """
         This function tests whether there already exists a DuplicateM2NExchangeViolation between two participants.
@@ -131,13 +131,13 @@ class M2NExchangeRule(Rule):
             if isinstance(violation, self.DuplicateM2NExchangeViolation):
                 # Check if any DuplicateM2NExchangeViolation contains these two participants
                 if (
-                    violation.participant1 == participant1
-                    and violation.participant2 == participant2
+                        violation.participant1 == participant1
+                        and violation.participant2 == participant2
                 ):
                     return True
                 elif (
-                    violation.participant1 == participant2
-                    and violation.participant2 == participant1
+                        violation.participant1 == participant2
+                        and violation.participant2 == participant1
                 ):
                     return True
         return False
