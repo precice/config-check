@@ -6,7 +6,7 @@ A library that checks a preCICE configuration file for logical errors.
 configuration for logical errors.
 
 > [!NOTE]
-> This checker assumes that `precice-tools check` has already been executed without an error on the configuration file.<br>
+> This checker assumes that `precice-tools check` (before preCICE version 3.3.0) or `precice-config-validate` (after preCICE version 3.3.0) has already been executed without an error on the configuration file.<br>
 > Otherwise, the behavior of this checker is undefined.
 
 ## Requirements
