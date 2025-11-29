@@ -37,6 +37,8 @@ def runCheck(path: pathlib.Path, debug: bool):
     print_all_results(violations_by_rule, debug)
 
     if all(map(lambda vals: len(vals) == 0, violations_by_rule.values())):
+        out_str:str = c.dyeing("No issues found!", c.green)
+        print(out_str)
         return 0
     else:
         return 2
