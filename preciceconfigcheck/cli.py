@@ -5,7 +5,7 @@ import pathlib
 from preciceconfigcheck.severity import Severity
 import preciceconfigcheck.color as c
 
-from precice_config_graph.graph import builder as g
+from precice_config_graph.graph import builder
 from precice_config_graph import xml_processing
 
 from preciceconfigcheck.rules_processing import check_all_rules, print_all_results
@@ -28,7 +28,7 @@ def runCheck(path: pathlib.Path, debug: bool):
     # TODO: Participant.check(...)
     # Step 2: Detect more issues through the use of a graph
     root = xml_processing.parse_file(path)
-    graph = g.get_graph(root)
+    graph = builder.get_graph(root)
 
     # Individual checks need the graph
     violations_by_rule = check_all_rules(graph, debug)
