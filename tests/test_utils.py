@@ -2,7 +2,8 @@ import contextlib
 import io
 
 from networkx import Graph
-from precice_config_graph import xml_processing, graph as g
+from precice_config_graph import xml_processing
+from precice_config_graph.graph import builder
 
 from preciceconfigcheck.rules_processing import rules, check_all_rules
 from preciceconfigcheck.violation import Violation
@@ -83,7 +84,7 @@ def create_graph(path: str) -> Graph:
     :return: The graph created.
     """
     xml = xml_processing.parse_file(path)
-    graph = g.get_graph(xml)
+    graph = builder.get_graph(xml)
     return graph
 
 
